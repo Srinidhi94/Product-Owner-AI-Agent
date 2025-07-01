@@ -1,0 +1,279 @@
+{
+  "name": "ai-product-owner-agent",
+  "displayName": "AI Product Owner Agent",
+  "description": "Analyze Jira epics and Go codebases to generate visual technical documentation",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization",
+    "Documentation"
+  ],
+  "publisher": "your-company-internal",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-company/ai-product-owner-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-company/ai-product-owner-extension/issues"
+  },
+  "activationEvents": [
+    "onCommand:aiProductOwner.analyzeEpic",
+    "onCommand:aiProductOwner.configureSettings",
+    "onCommand:aiProductOwner.refreshDocumentation",
+    "onWorkspaceContains:**/*.go"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiProductOwner.analyzeEpic",
+        "title": "Analyze Epic",
+        "category": "AI Product Owner",
+        "icon": "$(graph)",
+        "enablement": "aiProductOwner.configured"
+      },
+      {
+        "command": "aiProductOwner.configureSettings",
+        "title": "Configure Settings",
+        "category": "AI Product Owner",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "aiProductOwner.refreshDocumentation",
+        "title": "Refresh Documentation",
+        "category": "AI Product Owner",
+        "icon": "$(refresh)",
+        "enablement": "aiProductOwner.hasResults"
+      },
+      {
+        "command": "aiProductOwner.openResult",
+        "title": "Open Analysis Result",
+        "category": "AI Product Owner",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "aiProductOwner.copyPrompt",
+        "title": "Copy Prompt to Clipboard",
+        "category": "AI Product Owner",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "aiProductOwner.openWalkthrough",
+        "title": "Show Welcome Walkthrough",
+        "category": "AI Product Owner",
+        "icon": "$(lightbulb)"
+      },
+      {
+        "command": "aiProductOwner.testConnection",
+        "title": "Test Jira Connection",
+        "category": "AI Product Owner",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "aiProductOwner.testJiraData",
+        "title": "Test Jira Data Fetch",
+        "category": "AI Product Owner",
+        "icon": "$(database)"
+      },
+      {
+        "command": "aiProductOwner.nextStage",
+        "title": "Next Stage (Manual)",
+        "category": "AI Product Owner",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "aiProductOwner.proceedToNextStage",
+        "title": "Proceed to Next Stage",
+        "category": "AI Product Owner",
+        "icon": "$(play)"
+      }
+    ],
+    "configuration": {
+      "title": "AI Product Owner",
+      "properties": {
+        "aiProductOwner.jira.baseUrl": {
+          "type": "string",
+          "description": "Jira base URL (e.g., company.atlassian.net)",
+          "scope": "application",
+          "order": 1
+        },
+        "aiProductOwner.jira.email": {
+          "type": "string",
+          "description": "Your Jira email address",
+          "scope": "application",
+          "order": 2
+        },
+        "aiProductOwner.jira.token": {
+          "type": "string",
+          "description": "Jira API token (stored securely in VS Code secrets)",
+          "scope": "application",
+          "order": 3
+        },
+        "aiProductOwner.output.generateDiagrams": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate Mermaid diagrams in analysis output",
+          "scope": "workspace",
+          "order": 4
+        },
+        "aiProductOwner.analysis.maxSolutions": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 3,
+          "description": "Maximum solution alternatives to generate (1-3)",
+          "scope": "workspace",
+          "order": 5
+        },
+        "aiProductOwner.output.directory": {
+          "type": "string",
+          "default": "./docs/analysis",
+          "description": "Output directory for generated documentation",
+          "scope": "workspace",
+          "order": 6
+        },
+        "aiProductOwner.codebase.includeTests": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include test files in codebase analysis",
+          "scope": "workspace",
+          "order": 7
+        },
+        "aiProductOwner.network.retryAttempts": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of retry attempts for network requests",
+          "scope": "application",
+          "order": 8
+        },
+        "aiProductOwner.network.timeoutSeconds": {
+          "type": "number",
+          "default": 30,
+          "minimum": 10,
+          "maximum": 120,
+          "description": "Request timeout in seconds",
+          "scope": "application",
+          "order": 9
+        },
+        "aiProductOwner.ui.showDetailedProgress": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show detailed progress notifications",
+          "scope": "application",
+          "order": 10
+        },
+        "aiProductOwner.debug.enableVerboseLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable verbose logging for troubleshooting",
+          "scope": "application",
+          "order": 11
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiProductOwner",
+          "title": "AI Product Owner",
+          "icon": "$(robot)"
+        }
+      ]
+    },
+    "views": {
+      "aiProductOwner": [
+        {
+          "id": "analysisResults",
+          "name": "Analysis Results",
+          "when": "aiProductOwner.hasResults"
+        },
+        {
+          "id": "currentAnalysis",
+          "name": "Current Analysis",
+          "when": "aiProductOwner.analyzing"
+        },
+        {
+          "id": "quickActions",
+          "name": "Quick Actions",
+          "when": "aiProductOwner.configured"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "aiProductOwner.analyzeEpic",
+          "when": "aiProductOwner.configured"
+        },
+        {
+          "command": "aiProductOwner.refreshDocumentation",
+          "when": "aiProductOwner.hasResults"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "aiProductOwner.analyzeEpic",
+          "when": "view == analysisResults",
+          "group": "navigation"
+        },
+        {
+          "command": "aiProductOwner.refreshDocumentation",
+          "when": "view == analysisResults",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "aiProductOwner.analyzeEpic",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "aiProductOwner.configured"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/integration.test.js",
+    "package-extension": "./scripts/package.sh",
+    "vsce-package": "vsce package --no-dependencies",
+    "vsce-publish": "vsce publish --no-dependencies",
+    "clean": "rm -rf out && rm -rf *.vsix && rm -rf node_modules/.cache",
+    "release": "npm run clean && npm run compile && npm run test && npm run vsce-package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^16.18.126",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.8.2",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "mermaid": "^10.6.0",
+    "yaml": "^2.3.4"
+  }
+}

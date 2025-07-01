@@ -487,15 +487,17 @@ class GoCodeAnalyzer:
         print(f"🔍 Analyzing Go project at: {self.project_path.absolute()}")
     
     def analyze_codebase(self) -> Dict:
-        """Analyze Go codebase and return insights"""
-        print("📂 Scanning Go files...")
+        """Analyze Go codebase structure and extract key information"""
+        print(f"🔍 Analyzing Go project at: {self.project_path.absolute()}")
         
+        # Check if project path exists
         if not self.project_path.exists():
-            print(f"⚠️  Project path doesn't exist: {self.project_path}")
+            print("📂 Scanning Go files...")
             return self._demo_codebase_analysis()
         
-        go_files = list(self.project_path.rglob("*.go"))
         
+        go_files = list(self.project_path.rglob("*.go"))
+
         if not go_files:
             print("⚠️  No Go files found, using demo analysis")
             return self._demo_codebase_analysis()

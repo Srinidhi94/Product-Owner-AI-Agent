@@ -1,0 +1,63 @@
+# VS Code Extension Package Exclusions
+
+# Source files
+src/**
+.vscode/**
+
+# Build and Development
+webpack.config.js
+tsconfig.json
+.eslintrc.json
+*.map
+
+# Package management
+node_modules/**
+package-lock.json
+.npmrc
+
+# Documentation and Development
+README.md
+CHANGELOG.md
+docs/**
+INSTALLATION.md
+BUILD_SUMMARY.md
+PACKAGING_SUMMARY.md
+DISTRIBUTION.md
+
+# Scripts and Configuration
+scripts/**
+.github/**
+
+# Git and Version Control
+.git/**
+.gitignore
+
+# Testing
+**/*.test.ts
+**/*.test.js
+test/**
+
+# Temporary and Cache
+*.tmp
+*.temp
+.cache/**
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Python files (from previous POC)
+*.py
+requirements.txt
+simple_poc.py
+__pycache__/**
+
+# Development artifacts
+.last-package-name
+ai-product-owner-agent-v*/
+*.vsix
+
+# Only include compiled output and essential files
+!out/**
+!package.json 
