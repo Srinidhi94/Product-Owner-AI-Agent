@@ -12,19 +12,19 @@
 
 ## 🚀 Getting Started
 
-The AI Product Owner Agent helps you analyze Jira epics and Go codebases to generate comprehensive technical documentation using GitHub Copilot. This extension transforms business requirements into actionable technical designs with visual diagrams and implementation plans.
+The AI Product Owner Agent helps you analyze Jira epics and Go codebases to generate comprehensive technical documentation using GitHub Copilot or any LLM. This extension transforms business requirements into actionable technical designs with visual diagrams and implementation plans.
 
 ### What You'll Need
 - ✅ VS Code (version 1.74.0 or higher)
 - ✅ Jira instance with API access
 - ✅ Jira API token
 - ✅ Go workspace (optional but recommended)
-- ✅ GitHub Copilot extension (for prompt execution)
+- ✅ GitHub Copilot extension (or any LLM)
 
 ### Key Features
 - 🔍 **Epic Analysis**: Fetch and analyze Jira epics with stories
 - 🏗️ **Codebase Integration**: Analyze Go project structure and patterns
-- 🤖 **AI-Powered Prompts**: Generate specialized prompts for Copilot
+- 🤖 **AI-Powered Prompts**: Generate specialized prompts for Copilot/LLMs
 - 📊 **Visual Documentation**: Create Mermaid diagrams and technical specs
 - 🔄 **Multi-Stage Analysis**: 5-stage comprehensive analysis workflow
 
@@ -99,6 +99,17 @@ You should see: ✅ "Jira connection successful!"
 
 ## 🎯 Using the Extension
 
+### Visual Workflow Overview
+```mermaid
+graph TD
+    A[User Triggers Analysis] --> B[Extension Generates Prompts]
+    B --> C[User Copies Prompt to Copilot/LLM]
+    C --> D[LLM Generates Response]
+    D --> E[User Pastes Response into Output File]
+    E --> F[Extension Updates Documentation]
+    F --> G[Ready for Review/Implementation]
+```
+
 ### Basic Workflow
 
 #### 1. Open Your Go Project
@@ -108,76 +119,32 @@ code /path/to/your/go/project
 ```
 
 #### 2. Start Epic Analysis
-**Method 1: Command Palette**
-- Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
-- Type "AI Product Owner: Analyze Epic"
-- Press Enter
-
-**Method 2: Keyboard Shortcut**
-- Press `Ctrl+Shift+A` (Windows/Linux) or `Cmd+Shift+A` (Mac)
-
-**Method 3: Activity Bar**
-- Click the robot icon in the activity bar
-- Click "Analyze Epic"
+- **Command Palette**: `Ctrl+Shift+P` → "AI Product Owner: Analyze Epic"
+- **Keyboard Shortcut**: `Ctrl+Shift+A` (Windows/Linux) or `Cmd+Shift+A` (Mac)
+- **Activity Bar**: Click the robot icon → "Analyze Epic"
 
 #### 3. Enter Epic Key
-When prompted, enter your Jira epic key:
-```
-Enter Jira Epic Key: PROJ-123
-```
-
-**Valid formats:**
-- `PROJ-123` ✅
-- `BACKEND-456` ✅  
-- `USER-STORY-789` ✅
-- `proj123` ❌ (must include dash)
+When prompted, enter your Jira epic key (e.g., `PROJ-123`).
 
 #### 4. Watch the Analysis Progress
-The extension will show detailed progress:
-
-```
-⏳ Analyzing Epic PROJ-123
-├── Initialize Jira client (10%)
-├── Test connection (25%)
-├── Fetch epic data (50%)
-├── Analyze codebase (75%)
-└── Generate prompts (100%)
-```
+The extension will show detailed progress as it fetches Jira data, analyzes the codebase, and generates prompts.
 
 #### 5. Execute Multi-Stage Analysis
 The extension guides you through 5 analysis stages:
+1. **🎯 Business Analysis**
+2. **🏗️ Technical Architecture**
+3. **⚙️ Implementation Design**
+4. **📋 Development Plan**
+5. **⚠️ Risk Assessment**
 
-1. **🎯 Business Analysis** (5-10 minutes)
-2. **🏗️ Technical Architecture** (10-15 minutes)
-3. **⚙️ Implementation Design** (10-15 minutes)
-4. **📋 Development Plan** (5-10 minutes)
-5. **⚠️ Risk Assessment** (5-10 minutes)
-
-### Interactive Workflow
-
-For each stage, you'll see:
-
-```
-🎯 Business Analysis Stage
-
-📋 Copy the prompt below and paste it into GitHub Copilot Chat:
-
-[Generated Prompt Content]
-
-Actions:
-[Open Copilot Chat] [Copy Prompt] [Stage Complete]
-```
-
-**Steps for each stage:**
-1. Click "Copy Prompt" to copy the generated prompt
-2. Click "Open Copilot Chat" (or open manually)
-3. Paste the prompt in Copilot Chat
-4. Wait for Copilot's complete response
-5. Copy Copilot's response to the output file
-6. Click "Stage Complete" to continue
+For each stage:
+- Click "Copy Prompt" to copy the generated prompt
+- Paste the prompt into Copilot Chat (or your LLM of choice)
+- Wait for the LLM's complete response
+- Copy the response and paste it into the designated section of the output file
+- Click "Stage Complete" to continue
 
 ### Output Structure
-
 After analysis, you'll find generated files in:
 ```
 your-project/
@@ -193,15 +160,10 @@ your-project/
 ## 📝 Workflow Examples
 
 ### Example 1: User Authentication Epic
-
 **Epic**: `AUTH-101 - Implement OAuth 2.0 Authentication`
-
-**Input Data:**
-```
-Stories: 5 stories, 34 story points
-Codebase: 45 Go files, JWT patterns detected
-Components: auth-service, user-management
-```
+- Stories: 5 stories, 34 story points
+- Codebase: 45 Go files, JWT patterns detected
+- Components: auth-service, user-management
 
 **Generated Output:**
 - Business requirements analysis with stakeholder mapping
@@ -211,15 +173,10 @@ Components: auth-service, user-management
 - Risk assessment with security considerations
 
 ### Example 2: Microservice Migration
-
 **Epic**: `BACKEND-205 - Migrate Monolith to Microservices`
-
-**Input Data:**
-```
-Stories: 12 stories, 89 story points
-Codebase: 200+ Go files, Database patterns
-Components: user-service, order-service, payment-service
-```
+- Stories: 12 stories, 89 story points
+- Codebase: 200+ Go files, Database patterns
+- Components: user-service, order-service, payment-service
 
 **Generated Output:**
 - Service boundary analysis
@@ -228,230 +185,69 @@ Components: user-service, order-service, payment-service
 - Deployment and monitoring strategy
 - Risk mitigation for data consistency
 
-## 🔧 Troubleshooting
+## 🛠️ Troubleshooting
 
-### Common Issues
-
-#### ❌ "Jira authentication failed"
-
-**Symptoms:**
-```
-🔐 Jira authentication failed during Epic Analysis.
-This usually means your API token is invalid or expired.
-```
-
-**Solutions:**
-1. **Check Token Validity**
-   - Go to [Atlassian API Tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
-   - Verify your token hasn't expired
-   - Generate a new token if needed
-
-2. **Verify Email Address**
-   - Ensure you're using the exact email associated with your Jira account
-   - Check for typos in the email configuration
-
-3. **Test Manually**
-   ```bash
-   curl -u your-email@company.com:your-token \
-     https://your-company.atlassian.net/rest/api/3/myself
-   ```
-
-#### ❌ "Epic not found"
-
-**Symptoms:**
-```
-🔍 Epic "PROJ-123" not found during Epic Analysis.
-```
-
-**Solutions:**
-1. **Check Epic Key Format**
-   - Must be uppercase: `PROJ-123` not `proj-123`
-   - Must include dash: `PROJ-123` not `PROJ123`
-   - Must exist in Jira
-
-2. **Verify Permissions**
-   - Ensure you can view the epic in Jira web interface
-   - Check project access permissions
-   - Verify the epic is in the correct project
-
-3. **Try Project Analysis**
-   - If epic access fails, try the project key instead
-   - Example: `PROJ` instead of `PROJ-123`
-
-#### ❌ "No Go files found"
-
-**Symptoms:**
-```
-📁 No Go files found in the current workspace.
-```
-
-**Solutions:**
-1. **Check Workspace**
-   - Ensure you've opened a folder containing Go files
-   - Look for `.go` files in subdirectories
-   - Verify VS Code workspace is correctly set
-
-2. **Continue Without Codebase**
-   - Click "Continue Anyway" to analyze epic only
-   - Analysis will focus on Jira data without code context
-
-#### ❌ "GitHub Copilot integration issue"
-
-**Symptoms:**
-```
-🤖 GitHub Copilot integration issue during Epic Analysis.
-```
-
-**Solutions:**
-1. **Install Copilot Extension**
-   - Go to Extensions marketplace
-   - Search for "GitHub Copilot"
-   - Install and activate the extension
-
-2. **Manual Workflow**
-   - Use the "Manual Copy/Paste" option
-   - Copy prompts manually to Copilot Chat
-   - Follow the guided workflow
-
-#### ⚠️ "Rate limit exceeded"
-
-**Symptoms:**
-```
-⏳ Jira API rate limit exceeded during Epic Analysis.
-Please wait 60 seconds before retrying.
-```
-
-**Solutions:**
-1. **Wait and Retry**
-   - Click "Wait and Retry" to automatically retry
-   - Extension shows countdown timer
-
-2. **Adjust Settings**
-   ```json
-   {
-     "aiProductOwner.network.retryAttempts": 5,
-     "aiProductOwner.network.timeoutSeconds": 60
-   }
-   ```
+### Common Issues & Solutions
+- **Jira authentication failed:** Check API token and email.
+- **Epic not found:** Verify epic key and permissions.
+- **No Go files found:** Check project path and structure.
+- **Copilot integration issue:** Ensure Copilot extension is installed and active.
+- **Rate limit exceeded:** Wait and retry, or adjust network settings.
 
 ### Debug Mode
-
 Enable verbose logging for detailed troubleshooting:
-
 ```json
 {
   "aiProductOwner.debug.enableVerboseLogging": true
 }
 ```
-
-Then check the output panel: View → Output → "AI Product Owner - Error Handler"
+Check the output panel: View → Output → "AI Product Owner - Error Handler"
 
 ### Getting Help
-
-1. **Check Output Panel**
-   - View → Output → "AI Product Owner"
-   - Look for detailed error messages
-
-2. **Test Individual Components**
-   - Use "Test Jira Connection" command
-   - Verify codebase analysis separately
-
-3. **Reset Configuration**
-   - Clear all settings and reconfigure
-   - Use "AI Product Owner: Configure Settings"
+- Check Output Panel: View → Output → "AI Product Owner"
+- Test individual components: Use "Test Jira Connection" command
+- Reset configuration: Use "AI Product Owner: Configure Settings"
 
 ## 💡 Best Practices
-
-### Epic Selection
-- **Choose Well-Defined Epics**: Select epics with clear stories and acceptance criteria
-- **Moderate Scope**: 5-15 stories work best (50-150 story points)
-- **Technical Epics**: Focus on implementation-heavy epics rather than pure research
-
-### Codebase Preparation
-- **Clean Project Structure**: Organize Go files in logical packages
-- **Up-to-Date Dependencies**: Ensure `go.mod` reflects current dependencies
-- **Document Patterns**: Use consistent naming and architecture patterns
-
-### Prompt Optimization
-- **Review Before Execution**: Read generated prompts before pasting to Copilot
-- **Add Context**: Include additional context in Copilot conversations
-- **Iterate on Output**: Ask Copilot for clarifications or improvements
-
-### Output Management
-- **Version Control**: Commit generated documentation to Git
-- **Regular Updates**: Re-run analysis when epics change significantly
-- **Team Sharing**: Share analysis results with development team
-
-### Quality Assurance
-- **Validate Diagrams**: Ensure all Mermaid diagrams render correctly
-- **Review Technical Decisions**: Have senior developers review architectural choices
-- **Test Implementation Plans**: Validate development timelines with team
+- **Epic Selection:** Choose well-defined epics with clear stories and acceptance criteria
+- **Codebase Preparation:** Organize Go files in logical packages; ensure `go.mod` is up to date
+- **Prompt Optimization:** Review generated prompts before using; add context as needed
+- **Output Management:** Commit generated documentation to Git; re-run analysis when epics change
+- **Quality Assurance:** Validate diagrams, review technical decisions, and test implementation plans
 
 ## ❓ FAQ
 
-### General Questions
+### General
+- **Q: Do I need GitHub Copilot to use this extension?**
+  - A: No, you can use any LLM (Claude, ChatGPT, etc.) with the generated prompts.
+- **Q: Can I use this with other programming languages?**
+  - A: Currently optimized for Go, but extensible to other languages.
+- **Q: Where are my API tokens stored?**
+  - A: Tokens are stored securely in VS Code's built-in secrets storage.
+- **Q: Can I customize the prompt templates?**
+  - A: Yes, prompt templates are extensible and can be tailored to your workflow.
 
-**Q: What types of projects work best with this extension?**
-A: Go microservices, REST APIs, and backend systems. Works best with well-structured codebases and clear Jira epic definitions.
+### Usage
+- **Q: How long does a typical analysis take?**
+  - A: 30-60 minutes total, depending on epic complexity and LLM interaction.
+- **Q: Can I pause and resume analysis?**
+  - A: Yes, the extension supports pausing between stages.
+- **Q: What if my epic changes during analysis?**
+  - A: Re-run the analysis to get updated prompts and documentation.
 
-**Q: Do I need GitHub Copilot to use this extension?**
-A: While Copilot integration is recommended, you can use the generated prompts with any AI assistant manually.
-
-**Q: Can I use this with other programming languages?**
-A: Currently optimized for Go, but the Jira analysis and prompt generation work with any project type.
-
-### Configuration Questions
-
-**Q: Where are my API tokens stored?**
-A: Tokens are stored securely in VS Code's built-in secrets storage, not in plain text configuration files.
-
-**Q: Can I use this with Jira Server (on-premise)?**
-A: Yes, just set the `baseUrl` to your on-premise Jira server URL.
-
-**Q: How do I share configuration with my team?**
-A: Share workspace settings (output directories, analysis preferences) but keep credentials personal.
-
-### Usage Questions
-
-**Q: How long does a typical analysis take?**
-A: 30-60 minutes total (5-15 minutes per stage), depending on epic complexity and your interaction with Copilot.
-
-**Q: Can I pause and resume analysis?**
-A: Yes, the extension supports pausing between stages. Your progress is automatically saved.
-
-**Q: What if my epic changes during analysis?**
-A: Re-run the analysis to get updated prompts with current epic data.
-
-### Troubleshooting Questions
-
-**Q: Why do I get permission errors?**
-A: Ensure your Jira account has "Browse Projects" permission and access to the specific epic's project.
-
-**Q: What if the extension crashes?**
-A: Check the Output panel for error details, restart VS Code, and try again. Enable debug logging for more information.
-
-**Q: Can I customize the prompt templates?**
-A: Currently, templates are built-in, but you can modify the generated prompts before using them with Copilot.
-
-### Advanced Questions
-
-**Q: How do I integrate this with CI/CD?**
-A: Generate documentation as part of your development workflow and commit the output to version control.
-
-**Q: Can I automate epic analysis?**
-A: The extension is designed for interactive use, but you could build automation around the underlying analysis components.
-
-**Q: How do I contribute improvements?**
-A: See the Developer Guide for contribution guidelines and development setup instructions.
-
----
+### Advanced
+- **Q: How do I integrate this with CI/CD?**
+  - A: Generate documentation as part of your workflow and commit the output to version control.
+- **Q: Can I automate epic analysis?**
+  - A: The extension is designed for interactive use, but automation is on the roadmap.
+- **Q: How do I contribute improvements?**
+  - A: See the Developer Guide for contribution guidelines.
 
 ## 🎯 Next Steps
-
-1. **Complete Setup**: Ensure Jira connection is working
-2. **Try First Epic**: Start with a small, well-defined epic
-3. **Explore Features**: Test different types of epics and codebases
-4. **Share Results**: Show generated documentation to your team
-5. **Provide Feedback**: Help improve the extension with your experience
+1. **Complete Setup:** Ensure Jira connection is working
+2. **Try First Epic:** Start with a small, well-defined epic
+3. **Explore Features:** Test different types of epics and codebases
+4. **Share Results:** Show generated documentation to your team
+5. **Provide Feedback:** Help improve the extension with your experience
 
 For technical details and customization options, see the [Developer Guide](DEVELOPER_GUIDE.md). 
