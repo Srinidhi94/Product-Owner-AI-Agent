@@ -42,6 +42,13 @@ export class DocumentGenerator {
     this.log(`📁 Output directory: ${this.baseOutputDir}`);
   }
 
+  private log(message: string): void {
+    if (this.outputChannel) {
+      this.outputChannel.appendLine(message);
+    }
+    console.log(message);
+  }
+
   /**
    * Initialize output folder structure for an epic
    */
@@ -95,6 +102,7 @@ export class DocumentGenerator {
     codebaseData: any
   ): Promise<string> {
     const analysisPath = path.join(this.getOutputDirectory(epicKey), 'TECHNICAL_ANALYSIS.md');
+    const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
     
     const masterContent = `# Technical Analysis - ${epicKey}
 
@@ -115,6 +123,8 @@ This document contains the comprehensive technical analysis following the Princi
 4. **🏗️ Infrastructure & NFR** - Operations and performance
 5. **📝 Task Breakdown** - Jira-ready implementation tasks
 
+**Note**: All generated prompts are stored in [PROMPTS.md](./PROMPTS.md) for reference and reuse.
+
 ---
 
 ## 📋 1. Requirements Analysis
@@ -125,79 +135,428 @@ This document contains the comprehensive technical analysis following the Princi
 - **Story Points**: ${jiraData.totalStoryPoints}
 - **Description**: ${jiraData.description || 'See Jira for details'}
 
-### Generated Prompt
-*[Automated prompt for Requirements Analysis will be documented here]*
+### 🤖 Copilot Response
 
-### Copilot Response
-*[Paste Copilot's response here after running the Requirements Analysis prompt]*
+> **📋 Instructions**: 
+> 1. Copy the Requirements Analysis prompt from [PROMPTS.md](./PROMPTS.md) (Stage 1)
+> 2. Paste it in GitHub Copilot Chat
+> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
+> 4. Replace this entire section below with Copilot's response
+
+### 🤖 Copilot Response Section:
 
 ---
 
 ## 🎯 2. Design Overview
 
-### Generated Prompt
-*[Automated prompt for Design Overview will be documented here]*
+### 🤖 Copilot Response
 
-### Copilot Response
-*[Paste Copilot's response here after running the Design Overview prompt]*
+> **📋 Instructions**: 
+> 1. Copy the Design Overview prompt from [PROMPTS.md](./PROMPTS.md) (Stage 2)
+> 2. Paste it in GitHub Copilot Chat
+> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
+> 4. Replace this entire section below with Copilot's response
+
+### 🤖 Copilot Response Section:
 
 ---
 
 ## 🔧 3. Detailed Technical Design
 
-### Generated Prompt
-*[Automated prompt for Technical Design will be documented here]*
+### 🤖 Copilot Response
 
-### Copilot Response
-*[Paste Copilot's response here after running the Technical Design prompt]*
+> **📋 Instructions**: 
+> 1. Copy the Technical Design prompt from [PROMPTS.md](./PROMPTS.md) (Stage 3)
+> 2. Paste it in GitHub Copilot Chat
+> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
+> 4. Replace this entire section below with Copilot's response
+
+### 🤖 Copilot Response Section:
 
 ---
 
-## 🏗️ 4. Infrastructure & Non-Functional Requirements
+## 🏗️4. Infrastructure & Non-Functional Requirements
 
-### Generated Prompt
-*[Automated prompt for Infrastructure & NFR will be documented here]*
+### 🤖 Copilot Response
 
-### Copilot Response
-*[Paste Copilot's response here after running the Infrastructure & NFR prompt]*
+> **📋 Instructions**: 
+> 1. Copy the Infrastructure & NFR prompt from [PROMPTS.md](./PROMPTS.md) (Stage 4)
+> 2. Paste it in GitHub Copilot Chat
+> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
+> 4. Replace this entire section below with Copilot's response
+
+### 🤖 Copilot Response Section:
 
 ---
 
 ## 📝 5. Task Breakdown
 
-### Generated Prompt
-*[Automated prompt for Task Breakdown will be documented here]*
+### 🤖 Copilot Response
 
-### Copilot Response
-*[Paste Copilot's response here after running the Task Breakdown prompt]*
+> **📋 Instructions**: 
+> 1. Copy the Task Breakdown prompt from [PROMPTS.md](./PROMPTS.md) (Stage 5)
+> 2. Paste it in GitHub Copilot Chat
+> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
+> 4. Replace this entire section below with Copilot's response
+
+### 🤖 Copilot Response Section:
 
 ---
 
-## ✅ Completion Checklist
+## ✅ Completion Checklist:
+- [x] **Stage 1**: Requirements Analysis response pasted ✅
+- [x] **Stage 2**: Design Overview response pasted ✅  
+- [x] **Stage 3**: Technical Design response pasted ✅
+- [x] **Stage 4**: Infrastructure & NFR response pasted ✅
+- [x] **Stage 5**: Task Breakdown response pasted ✅
 
-- [ ] Requirements Analysis completed
-- [ ] Design Overview completed
-- [ ] Technical Design completed
-- [ ] Infrastructure & NFR completed
-- [ ] Task Breakdown completed
-- [ ] All Mermaid diagrams verified
-- [ ] Implementation ready for development
+**Progress**: 5/5 stages complete ✅
+
+### 📊 Quality Verification
+- [ ] All required Mermaid diagrams present
+- [ ] Codebase-specific technical details included
+- [ ] Principal Engineer level analysis depth
+- [ ] Implementation-ready specifications
+
+### 🎯 Final Validation
+- [ ] All prompt responses completed
+- [ ] Technical approach clearly defined
+- [ ] Ready for development implementation
 
 ---
 
 ## 📊 Analysis Summary
 
-**Total Estimated Duration**: 40 minutes across 5 automated stages
+**Analysis Stages**: 5 comprehensive technical analysis stages
 **Quality Standard**: Principal Engineer level technical analysis
 **Output**: Implementation-ready technical specification with Jira tasks
 
 *This analysis was generated by AI Product Owner Agent - Automated Technical Analysis*
 `;
 
+    // Create the main analysis document
     fs.writeFileSync(analysisPath, masterContent, 'utf-8');
     this.log(`📝 Created master analysis document: TECHNICAL_ANALYSIS.md`);
 
+    // Create the separate prompts document
+    await this.createPromptsDocument(epicKey, jiraData, codebaseData);
+
     return analysisPath;
+  }
+
+  /**
+   * Create separate prompts document for reference and reuse
+   */
+  async createPromptsDocument(
+    epicKey: string,
+    jiraData: any,
+    codebaseData: any
+  ): Promise<string> {
+    const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
+    
+    const promptsContent = `# 📋 Generated Prompts - ${epicKey}
+
+**Generated**: ${new Date().toLocaleString()}  
+**Epic**: ${jiraData.key} - ${jiraData.name}  
+**Purpose**: Optimized AI prompts for technical analysis
+
+---
+
+## 🎯 Quick Navigation
+
+| Stage | Role | Status |
+|-------|------|--------|
+| [📋 Stage 1](#stage-1-requirements-analysis) | Principal Engineer | ⏳ Pending |
+| [🎯 Stage 2](#stage-2-design-overview) | Principal Engineer | ⏳ Pending |
+| [⚡ Stage 3](#stage-3-detailed-technical-design) | Principal Engineer | ⏳ Pending |
+| [🏗️ Stage 4](#stage-4-infrastructure--nfr) | Principal Engineer | ⏳ Pending |
+| [📝 Stage 5](#stage-5-task-breakdown) | Product Owner | ⏳ Pending |
+
+---
+
+## 🛠️ How to Use These Prompts
+
+1. **📋 Copy** - Click to copy any prompt from the sections below
+2. **🤖 Paste** - Open GitHub Copilot Chat and paste the prompt
+3. **⏱️ Wait** - Let Copilot analyze and generate response
+4. **💾 Save** - Copy Copilot's response back to [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+5. **➡️ Next** - Move to the next stage
+
+---
+
+# Stage 1: Requirements Analysis
+
+**Role**: Principal Engineer | **Status**: ⏳ Pending
+
+**Required Diagrams**: Requirements Overview, Dependencies Map
+
+## 📝 Prompt for Copilot
+
+[Prompt will be automatically populated when stage executes]
+
+## 📋 Instructions After Copilot Response
+
+1. Copy Copilot's complete response 
+2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+3. Find **"## 📋 1. Requirements Analysis"** section
+4. Replace the placeholder text with Copilot's response
+5. Verify all required Mermaid diagrams are included
+
+---
+
+# Stage 2: Design Overview
+
+**Role**: Principal Engineer | **Status**: ⏳ Pending
+
+**Required Diagrams**: Design Overview Diagram, Component Interaction
+
+## 📝 Prompt for Copilot
+
+[Prompt will be automatically populated when stage executes]
+
+## 📋 Instructions After Copilot Response
+
+1. Copy Copilot's complete response
+2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+3. Find **"## 🎯 2. Design Overview"** section
+4. Replace the placeholder text with Copilot's response
+5. Verify all required Mermaid diagrams are included
+
+---
+
+# Stage 3: Detailed Technical Design
+
+**Role**: Principal Engineer | **Status**: ⏳ Pending
+
+**Required Diagrams**: Database Schema Changes, API Design, Business Logic Flow, Component Architecture
+
+## 📝 Prompt for Copilot
+
+[Prompt will be automatically populated when stage executes]
+
+## 📋 Instructions After Copilot Response
+
+1. Copy Copilot's complete response
+2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+3. Find **"## 🔧 3. Detailed Technical Design"** section
+4. Replace the placeholder text with Copilot's response
+5. Verify all required Mermaid diagrams are included
+
+---
+
+# Stage 4: Infrastructure & NFR
+
+**Role**: Principal Engineer | **Status**: ⏳ Pending
+
+**Required Diagrams**: Infrastructure Changes, Performance Architecture
+
+## 📝 Prompt for Copilot
+
+[Prompt will be automatically populated when stage executes]
+
+## 📋 Instructions After Copilot Response
+
+1. Copy Copilot's complete response
+2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+3. Find **"## 🏗️ 4. Infrastructure & Non-Functional Requirements"** section
+4. Replace the placeholder text with Copilot's response
+5. Verify all required Mermaid diagrams are included
+
+---
+
+# Stage 5: Task Breakdown
+
+**Role**: Product Owner | **Status**: ⏳ Pending
+
+**Required Diagrams**: Task Breakdown Structure, Implementation Timeline
+
+## 📝 Prompt for Copilot
+
+[Prompt will be automatically populated when stage executes]
+
+## 📋 Instructions After Copilot Response
+
+1. Copy Copilot's complete response
+2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
+3. Find **"## 📝 5. Task Breakdown"** section
+4. Replace the placeholder text with Copilot's response
+5. Verify all required Mermaid diagrams are included
+
+---
+
+## 📊 Prompt Engineering Best Practices
+
+### ✨ Techniques Applied:
+- **🏷️ XML Tags**: Structured input/output with \`<jira_context>\`, \`<thinking>\` tags
+- **🧠 Explicit Reasoning**: Step-by-step thinking sections for better analysis
+- **🎯 Specific Instructions**: Clear requirements instead of vague directions  
+- **📋 Context Integration**: Combines Jira requirements with codebase analysis
+- **🔄 Sequential Flow**: Each stage builds on previous analysis
+
+### 📈 Quality Improvements:
+- **Principal Engineer perspective** for technical depth
+- **Codebase-specific analysis** using actual project patterns
+- **Required Mermaid diagrams** for visual communication
+- **Implementation-ready outputs** for immediate development use
+
+---
+
+*Generated by AI Product Owner Agent - Enhanced with Anthropic prompt engineering best practices*
+`;
+
+    fs.writeFileSync(promptsPath, promptsContent, 'utf-8');
+    this.log(`📝 Created prompts document: PROMPTS.md`);
+
+    return promptsPath;
+  }
+
+  /**
+   * Save stage prompt to both the master document and the prompts document
+   */
+  async saveStagePromptToDocuments(
+    epicKey: string,
+    stage: any,
+    prompt: any,
+    stageNumber: number
+  ): Promise<void> {
+    // Save to master document (existing functionality)
+    await this.saveStagePrompt(epicKey, stage, prompt, stageNumber);
+    
+    // Also save to prompts document
+    await this.updatePromptsDocument(epicKey, stage, prompt, stageNumber);
+  }
+
+  /**
+   * Update prompts document with the actual generated prompt
+   */
+  async updatePromptsDocument(
+    epicKey: string,
+    stage: any,
+    prompt: any,
+    stageNumber: number
+  ): Promise<void> {
+    const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
+    
+    if (!fs.existsSync(promptsPath)) {
+      this.log(`⚠️ Prompts document not found for ${epicKey}`);
+      return;
+    }
+
+    let content = fs.readFileSync(promptsPath, 'utf-8');
+    
+    // Update the navigation table status from Pending to Executed
+    const stageNames = [
+      'Stage 1',
+      'Stage 2', 
+      'Stage 3',
+      'Stage 4',
+      'Stage 5'
+    ];
+    
+    const stageName = stageNames[stageNumber - 1];
+    
+    // Update navigation table status
+    content = content.replace(
+      new RegExp(`(\\| \\[.*?${stageName}.*?\\].*?\\| .*? \\|) ⏳ Pending (\\|)`, 'g'),
+      `$1 📝 Executed $2`
+    );
+    
+    // Find the specific stage section and replace its placeholder  
+    const placeholderText = String.raw`\[Prompt will be automatically populated when stage executes\]`;
+    const stageHeaderPattern = new RegExp(`(# Stage ${stageNumber}:.*?## 📝 Prompt for Copilot.*?)${placeholderText}`, 'gs');
+    
+    content = content.replace(stageHeaderPattern, (match, prefix) => {
+      return `${prefix}\`\`\`\n${prompt.content}\n\`\`\``;
+    });
+    
+    // Update the status in the stage section header
+    const stageTitle = `# Stage ${stageNumber}:`;
+    content = content.replace(
+      new RegExp(`(${stageTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) ⏳ Pending`, 's'),
+      `$1 📝 Executed`
+    );
+    
+    fs.writeFileSync(promptsPath, content, 'utf-8');
+    this.log(`✅ Updated PROMPTS.md with ${stage.name} prompt (Executed)`);
+  }
+
+  /**
+   * Mark a stage response as completed in both documents
+   */
+  async markResponseCompleted(
+    epicKey: string,
+    stageNumber: number,
+    stageName: string
+  ): Promise<void> {
+    // Update PROMPTS.md navigation table
+    const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
+    if (fs.existsSync(promptsPath)) {
+      let promptsContent = fs.readFileSync(promptsPath, 'utf-8');
+      
+      // Update navigation table to show completed
+      const stageRef = `Stage ${stageNumber}`;
+      promptsContent = promptsContent.replace(
+        new RegExp(`(\\| \\[.*?${stageRef}.*?\\].*?\\| .*? \\| .*? \\|) 📝 Executed (\\|)`, 'g'),
+        `$1 ✅ Completed $2`
+      );
+      
+      // Update section status
+      const stageTitle = `# Stage ${stageNumber}:`;
+      promptsContent = promptsContent.replace(
+        new RegExp(`(${stageTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) 📝 Executed`, 's'),
+        `$1 ✅ Completed`
+      );
+      
+      fs.writeFileSync(promptsPath, promptsContent, 'utf-8');
+    }
+    
+    // Update TECHNICAL_ANALYSIS.md response status
+    const analysisPath = path.join(this.getOutputDirectory(epicKey), 'TECHNICAL_ANALYSIS.md');
+    if (fs.existsSync(analysisPath)) {
+      let analysisContent = fs.readFileSync(analysisPath, 'utf-8');
+      
+      // Update the response status for the specific stage
+      const stageHeaders = [
+        '## 📋 1. Requirements Analysis',
+        '## 🎯 2. Design Overview',
+        '## 🔧 3. Detailed Technical Design',
+        '## 🏗️ 4. Infrastructure & Non-Functional Requirements',
+        '## 📝 5. Task Breakdown'
+      ];
+      
+      if (stageNumber <= stageHeaders.length) {
+        const stageHeader = stageHeaders[stageNumber - 1];
+        
+        // Find the section and update its status
+        const statusPattern = new RegExp(
+          `(${stageHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) ⏳ Waiting for Copilot response`, 
+          's'
+        );
+        
+        analysisContent = analysisContent.replace(statusPattern, `$1 ✅ Response completed`);
+      }
+      
+      // Update completion checklist
+      const checklistItems = [
+        'Requirements Analysis response pasted',
+        'Design Overview response pasted',
+        'Technical Design response pasted', 
+        'Infrastructure & NFR response pasted',
+        'Task Breakdown response pasted'
+      ];
+      
+      if (stageNumber <= checklistItems.length) {
+        const itemText = checklistItems[stageNumber - 1];
+        analysisContent = analysisContent.replace(
+          new RegExp(`- \\[ \\] \\*\\*Stage ${stageNumber}\\*\\*: ${itemText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'),
+          `- [x] **Stage ${stageNumber}**: ${itemText}`
+        );
+      }
+      
+      fs.writeFileSync(analysisPath, analysisContent, 'utf-8');
+    }
+    
+    this.log(`✅ Marked ${stageName} (Stage ${stageNumber}) as completed`);
   }
 
   /**
@@ -239,7 +598,6 @@ This document contains the comprehensive technical analysis following the Princi
 ${prompt.content}
 \`\`\`
 
-**Estimated Duration**: ${stage.duration}
 **Required Diagrams**: ${stage.requiredDiagrams.join(', ')}
 **Generated**: ${new Date().toLocaleString()}
 
@@ -273,7 +631,7 @@ ${prompt.content}
 ### 2. Stage Execution
 ${stages.map((stage, index) => `
 #### Stage ${index + 1}: ${stage.name}
-- ✅ Technical prompt generated (${stage.duration})
+- ✅ Technical prompt generated
 - ✅ Prompt copied to clipboard
 - ✅ Copilot Chat opened automatically
 - ✅ Non-modal guidance provided
@@ -296,16 +654,15 @@ ${stages.map((stage, index) => `
 
 ## 📊 Analysis Metrics
 
-- **Total Stages**: ${stages.length}
-- **Estimated Duration**: ${stages.reduce((sum, stage) => sum + parseInt(stage.duration.split(' ')[0]), 0)} minutes
-- **Required Diagrams**: ${stages.reduce((sum, stage) => sum + stage.requiredDiagrams.length, 0)} total
+- **Total Stages**: 5
+- **Required Diagrams**: 12 total
 - **Focus**: Principal Engineer technical analysis
 - **Quality**: Implementation-ready specifications
 
 ## 🎯 Success Criteria
 
 - [ ] All 5 stage responses completed
-- [ ] ${stages.reduce((sum, stage) => sum + stage.requiredDiagrams.length, 0)} Mermaid diagrams present
+- [ ] 12 Mermaid diagrams present
 - [ ] Codebase-specific technical details included
 - [ ] Implementation approach clearly defined
 - [ ] Jira tasks ready for development
@@ -318,7 +675,7 @@ Your automated technical analysis is ready for completion!
 `;
 
     fs.writeFileSync(summaryPath, summaryContent, 'utf-8');
-    this.log(`📋 Generated automation summary: AUTOMATION_SUMMARY.md`);
+    this.log(`📊 Generated completion summary: AUTOMATION_SUMMARY.md`);
   }
 
   /**
@@ -468,367 +825,6 @@ When all stages are complete, a comprehensive \`SUMMARY.md\` will be generated w
   }
 
   /**
-   * Show progress document in VS Code
-   */
-  async showProgressDocument(progress: StageProgress, stages: AnalysisStage[]): Promise<void> {
-    const completedCount = progress.completed.filter(Boolean).length;
-    const progressContent = this.generateProgressContent(progress, stages, completedCount);
-    
-    // Open progress document in VS Code
-    const doc = await vscode.workspace.openTextDocument({
-      content: progressContent,
-      language: 'markdown'
-    });
-    await vscode.window.showTextDocument(doc);
-    this.log('📊 Displayed progress document');
-  }
-
-  /**
-   * Generate progress document content
-   */
-  private generateProgressContent(
-    progress: StageProgress,
-    stages: AnalysisStage[],
-    completedCount: number
-  ): string {
-    const elapsed = Math.round((new Date().getTime() - progress.startTime.getTime()) / 1000 / 60);
-    const estimatedTotal = stages.reduce((sum, stage) => sum + parseInt(stage.duration), 0);
-    const estimatedRemaining = stages
-      .slice(completedCount)
-      .reduce((sum, stage) => sum + parseInt(stage.duration), 0);
-
-    return `# 📊 Analysis Progress Report
-
-**Started**: ${progress.startTime.toLocaleString()}
-**Elapsed**: ${elapsed} minutes
-**Progress**: ${completedCount}/${progress.totalStages} stages complete (${Math.round(completedCount / progress.totalStages * 100)}%)
-
-## 🎯 Stage Status
-
-${stages.map((stage, index) => {
-  const isComplete = progress.completed[index];
-  const isCurrent = index === progress.currentStage;
-  const statusIcon = isComplete ? '✅' : isCurrent ? '🔄' : '⏳';
-  
-  return `${statusIcon} **${stage.icon} ${stage.name}** (${stage.duration})
-   ${stage.description}${isComplete ? ' - **COMPLETE**' : isCurrent ? ' - **IN PROGRESS**' : ''}`;
-}).join('\n\n')}
-
-## ⏱️ Time Tracking
-
-- **Estimated Total**: ${estimatedTotal} minutes
-- **Time Elapsed**: ${elapsed} minutes  
-- **Estimated Remaining**: ${estimatedRemaining} minutes
-- **Projected Completion**: ${new Date(Date.now() + estimatedRemaining * 60000).toLocaleString()}
-
-## 📈 Quality Metrics
-
-- **Completion Rate**: ${Math.round(completedCount / progress.totalStages * 100)}%
-- **Average Stage Time**: ${completedCount > 0 ? Math.round(elapsed / completedCount) : 0} minutes
-- **Remaining Stages**: ${progress.totalStages - completedCount}
-
-## 🎉 Next Steps
-
-${completedCount === progress.totalStages 
-  ? '**All stages complete!** 🎉 Generating final summary document...' 
-  : `**Continue with**: ${stages[progress.currentStage]?.icon} ${stages[progress.currentStage]?.name}`}
-
----
-
-*Generated by AI Product Owner Agent - ${new Date().toLocaleString()}*
-`;
-  }
-
-  /**
-   * Generate final summary document
-   */
-  async generateFinalSummary(
-    epicKey: string,
-    jiraData: JiraPortfolio,
-    codebaseData: CodebaseAnalysis,
-    progress: StageProgress,
-    stages: AnalysisStage[]
-  ): Promise<void> {
-    const summaryContent = this.generateSummaryContent(
-      epicKey,
-      jiraData,
-      codebaseData,
-      progress,
-      stages
-    );
-    
-    const summaryPath = this.getSummaryPath(epicKey);
-    fs.writeFileSync(summaryPath, summaryContent, 'utf-8');
-    
-    this.log(`📋 Generated final summary: ${path.basename(summaryPath)}`);
-  }
-
-  /**
-   * Generate comprehensive summary content
-   */
-  private generateSummaryContent(
-    epicKey: string,
-    jiraData: JiraPortfolio,
-    codebaseData: CodebaseAnalysis,
-    progress: StageProgress,
-    stages: AnalysisStage[]
-  ): string {
-    const completedCount = progress.completed.filter(Boolean).length;
-    const totalTime = Math.round((new Date().getTime() - progress.startTime.getTime()) / 1000 / 60);
-    const completionRate = Math.round(completedCount / progress.totalStages * 100);
-
-    return `# 🤖 AI Product Owner - Analysis Summary
-
-## 📊 Executive Summary
-
-**Epic**: ${jiraData.key} - ${jiraData.name}
-**Analysis Date**: ${progress.startTime.toLocaleDateString()}
-**Completion**: ${completedCount}/${progress.totalStages} stages (${completionRate}%)
-**Duration**: ${totalTime} minutes
-**Quality**: ${completionRate === 100 ? 'Complete Analysis' : 'Partial Analysis'}
-
-## 🎯 Business Context
-
-### Epic Overview
-- **Type**: ${jiraData.type}
-- **Total Story Points**: ${jiraData.totalStoryPoints}
-- **Epics Count**: ${jiraData.epics.length}
-- **Stories Count**: ${jiraData.epics.reduce((sum, epic) => sum + epic.stories.length, 0)}
-
-### Technical Context  
-- **Codebase**: ${codebaseData.totalFiles} Go files
-- **Packages**: ${codebaseData.packages.length} (${codebaseData.packages.join(', ')})
-- **Architecture**: ${codebaseData.patterns.map(p => p.name).join(', ')}
-- **Complexity**: ${codebaseData.metrics.complexity}
-
-## 📋 Analysis Stages
-
- ${stages.map((stage, index) => {
-   const isComplete = progress.completed[index];
-   const statusIcon = isComplete ? '✅' : '❌';
-   const stageFile = `${String(index + 1).padStart(2, '0')}-${stage.id}.md`;
-   
-   return `### ${statusIcon} ${stage.icon} ${stage.name}
-  
-**Duration**: ${stage.duration}
-**Status**: ${isComplete ? 'Complete' : 'Incomplete'}
-**Focus**: ${stage.description}
-
-${isComplete 
-  ? `📄 **[View Analysis](./stages/${stageFile})**
-
-**Required Diagrams**: ${stage.requiredDiagrams.join(', ')}`
-  : `⚠️ **Stage not completed** - Analysis may be incomplete without this stage`}
-`;
- }).join('\n\n')}
-
-## 🏗️ Implementation Roadmap
-
-Based on the completed analysis stages:
-
-### Immediate Actions (Week 1-2)
-${completedCount >= 1 ? '- Review business analysis findings and validate with stakeholders' : '- ⚠️ Complete business analysis first'}
-${completedCount >= 2 ? '- Set up technical architecture based on system design recommendations' : '- ⚠️ Complete technical architecture analysis'}
-
-### Development Phase (Week 3-6)  
-${completedCount >= 3 ? '- Begin implementation following the detailed design specifications' : '- ⚠️ Complete implementation design analysis'}
-${completedCount >= 4 ? '- Execute development plan with sprint breakdown and timeline' : '- ⚠️ Complete development planning'}
-
-### Risk Management (Ongoing)
-${completedCount >= 5 ? '- Implement risk mitigation strategies and monitoring' : '- ⚠️ Complete risk assessment for comprehensive coverage'}
-
-## 📊 Quality Assessment
-
-### Analysis Completeness
-- **Business Impact**: ${progress.completed[0] ? '✅ Analyzed' : '❌ Missing'}
-- **Technical Design**: ${progress.completed[1] ? '✅ Designed' : '❌ Missing'}  
-- **Implementation Plan**: ${progress.completed[2] ? '✅ Planned' : '❌ Missing'}
-- **Development Roadmap**: ${progress.completed[3] ? '✅ Created' : '❌ Missing'}
-- **Risk Strategy**: ${progress.completed[4] ? '✅ Assessed' : '❌ Missing'}
-
-### Recommendations
-${completionRate === 100 
-  ? '🎉 **Complete Analysis** - All stages completed successfully. Ready for implementation.'
-  : completionRate >= 80
-    ? '⚠️ **Nearly Complete** - Consider completing remaining stages for comprehensive coverage.'  
-    : '❌ **Partial Analysis** - Multiple stages incomplete. Recommend completing full analysis.'}
-
-## 📁 File Structure
-
-\`\`\`
-${epicKey}/
-├── README.md                          # Project overview
-├── SUMMARY.md                         # This summary document  
-├── stages/                            # Detailed analysis by stage
-${stages.map((stage, index) => {
-  const stageFile = `${String(index + 1).padStart(2, '0')}-${stage.id}.md`;
-  const status = progress.completed[index] ? '✅' : '❌';
-  return `│   ├── ${stageFile.padEnd(30)} # ${status} ${stage.name}`;
-}).join('\n')}
-└── templates/                         # Stage templates
-    └── *.md                           # Response templates
-\`\`\`
-
-## 🚀 Next Steps
-
-1. **Review Analysis** - Go through each completed stage document
-2. **Validate Findings** - Share with team and stakeholders  
-3. **Plan Implementation** - Use development roadmap and risk strategies
-4. **Monitor Progress** - Track implementation against analysis recommendations
-
-${completionRate < 100 ? `
-## ⚠️ Incomplete Analysis Notice
-
-This analysis is ${completionRate}% complete. For comprehensive coverage, consider completing:
-
-${stages.map((stage, index) => 
-  !progress.completed[index] ? `- ${stage.icon} ${stage.name} (${stage.duration})` : null
-).filter(Boolean).join('\n')}
-` : ''}
-
----
-
-**Generated**: ${new Date().toLocaleString()}
-**Tool**: AI Product Owner Agent v1.0.0
-**Total Analysis Time**: ${totalTime} minutes
-`;
-  }
-
-  /**
-   * Create comprehensive analysis template file
-   */
-  async createComprehensiveTemplate(epicKey: string, prompt: any): Promise<string> {
-    const templatePath = path.join(this.getOutputDirectory(epicKey), 'COMPREHENSIVE_ANALYSIS.md');
-    
-    const templateContent = `# Comprehensive Analysis - ${epicKey}
-
-**Generated**: ${new Date().toLocaleString()}
-**Epic**: ${epicKey}
-**Analysis Type**: Comprehensive Single-Prompt Analysis
-
-## 🎯 Analysis Overview
-
-This comprehensive analysis covers all 5 analysis areas in a single structured response:
-
-1. **📊 Business Analysis & User Impact** (3 Mermaid diagrams)
-2. **🏗️ Technical Architecture & System Design** (3 Mermaid diagrams)  
-3. **💡 Implementation Design & Technical Approach** (3 Mermaid diagrams)
-4. **🗺️ Development Plan & Sprint Organization** (2 Mermaid diagrams)
-5. **⚠️ Risk Assessment & Mitigation Strategy** (1 Mermaid diagram)
-
-**Total Expected**: 12 Mermaid diagrams + comprehensive analysis
-
----
-
-## 📋 Instructions
-
-### Step 1: Copy the Comprehensive Prompt
-The comprehensive prompt has been copied to your clipboard. If you need it again, use the extension command "Copy Prompt to Clipboard".
-
-### Step 2: Paste into GitHub Copilot Chat
-Open GitHub Copilot Chat and paste the comprehensive prompt. 
-
-### Step 3: Wait for Complete Response
-Copilot will generate a comprehensive response covering all 5 analysis areas. This typically takes 35-40 minutes.
-
-### Step 4: Copy Response Below
-Once Copilot completes the analysis, copy the entire response and paste it in the section below.
-
----
-
-## 🤖 Copilot Comprehensive Response
-
-*Paste Copilot's complete comprehensive response here...*
-
-<!-- 
-This template was created by AI Product Owner Agent
-Copy Copilot's comprehensive response above this comment
-The response should include all 5 analysis sections with 12 Mermaid diagrams
--->
-
----
-
-## ✅ Quality Verification Checklist
-
-### Business Analysis Section
-- [ ] User Journey Map (journey diagram)
-- [ ] Business Value Flow (flowchart)
-- [ ] Stakeholder Matrix (graph)
-- [ ] User impact analysis completed
-- [ ] Business value assessment included
-
-### Technical Architecture Section  
-- [ ] System Architecture (graph)
-- [ ] Data Flow Diagram (flowchart)
-- [ ] Integration Map (graph)
-- [ ] System design detailed
-- [ ] Integration points defined
-
-### Implementation Design Section
-- [ ] Code Architecture (graph)
-- [ ] Database Schema (erDiagram)
-- [ ] API Flow (sequenceDiagram)
-- [ ] Implementation approach detailed
-- [ ] Technical decisions justified
-
-### Development Plan Section
-- [ ] Sprint Timeline (gantt)
-- [ ] Team Workflow (flowchart)
-- [ ] Sprint breakdown provided
-- [ ] Timeline with milestones
-- [ ] Resource allocation defined
-
-### Risk Assessment Section
-- [ ] Risk Matrix (graph)
-- [ ] Risk identification completed
-- [ ] Mitigation strategies provided
-- [ ] Contingency planning included
-
-### Overall Quality
-- [ ] All 12 Mermaid diagrams present and valid
-- [ ] Maximum 2 solution approaches where applicable
-- [ ] Implementation details are specific and actionable
-- [ ] Technical decisions are well-justified
-- [ ] Analysis covers all required areas comprehensively
-
----
-
-## 📊 Analysis Metrics
-
-- **Estimated Copilot Time**: 35-40 minutes
-- **Expected Response Length**: 8,000-12,000 words
-- **Diagrams Required**: 12 Mermaid diagrams
-- **Analysis Areas**: 5 comprehensive sections
-- **Quality Standard**: Enterprise-ready implementation guidance
-
----
-
-## 📝 Additional Notes
-
-*Add any observations, refinements, or follow-up questions here...*
-
----
-
-**Analysis Status**: ⏳ In Progress
-**Completion Date**: _To be updated when complete_
-
-*Generated by AI Product Owner Agent - Comprehensive Analysis Mode*
-`;
-
-    // Ensure directory exists
-    const outputDir = path.dirname(templatePath);
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
-    // Write template file
-    fs.writeFileSync(templatePath, templateContent, 'utf-8');
-    this.log(`📝 Created comprehensive analysis template: COMPREHENSIVE_ANALYSIS.md`);
-
-    return templatePath;
-  }
-
-  /**
    * Get output directory for an epic
    */
   getOutputDirectory(epicKey: string): string {
@@ -866,19 +862,7 @@ ${diagrams.map((diagram, index) => `
 \`\`\`mermaid
 ${diagram.code}
 \`\`\`
-
----
 `).join('')}
-
-## 💡 Viewing Instructions
-
-1. **VS Code**: Install Mermaid Preview extension for live diagram rendering
-2. **GitHub**: Diagrams render automatically in markdown preview
-3. **Export**: Use Mermaid Live Editor to export as PNG/SVG
-
----
-
-*Generated by AI Product Owner Agent*
 `;
 
     const previewPath = path.join(this.getOutputDirectory(epicKey), 'DIAGRAMS.md');
@@ -887,17 +871,34 @@ ${diagram.code}
   }
 
   /**
-   * VS Code specific: Log to output channel
+   * Show progress document (stub for compatibility)
    */
-  private log(message: string): void {
-    this.outputChannel.appendLine(message);
-    console.log(message);
+  async showProgressDocument(progress: any, stages: any[]): Promise<void> {
+    this.log('showProgressDocument called (stub)');
+    // No-op for now
   }
 
   /**
-   * Clean up resources
+   * Generate final summary (stub for compatibility)
+   */
+  async generateFinalSummary(...args: any[]): Promise<void> {
+    this.log('generateFinalSummary called (stub)');
+    // No-op for now
+  }
+
+  /**
+   * Create comprehensive template (stub for compatibility)
+   */
+  async createComprehensiveTemplate(epicKey: string, prompt: any): Promise<string> {
+    this.log('createComprehensiveTemplate called (stub)');
+    // No-op for now, return empty string or a placeholder path
+    return '';
+  }
+
+  /**
+   * Dispose resources
    */
   dispose(): void {
-    this.outputChannel.dispose();
+    this.outputChannel?.dispose();
   }
-} 
+}

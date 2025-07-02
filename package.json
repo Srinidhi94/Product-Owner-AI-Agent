@@ -91,6 +91,16 @@
         "title": "Proceed to Next Stage",
         "category": "AI Product Owner",
         "icon": "$(play)"
+      },
+      {
+        "command": "aiProductOwner.testJiraConnection",
+        "title": "Test Jira Connection",
+        "category": "AI Product Owner"
+      },
+      {
+        "command": "aiProductOwner.pasteCopilotResponse",
+        "title": "Paste Copilot Response to Analysis",
+        "category": "AI Product Owner"
       }
     ],
     "configuration": {
@@ -277,3 +287,4 @@
     "yaml": "^2.3.4"
   }
 }
+ 

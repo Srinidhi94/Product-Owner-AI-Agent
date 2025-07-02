@@ -962,7 +962,7 @@ ${viz.mermaidCode}
     sections.push(`**Epic/Portfolio**: ${jiraData.key} - ${jiraData.name}`);
     sections.push(`**Generated**: ${new Date().toLocaleString()}`);
     sections.push(`**Total Prompts**: ${prompts.length}`);
-    sections.push(`**Total Estimated Time**: ${prompts.reduce((sum, p) => sum + p.estimatedDuration, 0)} minutes`);
+    sections.push(`**Analysis Stages**: ${prompts.length} comprehensive technical stages`);
     sections.push('');
     
     // Executive Summary

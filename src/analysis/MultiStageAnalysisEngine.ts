@@ -86,46 +86,30 @@ export class MultiStageAnalysisEngine {
   async runFullAnalysis(
     epicKey: string,
     jiraData: JiraPortfolio,
-    codebaseData: CodebaseAnalysis,
-    progress: vscode.Progress<{ increment?: number; message?: string }>
+    codebaseData: CodebaseAnalysis
   ): Promise<void> {
     this.log(`🚀 Starting automated technical analysis for ${epicKey}`);
     
     try {
-      // Initialize clean output structure (5%)
-      progress.report({ increment: 5, message: '📁 Setting up analysis workspace...' });
+      // Initialize clean output structure (10%)
       await this.documentGenerator.initializeCleanOutputStructure(epicKey);
       
-      // Create master analysis document (10%)
-      progress.report({ increment: 5, message: '📝 Creating master analysis document...' });
+      // Create master analysis document (10%)  
       const masterDocPath = await this.documentGenerator.createMasterAnalysisDocument(epicKey, jiraData, codebaseData);
       
-      // Show workflow overview and start sequential execution
-      progress.report({ increment: 10, message: '🎯 Starting sequential automated workflow...' });
+      // Show workflow overview (5%)
       await this.showSequentialWorkflowOverview(epicKey, this.stages);
       
-      // Run sequential analysis stages with user confirmation (10% to 85%)
-      const stageIncrement = 75 / this.stages.length; // 75% total across all stages
-      
+      // Run sequential analysis stages with user confirmation (75% total)
       for (let i = 0; i < this.stages.length; i++) {
         const stage = this.stages[i];
         this.log(`🔄 Starting Stage ${i + 1}/${this.stages.length}: ${stage.name}`);
         
-        progress.report({ 
-          increment: stageIncrement / 2, 
-          message: `${stage.icon} ${stage.name} - Generating prompt...` 
-        });
-        
         // Generate stage-specific prompt with codebase context
         const stagePrompt = await this.generateTechnicalStagePrompt(stage, jiraData, codebaseData, i);
         
-        // Save prompt to documentation
-        await this.documentGenerator.saveStagePrompt(epicKey, stage, stagePrompt, i + 1);
-        
-        progress.report({ 
-          increment: stageIncrement / 2, 
-          message: `${stage.icon} ${stage.name} - Executing in Copilot...` 
-        });
+        // Save prompt to both documentation files
+        await this.documentGenerator.saveStagePromptToDocuments(epicKey, stage, stagePrompt, i + 1);
         
         // Execute stage and wait for completion
         await this.executeSequentialStage(epicKey, stage, stagePrompt, i + 1);
@@ -133,8 +117,7 @@ export class MultiStageAnalysisEngine {
         this.log(`✅ Completed Stage ${i + 1}: ${stage.name}`);
       }
       
-      // Finalize and open results (85% to 100%)
-      progress.report({ increment: 15, message: '🎉 Opening analysis results...' });
+      // Finalize and open results (total: 10% + 10% + 5% + 75% = 100%)
       await this.finalizeAndOpenResults(epicKey, masterDocPath);
       
       this.log(`✅ Automated technical analysis completed for ${epicKey}`);
@@ -149,18 +132,12 @@ export class MultiStageAnalysisEngine {
   /**
    * Show analysis overview and get user confirmation
    */
-  private async showAnalysisOverview(epicKey: string, progress: StageProgress): Promise<void> {
-    const totalTime = this.stages.reduce((sum, stage) => {
-      const minutes = parseInt(stage.duration.split(' ')[0]);
-      return sum + minutes;
-    }, 0);
-
+  private async showAnalysisOverview(epicKey: string): Promise<void> {
     const overview = `# 🤖 AI Product Owner - Interactive Analysis
 
 **Epic**: ${epicKey}
 **Total Stages**: ${this.stages.length}
-**Estimated Time**: ${totalTime} minutes
-**Started**: ${progress.startTime.toLocaleString()}
+**Analysis Coverage**: 5 comprehensive stages
 
 ## 📋 Analysis Stages
 
@@ -182,7 +159,6 @@ Ready to begin?`;
 
     const action = await vscode.window.showInformationMessage(
       `🚀 Ready to start 5-stage analysis for ${epicKey}?\n\nThis will guide you through ${this.stages.length} focused prompts with GitHub Copilot.`,
-      { modal: true },
       'Start Analysis',
       'Show Overview',
       'Cancel'
@@ -199,7 +175,6 @@ Ready to begin?`;
       // Ask again after showing overview
       const startAction = await vscode.window.showInformationMessage(
         'Ready to start the analysis?',
-        { modal: true },
         'Start Analysis',
         'Cancel'
       );
@@ -273,7 +248,6 @@ Ready to begin?`;
 
     const action = await vscode.window.showInformationMessage(
       instructions,
-      { modal: true },
       'Open Copilot Chat',
       'Open Output File',
       'Stage Complete',
@@ -296,7 +270,6 @@ Ready to begin?`;
       case 'Skip Stage': {
         const confirmSkip = await vscode.window.showWarningMessage(
           `Skip ${stage.name}? This will reduce analysis quality.`,
-          { modal: true },
           'Skip Stage',
           'Go Back'
         );
@@ -384,20 +357,6 @@ Ready to begin?`;
    * Wait for user to complete the current stage with persistent UX
    */
   private async waitForStageCompletion(stage: AnalysisStage, outputFilePath: string): Promise<boolean> {
-    // Create a persistent status bar item for stage progression
-    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    statusBarItem.text = `$(play) ${stage.icon} ${stage.name} - Ready`;
-    statusBarItem.tooltip = 'Click to proceed to next stage when Copilot analysis is complete';
-    statusBarItem.command = 'aiProductOwner.proceedToNextStage';
-    statusBarItem.show();
-
-    // Store current stage info for the proceed command
-    this.currentStageInfo = {
-      stage: stage,
-      outputFilePath: outputFilePath,
-      statusBarItem: statusBarItem
-    };
-
     // Show initial setup actions
     const setupAction = await vscode.window.showInformationMessage(
       `🎯 ${stage.icon} ${stage.name} - Ready!\n\n✅ Prompt copied to clipboard\n📁 Output file created\n\nChoose your next action:`,
@@ -430,7 +389,6 @@ Ready to begin?`;
         
       case 'Proceed to Next Stage':
         // User wants to skip directly
-        statusBarItem.dispose();
         return true;
     }
 
@@ -456,7 +414,6 @@ Ready to begin?`;
     
     const action = await vscode.window.showInformationMessage(
       `Complete ${stage.icon} ${stage.name}?\n\nMake sure you've:\n• Pasted the prompt in Copilot Chat\n• Received and reviewed the response\n• Copied any important information`,
-      { modal: true },
       'Stage Complete ✅',
       'Not Yet - Continue Working',
       'Skip This Stage'
@@ -471,21 +428,20 @@ Ready to begin?`;
         vscode.window.showInformationMessage(`✅ ${stage.name} completed! Moving to next stage...`);
         break;
         
-             case 'Skip This Stage': {
-         const confirmSkip = await vscode.window.showWarningMessage(
-           `Skip ${stage.name}? This will reduce analysis quality.`,
-           { modal: true },
-           'Yes, Skip Stage',
-           'No, Continue Working'
-         );
-         if (confirmSkip === 'Yes, Skip Stage') {
-           statusBarItem.dispose();
-           this.stageCompletionResolver(false);
-           this.currentStageInfo = null;
-           this.stageCompletionResolver = null;
-         }
-         break;
-       }
+      case 'Skip This Stage': {
+        const confirmSkip = await vscode.window.showWarningMessage(
+          `Skip ${stage.name}? This will reduce analysis quality.`,
+          'Yes, Skip Stage',
+          'No, Continue Working'
+        );
+        if (confirmSkip === 'Yes, Skip Stage') {
+          statusBarItem.dispose();
+          this.stageCompletionResolver(false);
+          this.currentStageInfo = null;
+          this.stageCompletionResolver = null;
+        }
+        break;
+      }
         
       case 'Not Yet - Continue Working':
       default:
@@ -684,7 +640,7 @@ ${stages.map((stage, index) => `
 3. **User Confirmation** - Wait for you to confirm stage completion
 4. **Automatic Progression** - Move to next stage automatically
 
-**Total Estimated Time**: ${totalTime} minutes
+**Analysis Stages**: 5 comprehensive technical stages
 **Interaction Required**: Confirmation after each Copilot analysis
 
 The workflow will now proceed stage by stage. Each stage will:
@@ -695,7 +651,7 @@ The workflow will now proceed stage by stage. Each stage will:
 Ready to begin sequential execution!`;
 
     await vscode.window.showInformationMessage(
-      `🚀 Sequential Workflow Ready!\n\n${stages.length} stages will execute one by one.\nEach stage waits for Copilot completion before proceeding.\n\nTotal time: ~${totalTime} minutes`,
+      `🚀 Sequential Workflow Ready!\n\n${stages.length} stages will execute one by one.\nEach stage waits for Copilot completion before proceeding.\n\n5 stages will execute one by one`,
       { modal: true },
       'Start Sequential Execution'
     );
@@ -722,12 +678,12 @@ Ready to begin sequential execution!`;
     
     // Show stage start notification with flat timing
     vscode.window.showInformationMessage(
-      `🤖 Stage ${stageNumber}/5: ${stage.name}\n\n✅ Prompt copied to clipboard\n🤖 Copilot Chat opened\n⏱️ Estimated duration: ~${stage.duration}\n\n📋 Paste the prompt in Copilot Chat and wait for response.\n🔔 Completion check will appear in 1 minute.`,
+      `🤖 Stage ${stageNumber}/5: ${stage.name}\n\n✅ Prompt copied to clipboard\n🤖 Copilot Chat opened\n\n📋 Paste the prompt in Copilot Chat and wait for response.\n🔔 Completion check will appear in 30 seconds.`,
       { modal: false }
     );
     
-         // Wait for user confirmation that stage is complete
-     await this.waitForSequentialStageCompletion(stage, stageNumber);
+    // Wait for user confirmation that stage is complete
+    await this.waitForSequentialStageCompletion(stage, stageNumber);
     
     this.log(`✅ Sequential stage ${stageNumber} completed: ${stage.name}`);
   }
@@ -753,13 +709,13 @@ Ready to begin sequential execution!`;
             resolve();
             break;
             
-                     case 'Still Working...': {
-             // Wait 1 minute before checking again
-             const recheckMs = 60 * 1000; // 1 minute
-             this.log(`⏱️ User still working, rechecking in 1 minute...`);
-             setTimeout(checkCompletion, recheckMs);
-             break;
-           }
+          case 'Still Working...': {
+            // Wait 30 seconds before checking again
+            const recheckMs = 30 * 1000; // 30 seconds
+            this.log(`⏱️ User still working, rechecking in 30 seconds...`);
+            setTimeout(checkCompletion, recheckMs);
+            break;
+          }
             
           case 'Show Stage Help':
             await this.showStageHelp(stage);
@@ -774,11 +730,11 @@ Ready to begin sequential execution!`;
         }
       };
 
-             // Wait 1 minute before first completion check
-       const checkIntervalMs = 60 * 1000; // 1 minute
-       
-       this.log(`⏱️ Waiting 1 minute before checking stage completion...`);
-       setTimeout(checkCompletion, checkIntervalMs);
+      // Wait 30 seconds before first completion check
+      const checkIntervalMs = 30 * 1000; // 30 seconds
+      
+      this.log(`⏱️ Waiting 30 seconds before checking stage completion...`);
+      setTimeout(checkCompletion, checkIntervalMs);
     });
   }
 
@@ -841,7 +797,7 @@ Ready to begin sequential execution!`;
 - [ ] Infrastructure & NFR response added
 - [ ] Task Breakdown response added
 
-## 🎯 Quality Standards
+## �� Quality Standards
 
 Each stage should include:
 - **Specific to your codebase** - References actual files, patterns, architecture
@@ -880,8 +836,7 @@ Your technical analysis is ready for completion!`;
   private async executeStreamlinedWorkflow(
     epicKey: string,
     prompt: GeneratedPrompt,
-    templatePath: string,
-    progress: vscode.Progress<{ increment?: number; message?: string }>
+    templatePath: string
   ): Promise<void> {
     // Copy prompt to clipboard
     await vscode.env.clipboard.writeText(prompt.content);
@@ -897,8 +852,6 @@ Your technical analysis is ready for completion!`;
       `🚀 Streamlined Workflow Ready!\n\n✅ Prompt copied to clipboard\n📁 Template file opened\n🤖 Copilot Chat opened\n\n➡️ Next: Paste prompt in Copilot Chat and wait for comprehensive response!`,
       'Got it!'
     );
-    
-    progress.report({ increment: 60, message: '🚀 Ready for Copilot analysis!' });
   }
 
   /**

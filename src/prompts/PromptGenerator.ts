@@ -52,7 +52,7 @@ export class PromptGenerator {
 
     // Generate each prompt sequentially to maintain context flow
     for (const template of PROMPT_TEMPLATES) {
-      this.log(`📝 Generating: ${template.name} (${template.estimatedDuration} min)`);
+      this.log(`📝 Generating: ${template.name}`);
       
       const promptContent = this.substituteTemplateVariables(
         template.template,
@@ -83,7 +83,7 @@ export class PromptGenerator {
       await this.savePromptsToFiles(prompts, jiraData.key, options.outputDirectory);
     }
 
-    this.log(`🎉 All 5 prompts generated successfully! Total estimated time: ${this.getTotalDuration(prompts)} minutes`);
+    this.log(`🎉 All 5 prompts generated successfully!`);
     
     return prompts;
   }
@@ -293,7 +293,9 @@ export class PromptGenerator {
 3. **Wait for complete response** with all required Mermaid diagrams
 4. **Save the response** for the next analysis stage
 
-⏱️ **Estimated completion time**: ${PROMPT_TEMPLATES.find(t => t.id === templateId)?.estimatedDuration || 5} minutes
+🎯 **Analysis Focus**: Principal Engineer technical analysis
+
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
 
     return header + content + footer;
@@ -382,7 +384,7 @@ export class PromptGenerator {
       sections.push('');
     });
     
-    sections.push(`## ⏱️ Total Estimated Time: ${totalTime} minutes`);
+    // Total time calculation removed per user request
     sections.push('');
     
     sections.push('## 📋 Usage Instructions');
@@ -455,19 +457,33 @@ export class PromptGenerator {
 
 You are a **Principal Engineer** analyzing requirements for epic ${contextData.epicKey}.
 
+## 🎯 Important: File Update Instructions
+
+**I need you to directly update the TECHNICAL_ANALYSIS.md file for me:**
+
+1. **Open the file**: TECHNICAL_ANALYSIS.md in the workspace
+2. **Find the section**: "## 📋 1. Requirements Analysis"  
+3. **Replace everything from "### 🤖 Copilot Response Section:" onwards** with your complete analysis
+4. **Save the file** after updating
+
+This will automatically update the correct section with your response.
+
 ## Jira Requirements Context
 
+**Epic Details:**
 ${contextData.jiraContext}
 
 ## Current Codebase Context
 
+**Codebase Analysis:**
 ${contextData.codebaseContext}
 
-## Analysis Task
+## Requirements Analysis Task
 
-As a Principal Engineer, provide a **Requirements Analysis** following this structure:
+As a Principal Engineer, provide comprehensive **Requirements Analysis** following this structure:
 
-### 1. Requirements Summary (2-3 paragraphs)
+### 1. Requirements Summary
+Provide exactly 2-3 paragraphs covering:
 - Your understanding of the requirements at a high level
 - Key functional and non-functional requirements
 - Scope and boundaries of the feature
@@ -488,10 +504,21 @@ As a Principal Engineer, provide a **Requirements Analysis** following this stru
 - Clarifications needed from PMs
 - Constraints or limitations identified
 
-## Required Mermaid Diagrams
+### 5. Required Mermaid Diagrams
 
-1. **Requirements Overview** (flowchart) - High-level requirements flow
-2. **Dependencies Map** (graph) - Dependencies between features and systems
+**Requirements Overview** (flowchart):
+\`\`\`mermaid
+flowchart TD
+    A[Start] --> B[Your diagram here]
+    B --> C[End]
+\`\`\`
+
+**Dependencies Map** (graph):
+\`\`\`mermaid
+graph TB
+    A[Feature A] --> B[Your diagram here]
+    B --> C[Feature C]
+\`\`\`
 
 ## Quality Standards
 
@@ -502,7 +529,7 @@ As a Principal Engineer, provide a **Requirements Analysis** following this stru
 
 Focus on how these requirements fit into the existing codebase architecture and what technical considerations are most important.
 
-**Estimated Duration: ${stage.duration}**
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 
@@ -514,8 +541,19 @@ Focus on how these requirements fit into the existing codebase architecture and 
 
 You are a **Principal Engineer** creating a high-level design for epic ${contextData.epicKey}.
 
+## 🎯 Important: File Update Instructions
+
+**I need you to directly update the TECHNICAL_ANALYSIS.md file for me:**
+
+1. **Open the file**: TECHNICAL_ANALYSIS.md in the workspace
+2. **Find the section**: "## 🎯 2. Design Overview"
+3. **Replace everything from "### 🤖 Copilot Response Section:" onwards** with your complete analysis
+4. **Save the file** after updating
+
+This will automatically update the correct section with your response.
+
 ## Requirements Context (from previous analysis)
-*Reference the requirements analysis to maintain consistency*
+*Reference the requirements analysis from Stage 1 to maintain consistency*
 
 ## Current Codebase Context
 
@@ -557,7 +595,7 @@ As a Principal Engineer, provide a **Design Overview** following this structure:
 
 Keep this section focused on the big picture - detailed specifications come in the next stage.
 
-**Estimated Duration: ${stage.duration}**
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 
@@ -569,8 +607,20 @@ Keep this section focused on the big picture - detailed specifications come in t
 
 You are a **Principal Engineer** creating detailed technical specifications for epic ${contextData.epicKey}.
 
+## 🎯 Important: File Update Instructions
+
+**I need you to directly update the TECHNICAL_ANALYSIS.md file for me:**
+
+1. **Open the file**: TECHNICAL_ANALYSIS.md in the workspace
+2. **Find the section**: "## 🔧 3. Detailed Technical Design"
+3. **Replace everything from "### 🤖 Copilot Response Section:" onwards** with your complete analysis
+4. **Save the file** after updating
+
+This will automatically update the correct section with your response.
+
 ## Design Context (from previous analysis)
-*Reference the design overview to maintain consistency*
+**Design Overview:**
+*Reference the design overview from Stage 2 to maintain consistency and build upon it*
 
 ## Current Codebase Context
 
@@ -580,66 +630,156 @@ ${contextData.codebaseContext}
 
 As a Principal Engineer, provide **Detailed Technical Design** following this structure:
 
+### Step 1: Technical Analysis Process
+Work through your implementation thinking step-by-step:
+
+**CODEBASE ANALYSIS:**
+- Analysis of existing codebase patterns and how to extend them
+- Current architecture and where new features fit
+- Existing libraries and frameworks to leverage
+
+**DATABASE CONSIDERATIONS:**
+- Database schema changes needed and migration strategy
+- Data models and relationships
+- Performance and indexing considerations
+
+**API DESIGN THOUGHTS:**
+- API changes required and integration with existing endpoints
+- Request/response formats and validation
+- Authentication and authorization requirements
+
+**BUSINESS LOGIC ANALYSIS:**
+- Core business logic components and their interactions
+- Service layer design and separation of concerns
+- Error handling and edge case management
+
+**IMPLEMENTATION STRATEGY:**
+- Step-by-step implementation approach considering existing architecture
+- How changes fit into existing system architecture
+- Risk mitigation and rollback strategy
+
+### Step 2: Detailed Technical Design
+
 ### 1. Database Changes
+Provide specific details for:
 - Schema modifications (new tables, columns, indices)
-- Data migration strategy
-- Performance considerations
-- Backward compatibility
+- Data migration strategy with SQL examples
+- Performance considerations and indexing
+- Backward compatibility approach
 
 ### 2. API Changes
+Provide specific details for:
 - New endpoints or modifications to existing ones
-- Request/response formats
+- Request/response formats with JSON examples
 - Authentication/authorization changes
 - Versioning strategy
 
 ### 3. Core Business Logic
-- New business logic components
+Provide specific details for:
+- New business logic components following Go patterns
 - Modifications to existing logic
 - Domain objects and their relationships
 - Validation rules and constraints
 
 ### 4. Codebase-Specific Components
+Provide specific details for:
 - New packages/modules following project structure
-- Integration with existing components (emails, cronjobs, etc.)
-- Configuration changes
-- Third-party integrations
+- Integration with existing components (handlers, services, etc.)
+- Configuration changes and environment variables
+- Third-party integrations and dependencies
 
 ### 5. Implementation Approach
-- Maximum 2 alternative approaches
+Provide maximum 2 alternative approaches:
+
+**Approach 1** (Recommended):
 - Detailed implementation strategy
 - Code organization and structure
 - Testing approach
+- Effort estimation
 
-## Required Mermaid Diagrams
+**Approach 2** (Alternative - only if significantly different):
+- Alternative implementation strategy
+- Different technical approach
+- Trade-off analysis vs Approach 1
 
-1. **Database Schema Changes** (erDiagram) - New/modified tables and relationships
-2. **API Design** (sequenceDiagram) - API request/response flows
-3. **Business Logic Flow** (flowchart) - Core business logic processing
-4. **Component Architecture** (graph) - Code components and dependencies
+### 6. Required Mermaid Diagrams
+
+**Database Schema Changes** (erDiagram):
+\`\`\`mermaid
+erDiagram
+    USER {
+        id int PK
+        email string
+    }
+    SUBSCRIPTION {
+        id int PK
+        user_id int FK
+    }
+    USER ||--o{ SUBSCRIPTION : has
+\`\`\`
+
+**API Design** (sequenceDiagram):
+\`\`\`mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant DB
+    
+    Client->>API: POST /api/endpoint
+    API->>DB: Query data
+    DB-->>API: Return results
+    API-->>Client: JSON response
+\`\`\`
+
+**Business Logic Flow** (flowchart):
+\`\`\`mermaid
+flowchart TD
+    A[Input] --> B[Validation]
+    B --> C[Business Logic]
+    C --> D[Output]
+\`\`\`
+
+**Component Architecture** (graph):
+\`\`\`mermaid
+graph TB
+    A[Handler] --> B[Service]
+    B --> C[Repository]
+    C --> D[Database]
+\`\`\`
 
 ## Quality Standards
 
-- **Implementation-ready**: Detailed enough for development
+- **Implementation-ready**: Specific enough to start coding
 - **Codebase-specific**: Uses actual project patterns and structure
-- **Performance-aware**: Considers scalability and optimization
-- **Maintainable**: Follows existing architectural patterns
+- **Maximum 2 approaches**: Don't overwhelm with options
+- **Principal Engineer depth**: Technical leadership level detail
 
-Focus on technical details that developers need to implement the feature within the existing codebase.
-
-**Estimated Duration: ${stage.duration}**
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 
   /**
-   * Generate Infrastructure & NFR prompt
+   * Generate Infrastructure NFR prompt
    */
   private generateInfrastructureNFRPrompt(contextData: Record<string, string>, stage: any): string {
     return `# Infrastructure & Non-Functional Requirements - Principal Engineer Operations
 
-You are a **Principal Engineer** analyzing infrastructure and non-functional requirements for epic ${contextData.epicKey}.
+You are a **Principal Engineer** defining infrastructure and non-functional requirements for epic ${contextData.epicKey}.
+
+## 🎯 Important: File Update Instructions
+
+**I need you to directly update the TECHNICAL_ANALYSIS.md file for me:**
+
+1. **Open the file**: TECHNICAL_ANALYSIS.md in the workspace
+2. **Find the section**: "## 🏗️ 4. Infrastructure & Non-Functional Requirements"
+3. **Replace everything from "### 🤖 Copilot Response Section:" onwards** with your complete analysis
+4. **Save the file** after updating
+
+This will automatically update the correct section with your response.
 
 ## Technical Context (from previous analysis)
-*Reference the technical design to maintain consistency*
+**Technical Design:**
+*Reference the technical design from Stage 3 to ensure infrastructure supports the implementation*
 
 ## Current Codebase & Infrastructure Context
 
@@ -704,7 +844,7 @@ As a Principal Engineer, provide analysis following this structure:
 
 Focus on operational excellence and ensuring the feature works reliably in production.
 
-**Estimated Duration: ${stage.duration}**
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 
@@ -712,12 +852,28 @@ Focus on operational excellence and ensuring the feature works reliably in produ
    * Generate Task Breakdown prompt
    */
   private generateTaskBreakdownPrompt(contextData: Record<string, string>, stage: any): string {
-    return `# Task Breakdown - Product Owner Planning
+    return `# Task Breakdown - Product Owner Implementation Plan
 
-You are now a **Product Owner** breaking down the technical analysis into actionable Jira tasks for epic ${contextData.epicKey}.
+You are a **Product Owner** with **Principal Engineer** technical expertise breaking down epic ${contextData.epicKey} into implementable tasks.
 
-## Complete Technical Analysis Context
-*Reference all previous analysis stages to create comprehensive task breakdown*
+## 🎯 Important: File Update Instructions
+
+**I need you to directly update the TECHNICAL_ANALYSIS.md file for me:**
+
+1. **Open the file**: TECHNICAL_ANALYSIS.md in the workspace
+2. **Find the section**: "## 📝 5. Task Breakdown"
+3. **Replace everything from "### 🤖 Copilot Response Section:" onwards** with your complete analysis
+4. **Save the file** after updating
+
+This will automatically update the correct section with your response.
+
+## Full Context (from previous analysis)
+**Technical Implementation:**
+*Reference all previous stages (Requirements, Design, Technical Design, Infrastructure) to create comprehensive task breakdown*
+
+## Current Codebase Context
+
+${contextData.codebaseContext}
 
 ## Task Breakdown Task
 
@@ -769,12 +925,46 @@ For each task, provide:
 - Communication plan
 - Review checkpoints
 
+## Quality Standards
+
+### Task Breakdown & Implementation Plan - Product Owner Expertise
+
+#### Summary
+
+**Epic**: ${contextData.epicKey}
+**Total Story Points**: Estimated based on complexity
+**Team Size Required**: 4-5 developers + 1 QA
+**Risk Level**: Medium (due to enterprise boundary complexity)
+
+This breakdown provides a structured, sprint-ready approach to implementing the functionality while maintaining system reliability and enterprise-grade quality standards.
+
 ## Required Mermaid Diagrams
 
-1. **Task Breakdown Structure** (graph) - Tasks and their relationships
-2. **Implementation Timeline** (gantt) - Sprint timeline with dependencies
+**Task Breakdown Structure** (graph):
+\`\`\`mermaid
+graph TB
+    A[Epic: ${contextData.epicKey}] --> B[Your story breakdown here]
+    B --> C[Story 1]
+    B --> D[Story 2]
+    B --> E[Story N]
+    
+    style A fill:#e3f2fd
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#e8f5e8
+    style E fill:#e8f5e8
+\`\`\`
 
-## Quality Standards
+**Implementation Timeline** (gantt):
+\`\`\`mermaid
+gantt
+    title Implementation Timeline
+    dateFormat  YYYY-MM-DD
+    section Sprint 1-2
+    Your timeline here :2025-01-01, 2025-01-14
+    section Sprint 3-4
+    Continue timeline :2025-01-15, 2025-01-28
+\`\`\`
 
 - **Actionable**: Each task is ready for development
 - **Comprehensive**: Covers all aspects of the technical design
@@ -783,7 +973,7 @@ For each task, provide:
 
 Create Jira-ready tasks that development teams can pick up and execute immediately.
 
-**Estimated Duration: ${stage.duration}**
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 
@@ -809,7 +999,9 @@ Provide technical analysis for: ${stage.description}
 
 ${stage.requiredDiagrams.map((diagram: string, index: number) => `${index + 1}. **${diagram}**`).join('\n')}
 
-**Estimated Duration: ${stage.duration}**
+**Focus**: ${stage.name}
+
+Use Context7 documentation and code context wherever applicable for your analysis.
 `;
   }
 

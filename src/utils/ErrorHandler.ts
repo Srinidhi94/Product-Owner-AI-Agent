@@ -22,15 +22,12 @@ export interface RetryConfig {
 
 export class ErrorHandler {
   private static outputChannel: vscode.OutputChannel;
-  private static statusBarItem: vscode.StatusBarItem;
 
   /**
-   * Initialize error handler with output channel and status bar
+   * Initialize error handler with output channel
    */
   static initialize(context: vscode.ExtensionContext): void {
     this.outputChannel = vscode.window.createOutputChannel('AI Product Owner - Error Handler');
-    this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    context.subscriptions.push(this.outputChannel, this.statusBarItem);
   }
 
   /**
@@ -41,7 +38,6 @@ export class ErrorHandler {
     const errorMessage = error.message || 'Unknown Jira error';
     
     this.logError('Jira Error', error, context);
-    this.updateStatusBar('❌ Jira Error', 'error');
 
     switch (errorCode) {
       case 401:
@@ -244,7 +240,6 @@ export class ErrorHandler {
    */
   static async handleCodebaseError(error: any, context: ErrorContext): Promise<boolean> {
     this.logError('Codebase Analysis Error', error, context);
-    this.updateStatusBar('⚠️ Codebase Issue', 'warning');
 
     if (error.message?.includes('No Go files found')) {
       return await this.handleNoGoFilesError(context);
@@ -420,105 +415,6 @@ export class ErrorHandler {
   }
 
   /**
-   * Show progress with cancellation support
-   */
-  static showProgressWithCancellation<T>(
-    title: string,
-    task: (progress: vscode.Progress<{ increment?: number; message?: string }>, token: vscode.CancellationToken) => Promise<T>
-  ) {
-    return vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title,
-      cancellable: true
-    }, async (progress, token) => {
-      this.updateStatusBar(`⏳ ${title}`, 'progress');
-      
-      try {
-        const result = await task(progress, token);
-        this.updateStatusBar('✅ Ready', 'success');
-        return result;
-      } catch (error) {
-        this.updateStatusBar('❌ Error', 'error');
-        throw error;
-      }
-    });
-  }
-
-  /**
-   * Show progress with detailed steps
-   */
-  static async showProgressWithSteps<T>(
-    title: string,
-    steps: Array<{ name: string; weight: number }>,
-    task: (progress: vscode.Progress<{ increment?: number; message?: string }>) => Promise<T>
-  ): Promise<T> {
-    return vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title,
-      cancellable: false
-    }, async (progress) => {
-      let currentProgress = 0;
-      
-      const stepProgress = {
-        report: (step: { increment?: number; message?: string }) => {
-          if (step.increment) {
-            currentProgress += step.increment;
-          }
-          progress.report({
-            increment: step.increment,
-            message: `${step.message} (${Math.round(currentProgress)}%)`
-          });
-        }
-      };
-
-      this.updateStatusBar(`⏳ ${title}`, 'progress');
-      
-      try {
-        const result = await task(stepProgress as any);
-        this.updateStatusBar('✅ Ready', 'success');
-        return result;
-      } catch (error) {
-        this.updateStatusBar('❌ Error', 'error');
-        throw error;
-      }
-    });
-  }
-
-  /**
-   * Update status bar with current state
-   */
-  private static updateStatusBar(text: string, type: 'success' | 'warning' | 'error' | 'progress'): void {
-    if (!this.statusBarItem) return;
-
-    this.statusBarItem.text = `$(robot) ${text}`;
-    this.statusBarItem.tooltip = 'AI Product Owner Agent';
-    
-    switch (type) {
-      case 'success':
-        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
-        break;
-      case 'warning':
-        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-        break;
-      case 'error':
-        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
-        break;
-      case 'progress':
-        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
-        break;
-    }
-
-    this.statusBarItem.show();
-    
-    // Auto-hide after success
-    if (type === 'success') {
-      setTimeout(() => {
-        this.statusBarItem.hide();
-      }, 3000);
-    }
-  }
-
-  /**
    * Log detailed error information
    */
   private static logError(category: string, error: any, context: ErrorContext): void {
@@ -583,7 +479,6 @@ Context: ${JSON.stringify(context, null, 2)}
           return;
         }
         
-        this.updateStatusBar(`⏳ Rate limit: ${remainingTime}s`, 'warning');
         remainingTime--;
       }, 1000);
     });
@@ -758,6 +653,27 @@ Troubleshooting:
    */
   static dispose(): void {
     this.outputChannel?.dispose();
-    this.statusBarItem?.dispose();
+  }
+
+  /**
+   * Show progress with cancellation support
+   */
+  static async showProgressWithCancellation<T>(title: string, task: (progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => Promise<T>): Promise<T> {
+    return await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title,
+      cancellable: true
+    }, (progress, token) => Promise.resolve(task(progress, token)));
+  }
+
+  /**
+   * Show progress with steps (no cancellation)
+   */
+  static async showProgressWithSteps<T>(title: string, task: (progress: vscode.Progress<{ message?: string; increment?: number }>) => Promise<T>): Promise<T> {
+    return await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title,
+      cancellable: false
+    }, (progress) => Promise.resolve(task(progress)));
   }
 }

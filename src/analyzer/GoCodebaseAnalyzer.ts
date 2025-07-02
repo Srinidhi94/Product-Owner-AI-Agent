@@ -242,30 +242,6 @@ export class GoCodebaseAnalyzer {
   }
 
   /**
-   * VS Code enhanced: Analyze with progress reporting for large codebases
-   */
-  async analyzeWithProgress(): Promise<CodebaseAnalysis> {
-    return await vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title: 'Analyzing Go Codebase',
-      cancellable: false
-    }, async (progress) => {
-      progress.report({ increment: 0, message: 'Scanning for Go files...' });
-      
-      const analysis = await this.analyzeCodebase();
-      
-      progress.report({ increment: 50, message: `Found ${analysis.totalFiles} files, analyzing...` });
-      
-      // Add small delay to show progress
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      progress.report({ increment: 100, message: 'Analysis complete!' });
-      
-      return analysis;
-    });
-  }
-
-  /**
    * Get pattern description for architectural patterns
    */
   private getPatternDescription(pattern: string): string {

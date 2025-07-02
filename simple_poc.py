@@ -496,18 +496,18 @@ class GoCodeAnalyzer:
             return self._demo_codebase_analysis()
         
         
-        go_files = list(self.project_path.rglob("*.go"))
-
-        if not go_files:
+            go_files = list(self.project_path.rglob("*.go"))
+            
+            if not go_files:
             print("⚠️  No Go files found, using demo analysis")
-            return self._demo_codebase_analysis()
-        
+                return self._demo_codebase_analysis()
+            
         print(f"📄 Found {len(go_files)} Go files")
         
         # Extract basic info
-        packages = set()
+            packages = set()
         structs = []
-        functions = []
+            functions = []
         imports = set()
         
         for go_file in go_files[:20]:  # Limit to first 20 files for performance
@@ -525,23 +525,23 @@ class GoCodeAnalyzer:
                 
                 # Extract function definitions
                 func_matches = re.findall(r'func\s+(?:\(\w+\s+\*?\w+\)\s+)?(\w+)\s*\(', content)
-                functions.extend(func_matches)
-                
+                    functions.extend(func_matches)
+                    
                 # Extract imports
                 import_matches = re.findall(r'import\s+(?:\(\s*)?(?:"([^"]+)"|`([^`]+)`)', content)
                 for match in import_matches:
                     imports.add(match[0] or match[1])
                     
-            except Exception as e:
+                except Exception as e:
                 print(f"⚠️  Error reading {go_file}: {e}")
-                continue
-        
+                    continue
+            
         # Identify patterns
         patterns = self._identify_patterns(go_files)
         
         analysis = {
-            'total_files': len(go_files),
-            'packages': list(packages),
+                'total_files': len(go_files),
+                'packages': list(packages),
             'structs': structs[:10],  # Limit output
             'functions': functions[:15],  # Limit output
             'imports': list(imports)[:10],  # Limit output
