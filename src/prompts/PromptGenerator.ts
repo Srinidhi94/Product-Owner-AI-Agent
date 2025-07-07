@@ -306,9 +306,9 @@ Use Context7 documentation and code context wherever applicable for your analysi
    */
   private validateMermaidDiagrams(content: string, templateId: string): void {
     const template = PROMPT_TEMPLATES.find(t => t.id === templateId);
-    if (!template) return;
+    if (!template) {return;}
 
-    const mermaidBlocks = content.match(/```mermaid/g) || [];
+    const mermaidBlocks = content.match(/~~~mermaid/g) || [];
     const requiredCount = template.requiredDiagrams.length;
 
     if (mermaidBlocks.length < requiredCount) {
@@ -507,18 +507,18 @@ Provide exactly 2-3 paragraphs covering:
 ### 5. Required Mermaid Diagrams
 
 **Requirements Overview** (flowchart):
-\`\`\`mermaid
+~~~mermaid
 flowchart TD
     A[Start] --> B[Your diagram here]
     B --> C[End]
-\`\`\`
+~~~
 
 **Dependencies Map** (graph):
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Feature A] --> B[Your diagram here]
     B --> C[Feature C]
-\`\`\`
+~~~
 
 ## Quality Standards
 
@@ -705,7 +705,7 @@ Provide maximum 2 alternative approaches:
 ### 6. Required Mermaid Diagrams
 
 **Database Schema Changes** (erDiagram):
-\`\`\`mermaid
+~~~mermaid
 erDiagram
     USER {
         id int PK
@@ -716,10 +716,10 @@ erDiagram
         user_id int FK
     }
     USER ||--o{ SUBSCRIPTION : has
-\`\`\`
+~~~
 
 **API Design** (sequenceDiagram):
-\`\`\`mermaid
+~~~mermaid
 sequenceDiagram
     participant Client
     participant API
@@ -729,23 +729,23 @@ sequenceDiagram
     API->>DB: Query data
     DB-->>API: Return results
     API-->>Client: JSON response
-\`\`\`
+~~~
 
 **Business Logic Flow** (flowchart):
-\`\`\`mermaid
+~~~mermaid
 flowchart TD
     A[Input] --> B[Validation]
     B --> C[Business Logic]
     C --> D[Output]
-\`\`\`
+~~~
 
 **Component Architecture** (graph):
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Handler] --> B[Service]
     B --> C[Repository]
     C --> D[Database]
-\`\`\`
+~~~
 
 ## Quality Standards
 
@@ -941,7 +941,7 @@ This breakdown provides a structured, sprint-ready approach to implementing the 
 ## Required Mermaid Diagrams
 
 **Task Breakdown Structure** (graph):
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Epic: ${contextData.epicKey}] --> B[Your story breakdown here]
     B --> C[Story 1]
@@ -953,10 +953,10 @@ graph TB
     style C fill:#e8f5e8
     style D fill:#e8f5e8
     style E fill:#e8f5e8
-\`\`\`
+~~~
 
 **Implementation Timeline** (gantt):
-\`\`\`mermaid
+~~~mermaid
 gantt
     title Implementation Timeline
     dateFormat  YYYY-MM-DD
@@ -964,7 +964,7 @@ gantt
     Your timeline here :2025-01-01, 2025-01-14
     section Sprint 3-4
     Continue timeline :2025-01-15, 2025-01-28
-\`\`\`
+~~~
 
 - **Actionable**: Each task is ready for development
 - **Comprehensive**: Covers all aspects of the technical design

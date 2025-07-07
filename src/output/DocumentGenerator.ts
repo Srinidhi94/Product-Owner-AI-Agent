@@ -859,9 +859,9 @@ This document contains all Mermaid diagrams generated during analysis.
 ${diagrams.map((diagram, index) => `
 ## ${index + 1}. ${diagram.title}
 
-\`\`\`mermaid
+~~~mermaid
 ${diagram.code}
-\`\`\`
+~~~
 `).join('')}
 `;
 

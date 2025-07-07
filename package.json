@@ -2,9 +2,9 @@
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
   "description": "Analyze Jira epics and Go codebases to generate visual technical documentation",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.75.0"
   },
   "categories": [
     "Other",
@@ -22,9 +22,6 @@
     "url": "https://github.com/your-company/ai-product-owner-extension/issues"
   },
   "activationEvents": [
-    "onCommand:aiProductOwner.analyzeEpic",
-    "onCommand:aiProductOwner.configureSettings",
-    "onCommand:aiProductOwner.refreshDocumentation",
     "onWorkspaceContains:**/*.go"
   ],
   "main": "./out/extension.js",
@@ -35,72 +32,72 @@
         "title": "Analyze Epic",
         "category": "AI Product Owner",
         "icon": "$(graph)",
-        "enablement": "aiProductOwner.configured"
+        "enablement": "aiProductOwner.configured",
+        "description": "Analyze a Jira epic and Go codebase to generate technical documentation."
       },
       {
         "command": "aiProductOwner.configureSettings",
         "title": "Configure Settings",
         "category": "AI Product Owner",
-        "icon": "$(settings-gear)"
+        "icon": "$(settings-gear)",
+        "description": "Configure Jira and extension settings."
       },
       {
         "command": "aiProductOwner.refreshDocumentation",
         "title": "Refresh Documentation",
         "category": "AI Product Owner",
         "icon": "$(refresh)",
-        "enablement": "aiProductOwner.hasResults"
-      },
-      {
-        "command": "aiProductOwner.openResult",
-        "title": "Open Analysis Result",
-        "category": "AI Product Owner",
-        "icon": "$(go-to-file)"
+        "enablement": "aiProductOwner.hasResults",
+        "description": "Refresh and display the latest generated documentation."
       },
       {
         "command": "aiProductOwner.copyPrompt",
         "title": "Copy Prompt to Clipboard",
         "category": "AI Product Owner",
-        "icon": "$(clippy)"
+        "icon": "$(clippy)",
+        "description": "Copy the generated prompt to your clipboard."
       },
       {
         "command": "aiProductOwner.openWalkthrough",
         "title": "Show Welcome Walkthrough",
         "category": "AI Product Owner",
-        "icon": "$(lightbulb)"
+        "icon": "$(lightbulb)",
+        "description": "Show the welcome walkthrough for new users."
       },
       {
         "command": "aiProductOwner.testConnection",
         "title": "Test Jira Connection",
         "category": "AI Product Owner",
-        "icon": "$(plug)"
+        "icon": "$(plug)",
+        "description": "Test the connection to your Jira instance."
       },
       {
         "command": "aiProductOwner.testJiraData",
         "title": "Test Jira Data Fetch",
         "category": "AI Product Owner",
-        "icon": "$(database)"
+        "icon": "$(database)",
+        "description": "Fetch and display sample Jira data for testing."
       },
       {
         "command": "aiProductOwner.nextStage",
         "title": "Next Stage (Manual)",
         "category": "AI Product Owner",
-        "icon": "$(arrow-right)"
+        "icon": "$(arrow-right)",
+        "description": "Manually proceed to the next analysis stage."
       },
       {
         "command": "aiProductOwner.proceedToNextStage",
         "title": "Proceed to Next Stage",
         "category": "AI Product Owner",
-        "icon": "$(play)"
+        "icon": "$(play)",
+        "description": "Automatically proceed to the next analysis stage."
       },
-      {
-        "command": "aiProductOwner.testJiraConnection",
-        "title": "Test Jira Connection",
-        "category": "AI Product Owner"
-      },
+
       {
         "command": "aiProductOwner.pasteCopilotResponse",
         "title": "Paste Copilot Response to Analysis",
-        "category": "AI Product Owner"
+        "category": "AI Product Owner",
+        "description": "Paste a Copilot response into the analysis workflow."
       }
     ],
     "configuration": {
@@ -257,24 +254,42 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src --ext ts --fix",
+    "lint:check": "eslint src --ext ts",
     "test": "node ./out/test/integration.test.js",
+    "test:unit": "node ./out/test/unit/GoCodebaseAnalyzer.test.js",
+    "test:coverage": "npm run test && npm run test:unit",
+    "test:verbose": "npm run test -- --verbose",
     "package-extension": "./scripts/package.sh",
     "vsce-package": "vsce package --no-dependencies",
     "vsce-publish": "vsce publish --no-dependencies",
-    "clean": "rm -rf out && rm -rf *.vsix && rm -rf node_modules/.cache",
-    "release": "npm run clean && npm run compile && npm run test && npm run vsce-package"
+    "clean": "rm -rf out && rm -rf *.vsix && rm -rf node_modules/.cache && rm -rf .tsbuildinfo",
+    "clean:all": "npm run clean && rm -rf node_modules",
+    "build": "npm run clean && npm run compile",
+    "build:prod": "npm run clean && npm run package",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "validate": "npm run typecheck && npm run lint:check && npm run format:check",
+    "release": "npm run validate && npm run test:coverage && npm run build:prod && npm run vsce-package",
+    "release:quick": "npm run test && npm run build:prod && npm run vsce-package",
+    "dev": "npm run watch",
+    "start": "npm run compile && code --extensionDevelopmentPath=.",
+    "debug": "npm run compile && code --extensionDevelopmentPath=. --verbose"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^16.18.126",
     "@types/vscode": "^1.74.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "@vscode/test-electron": "^2.2.0",
     "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "glob": "^8.0.3",
     "mocha": "^10.8.2",
+    "prettier": "^2.8.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
@@ -287,4 +302,3 @@
     "yaml": "^2.3.4"
   }
 }
- 

@@ -797,7 +797,7 @@ Ready to begin sequential execution!`;
 - [ ] Infrastructure & NFR response added
 - [ ] Task Breakdown response added
 
-## �� Quality Standards
+## 📊 Quality Standards
 
 Each stage should include:
 - **Specific to your codebase** - References actual files, patterns, architecture

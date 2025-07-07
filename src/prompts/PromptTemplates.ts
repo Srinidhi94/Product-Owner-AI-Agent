@@ -33,7 +33,7 @@ Senior product manager with UX design expertise. Focus on user impact and busine
 ## REQUIRED MERMAID DIAGRAMS
 
 ### User Journey Map (Current State):
-\`\`\`mermaid
+~~~mermaid
 journey
     title Current User Authentication Process
     section Login Attempt
@@ -43,10 +43,10 @@ journey
     section Success Path
       Access Granted       : 4: User
       Navigate to App      : 5: User
-\`\`\`
+~~~
 
 ### Stakeholder Impact Map:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Primary Users] --> B[Authentication System]
     C[Support Team] --> B  
@@ -55,7 +55,7 @@ graph TB
     
     style A fill:#e1f5fe
     style E fill:#e8f5e8
-\`\`\`
+~~~
 
 Provide comprehensive business analysis with clear user-centered justification.
 `;
@@ -91,7 +91,7 @@ Senior software architect with 10+ years Go microservice experience.
 ## REQUIRED MERMAID DIAGRAMS
 
 ### Current System Architecture:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Current Frontend] --> B[Existing API]
     B --> C[Current Auth]
@@ -100,10 +100,10 @@ graph TB
     
     style C fill:#ffebee
     style E fill:#ffebee
-\`\`\`
+~~~
 
 ### Proposed System Architecture:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Frontend App] --> B[API Gateway]  
     B --> C[Enhanced Auth Service]
@@ -113,16 +113,16 @@ graph TB
     
     style C fill:#e8f5e8
     style E fill:#e8f5e8
-\`\`\`
+~~~
 
 ### Data Flow Diagram:
-\`\`\`mermaid
+~~~mermaid
 flowchart LR
     A[User Request] --> B[Validation]
     B --> C[Token Generation]
     C --> D[Response]
     D --> E[Client Storage]
-\`\`\`
+~~~
 
 Use Context7 documentation for all Go/GORM/Gin best practices.
 `;
@@ -168,7 +168,7 @@ For the recommended approach:
 ## REQUIRED MERMAID DIAGRAMS
 
 ### Sequence Diagram - Login Flow:
-\`\`\`mermaid
+~~~mermaid
 sequenceDiagram
     participant U as User
     participant F as Frontend
@@ -182,10 +182,10 @@ sequenceDiagram
     A->>A: Generate JWT
     A-->>F: Return token
     F-->>U: Login success
-\`\`\`
+~~~
 
 ### Component Interaction:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Auth Handler] --> B[Validation Service]
     B --> C[User Repository]  
@@ -194,10 +194,10 @@ graph TB
     
     style A fill:#fff3e0
     style D fill:#e8f5e8
-\`\`\`
+~~~
 
 ### Database Schema:
-\`\`\`mermaid
+~~~
 erDiagram
     USER {
         int id PK
@@ -215,7 +215,7 @@ erDiagram
     }
     
     USER ||--o{ TOKEN : has
-\`\`\`
+~~~
 
 Focus on implementable, specific technical details with working code examples.
 `;
@@ -268,7 +268,7 @@ For the recommended approach:
 ## REQUIRED MERMAID DIAGRAMS
 
 ### Development Timeline (Gantt):
-\`\`\`mermaid
+~~~mermaid
 gantt
     title Development Timeline
     dateFormat  YYYY-MM-DD
@@ -281,10 +281,10 @@ gantt
     section Phase 3
     Testing & QA          :p5, after p4, 2w
     Production Deploy     :p6, after p5, 1w
-\`\`\`
+~~~
 
 ### Task Dependencies:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Database Setup] --> B[Auth Service]
     B --> C[API Endpoints]
@@ -297,10 +297,10 @@ graph TB
     
     style A fill:#e3f2fd
     style H fill:#e8f5e8
-\`\`\`
+~~~
 
 ### Team Workflow:
-\`\`\`mermaid
+~~~mermaid
 flowchart TD
     A[Sprint Planning] --> B[Development]
     B --> C[Code Review]
@@ -313,7 +313,7 @@ flowchart TD
     
     style E fill:#fff3e0
     style H fill:#e8f5e8
-\`\`\`
+~~~
 
 Provide actionable development plan with realistic timelines and clear deliverables.
 `;
@@ -369,7 +369,7 @@ For each identified risk:
 ## REQUIRED MERMAID DIAGRAMS
 
 ### Risk Impact Matrix:
-\`\`\`mermaid
+~~~mermaid
 quadrantChart
     title Risk Assessment Matrix
     x-axis Low Impact --> High Impact
@@ -383,10 +383,10 @@ quadrantChart
     Auth Integration: [0.6, 0.4]
     Performance Issues: [0.7, 0.5]
     Security Vulnerabilities: [0.9, 0.3]
-\`\`\`
+~~~
 
 ### Mitigation Flow:
-\`\`\`mermaid
+~~~
 flowchart TD
     A[Risk Identified] --> B{Risk Level}
     B -->|High| C[Immediate Action]
@@ -404,10 +404,10 @@ flowchart TD
     style C fill:#ffebee
     style J fill:#e8f5e8
     style K fill:#fff3e0
-\`\`\`
+~~~
 
 ### Contingency Plan:
-\`\`\`mermaid
+~~~mermaid
 graph TB
     A[Risk Triggers] --> B[Assessment]
     B --> C{Severity}
@@ -426,7 +426,7 @@ graph TB
     style D fill:#ffebee
     style G fill:#ffcdd2
     style J fill:#f3e5f5
-\`\`\`
+~~~
 
 Focus on actionable risk management with clear ownership and measurable outcomes.
 `;

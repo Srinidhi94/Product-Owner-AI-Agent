@@ -64,38 +64,16 @@ export class ErrorHandler {
    * Handle authentication errors (401/403)
    */
   private static async handleAuthenticationError(error: any, context: ErrorContext): Promise<boolean> {
-    const action = await vscode.window.showErrorMessage(
-      `🔐 Jira authentication failed during ${context.operation}.\n\nThis usually means your API token is invalid or expired.`,
-      { modal: true },
-      'Open Settings',
-      'Get API Token Help',
-      'Test Connection',
-      'Cancel'
+    const action = await vscode.window.showInformationMessage(
+      `🔐 Jira configuration is incomplete or invalid.\n\nPlease configure your Jira settings in the extension settings.`,
+      'Open Settings'
     );
 
-    switch (action) {
-      case 'Open Settings':
-        await vscode.commands.executeCommand('aiProductOwner.configureSettings');
-        return true;
-        
-      case 'Get API Token Help':
-        await vscode.env.openExternal(vscode.Uri.parse('https://id.atlassian.com/manage-profile/security/api-tokens'));
-        await vscode.window.showInformationMessage(
-          '💡 After creating your API token:\n1. Copy the token\n2. Go to extension settings\n3. Paste it in the "Token" field',
-          'Open Settings'
-        ).then(result => {
-          if (result === 'Open Settings') {
-            vscode.commands.executeCommand('aiProductOwner.configureSettings');
-          }
-        });
-        return false;
-        
-      case 'Test Connection':
-        return await this.testJiraConnection();
-        
-      default:
-        return false;
+    if (action === 'Open Settings') {
+      await vscode.commands.executeCommand('aiProductOwner.configureSettings');
     }
+    
+    return false;
   }
 
   /**
@@ -120,8 +98,8 @@ export class ErrorHandler {
           value: epicKey === 'the requested epic' ? '' : epicKey,
           placeHolder: 'e.g., PROJ-123',
           validateInput: (value) => {
-            if (!value) return 'Epic key is required';
-            if (!/^[A-Z]+-\d+$/i.test(value)) return 'Epic key format: PROJECT-NUMBER';
+            if (!value) {return 'Epic key is required';}
+            if (!/^[A-Z]+-\d+$/i.test(value)) {return 'Epic key format: PROJECT-NUMBER';}
             return null;
           }
         });
@@ -173,66 +151,24 @@ export class ErrorHandler {
    * Handle network errors
    */
   private static async handleNetworkError(error: any, context: ErrorContext): Promise<boolean> {
-    const retryConfig: RetryConfig = {
-      maxRetries: 3,
-      baseDelay: 1000,
-      maxDelay: 10000,
-      exponentialBase: 2
-    };
-
-    const action = await vscode.window.showErrorMessage(
-      `🌐 Network error during ${context.operation}.\n\nError: ${error.message}\n\nThis might be a temporary connectivity issue.`,
-      { modal: true },
-      'Retry Now',
-      'Retry with Backoff',
-      'Check Connection',
-      'Cancel'
+    await vscode.window.showInformationMessage(
+      `🌐 Network error during ${context.operation}.\n\nPlease check your internet connection and ensure you can access your Jira instance.`,
+      'OK'
     );
-
-    switch (action) {
-      case 'Retry Now':
-        return true;
-        
-      case 'Retry with Backoff':
-        return await this.retryWithExponentialBackoff(context, retryConfig);
-        
-      case 'Check Connection':
-        await this.checkNetworkConnectivity();
-        return false;
-        
-      default:
-        return false;
-    }
+    
+    return false;
   }
 
   /**
    * Handle generic Jira errors
    */
   private static async handleGenericJiraError(error: any, context: ErrorContext): Promise<boolean> {
-    const action = await vscode.window.showErrorMessage(
-      `❌ Jira error during ${context.operation}.\n\nError: ${error.message}\nCode: ${error.status || 'Unknown'}`,
-      { modal: true },
-      'Retry',
-      'Show Details',
-      'Report Issue',
-      'Cancel'
+    await vscode.window.showInformationMessage(
+      `❌ Jira error during ${context.operation}.\n\nPlease check your Jira configuration and ensure the service is accessible.`,
+      'OK'
     );
-
-    switch (action) {
-      case 'Retry':
-        return true;
-        
-      case 'Show Details':
-        this.showErrorDetails(error, context);
-        return false;
-        
-      case 'Report Issue':
-        await this.reportIssue(error, context);
-        return false;
-        
-      default:
-        return false;
-    }
+    
+    return false;
   }
 
   /**

@@ -11,6 +11,7 @@ import { GoCodebaseAnalyzer } from './analyzer/GoCodebaseAnalyzer';
 import { MultiStageAnalysisEngine } from './analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from './utils/ConfigurationManager';
 import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
+import { WelcomeManager } from './utils/WelcomeManager';
 import { 
   ExtensionState, 
   JiraPortfolio, 
@@ -65,7 +66,7 @@ class ExtensionStateManager {
 /**
  * Main extension activation function
  */
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('🚀 AI Product Owner Agent extension is now active!');
 
   // Initialize error handler and status management
@@ -90,8 +91,9 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Show welcome walkthrough for first-time users
-  ErrorHandler.showWelcomeWalkthrough(context);
+  // Initialize welcome manager and show walkthrough for first-time users
+  const welcomeManager = WelcomeManager.getInstance(context);
+  await welcomeManager.handleActivation();
 
   console.log('✅ AI Product Owner Agent extension activated successfully');
 }
@@ -191,63 +193,17 @@ function registerCommands(
   );
 
   // Open result command - now works without parameters
-  const openResultCommand = vscode.commands.registerCommand(
-    'aiProductOwner.openResult',
-    async (filePath?: string) => {
-      try {
-        const state = stateManager.getState();
-        
-        // If no file path provided, try to find the latest analysis results
-        if (!filePath) {
-          if (!state.currentEpic) {
-            vscode.window.showInformationMessage('No analysis results found. Run an epic analysis first.');
-            return;
-          }
-          
-          // Try to find the output directory for the current epic
-          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-          if (workspaceFolder) {
-            const outputDir = path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', state.currentEpic);
-            const readmePath = path.join(outputDir, 'README.md');
-            
-            if (fs.existsSync(readmePath)) {
-              filePath = readmePath;
-            } else {
-              // Show directory picker
-              const action = await vscode.window.showInformationMessage(
-                `No analysis results found for ${state.currentEpic}. What would you like to do?`,
-                'Open Output Folder',
-                'Run New Analysis'
-              );
-              
-              if (action === 'Open Output Folder') {
-                const uri = vscode.Uri.file(outputDir);
-                await vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: true });
-              } else if (action === 'Run New Analysis') {
-                await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-              }
-              return;
-            }
-          }
-        }
-        
-        if (filePath && fs.existsSync(filePath)) {
-          const uri = vscode.Uri.file(filePath);
-          await vscode.window.showTextDocument(uri);
-        } else {
-          vscode.window.showErrorMessage(`❌ File not found: ${filePath || 'undefined'}`);
-        }
-      } catch (error) {
-        vscode.window.showErrorMessage(`❌ Failed to open analysis results: ${error}`);
-      }
-    }
-  );
+  // Remove the openResultCommand registration and handler
+  // Remove any references to 'aiProductOwner.openResult' in the manual stage progression and elsewhere
+  // In the manual stage progression, remove the 'View Current Results' option and its case
+  // In the context.subscriptions, remove openResultCommand
 
   // Additional UX commands
   const openWalkthroughCommand = vscode.commands.registerCommand(
     'aiProductOwner.openWalkthrough',
     async () => {
-      await ErrorHandler.showWelcomeWalkthrough(context);
+      const welcomeManager = WelcomeManager.getInstance(context);
+      await welcomeManager.forceShowWalkthrough();
     }
   );
 
@@ -296,7 +252,7 @@ function registerCommands(
     async () => {
       try {
         const epicKey = await getEpicKeyFromUser();
-        if (!epicKey) return;
+        if (!epicKey) {return;}
 
         const config = configManager.getJiraConfiguration();
         const jiraClient = new JiraClient(config);
@@ -386,16 +342,12 @@ If you don't see this information in the generated prompts, there's a bug.`;
 
       const action = await vscode.window.showInformationMessage(
         `🔄 Manual Stage Progression for ${state.currentEpic}\n\nChoose your next action:`,
-        'View Current Results',
         'Open Output Folder',  
         'Restart Analysis',
         'Skip to Summary'
       );
 
       switch (action) {
-        case 'View Current Results':
-          await vscode.commands.executeCommand('aiProductOwner.openResult');
-          break;
         case 'Open Output Folder': {
           const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
           if (workspaceFolder) {
@@ -460,7 +412,6 @@ If you don't see this information in the generated prompts, there's a bug.`;
     configureSettingsCommand,
     refreshDocumentationCommand,
     copyPromptCommand,
-    openResultCommand,
     openWalkthroughCommand,
     testConnectionCommand,
     testJiraDataCommand,
@@ -735,7 +686,7 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     placeHolder: 'company.atlassian.net',
     ignoreFocusOut: true,
     validateInput: (value) => {
-      if (!value) return 'Jira URL is required';
+      if (!value) {return 'Jira URL is required';}
       if (value.includes('http://') || value.includes('https://')) {
         return 'Enter domain only (without http:// or https://)';
       }
@@ -743,7 +694,7 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     }
   });
 
-  if (!baseUrl) return;
+  if (!baseUrl) {return;}
 
   // Get email
   const email = await vscode.window.showInputBox({
@@ -752,13 +703,13 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     placeHolder: 'your.email@company.com',
     ignoreFocusOut: true,
     validateInput: (value) => {
-      if (!value) return 'Email is required';
-      if (!value.includes('@')) return 'Please enter a valid email address';
+      if (!value) {return 'Email is required';}
+      if (!value.includes('@')) {return 'Please enter a valid email address';}
       return null;
     }
   });
 
-  if (!email) return;
+  if (!email) {return;}
 
   // Get API token with security notice
   const tokenInfo = await vscode.window.showInformationMessage(
@@ -772,20 +723,20 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     return;
   }
 
-  if (tokenInfo !== 'I have a token') return;
+  if (tokenInfo !== 'I have a token') {return;}
 
   const token = await vscode.window.showInputBox({
     prompt: 'Enter your Jira API token',
     password: true,
     ignoreFocusOut: true,
     validateInput: (value) => {
-      if (!value) return 'API token is required';
-      if (value.length < 10) return 'API token seems too short';
+      if (!value) {return 'API token is required';}
+      if (value.length < 10) {return 'API token seems too short';}
       return null;
     }
   });
 
-  if (!token) return;
+  if (!token) {return;}
 
   // Save configuration
   await config.update('baseUrl', baseUrl, vscode.ConfigurationTarget.Global);
@@ -899,7 +850,7 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
     ignoreFocusOut: true
   });
 
-  if (!selection) return;
+  if (!selection) {return;}
 
   try {
     if (selection.label === '📁 Open Output Folder' || selection.filePath.endsWith('stages')) {

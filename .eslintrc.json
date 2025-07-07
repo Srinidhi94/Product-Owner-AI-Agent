@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "browser": false,
     "es6": true,
@@ -10,14 +11,21 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "rules": {
+    "no-console": "off",
     "no-unused-vars": "off",
     "prefer-const": "error",
-    "no-var": "error",
-    "no-console": "off"
+    "no-var": "error"
   },
-  "ignorePatterns": ["out", "dist", "**/*.d.ts", "webpack.config.js"]
+  "ignorePatterns": [
+    "out",
+    "dist", 
+    "node_modules",
+    "**/*.d.ts",
+    "*.vsix",
+    ".vscode",
+    "webpack.config.js"
+  ]
 } 

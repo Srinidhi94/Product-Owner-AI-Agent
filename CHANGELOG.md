@@ -5,6 +5,26 @@ All notable changes to the AI Product Owner Agent extension will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-01-07
+
+### 🐛 Fixed
+- **Welcome Walkthrough**: Fixed non-working welcome walkthrough functionality by properly connecting WelcomeManager to extension commands
+- **Mermaid Diagrams**: Fixed Mermaid diagram markdown parsing issues by replacing triple backticks with tildes in all prompt templates
+- **Extension Activation**: Improved first-time user experience with proper welcome manager initialization
+- **Command Registration**: Removed duplicate command registration causing confusing dropdown subtext
+
+### 🔧 Technical Changes
+- Updated extension activation to use async/await pattern for proper welcome manager initialization
+- Connected WelcomeManager.forceShowWalkthrough() to the "Show Welcome Walkthrough" command
+- Replaced all `\`\`\`mermaid` blocks with `~~~mermaid` blocks to prevent markdown parsing conflicts
+- Updated validateMermaidDiagrams function to detect tilde-delimited blocks
+- Fixed DocumentGenerator createDiagramPreview to use tilde delimiters
+
+### 📦 Packaging
+- Updated extension package (ai-product-owner-agent-1.0.1.vsix) with all fixes
+- Verified compilation and build process works correctly
+- Extension size: 5.48MB with all improvements
+
 ## [1.0.0] - 2024-12-29
 
 ### 🎉 Initial Release

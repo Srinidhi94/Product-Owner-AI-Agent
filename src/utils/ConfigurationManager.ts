@@ -253,7 +253,7 @@ export class ConfigurationManager {
    */
   isGoProject(): boolean {
     const workspacePath = this.getWorkspacePath();
-    if (!workspacePath) return false;
+    if (!workspacePath) {return false;}
     
     try {
       const fs = require('fs');
@@ -261,7 +261,7 @@ export class ConfigurationManager {
       
       // Check for go.mod file
       const goModPath = path.join(workspacePath, 'go.mod');
-      if (fs.existsSync(goModPath)) return true;
+      if (fs.existsSync(goModPath)) {return true;}
       
       // Check for any .go files
       const files = fs.readdirSync(workspacePath);
