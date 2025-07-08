@@ -20,7 +20,7 @@ graph TD
     H --> M[Copilot Integration]
     M --> N[User Pastes Prompt]
     N --> O[Copilot Response]
-    O --> P[User Pastes Response]
+    O --> P[Copilot updates the appropriate section]
     P --> Q[Documentation Updated]
 ```
 
@@ -82,8 +82,7 @@ sequenceDiagram
     AnalysisEngine->>User: Prompt ready (copy to Copilot)
     User->>Copilot: Paste prompt
     Copilot-->>User: Response
-    User->>DocGen: Paste response
-    DocGen-->>User: Updated documentation
+    Copilot->>DocGen: Update documentation
 ```
 
 ---
@@ -98,7 +97,7 @@ sequenceDiagram
 ## Visual: Component Interactions
 ```mermaid
 graph LR
-    subgraph VS Code Extension
+    subgraph VS Code Extension Boundary
       A[extension.ts] --> B[MultiStageAnalysisEngine]
       B --> C[JiraClient]
       B --> D[GoCodebaseAnalyzer]
@@ -108,8 +107,7 @@ graph LR
     F --> G[Output Files]
     E --> H[Prompts]
     H --> I[Copilot/LLM]
-    I --> J[User]
-    J --> F
+    I --> F
 ```
 
 ---
