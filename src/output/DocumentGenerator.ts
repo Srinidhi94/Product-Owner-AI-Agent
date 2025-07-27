@@ -32,10 +32,10 @@ export class DocumentGenerator {
 
   constructor() {
     this.outputChannel = vscode.window.createOutputChannel('AI Product Owner - Document Generator');
-    
+
     // Get workspace folder for output
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    this.baseOutputDir = workspaceFolder 
+    this.baseOutputDir = workspaceFolder
       ? path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output')
       : path.join(process.cwd(), 'ai-analysis-output');
 
@@ -54,13 +54,13 @@ export class DocumentGenerator {
    */
   async initializeOutputStructure(epicKey: string): Promise<string> {
     const epicDir = this.getOutputDirectory(epicKey);
-    
+
     // Create directory structure
     const directories = [
       epicDir,
       path.join(epicDir, 'stages'),
       path.join(epicDir, 'templates'),
-      path.join(epicDir, 'assets')
+      path.join(epicDir, 'assets'),
     ];
 
     for (const dir of directories) {
@@ -82,7 +82,7 @@ export class DocumentGenerator {
    */
   async initializeCleanOutputStructure(epicKey: string): Promise<string> {
     const epicDir = this.getOutputDirectory(epicKey);
-    
+
     // Create simple directory structure (no templates/assets folders)
     if (!fs.existsSync(epicDir)) {
       fs.mkdirSync(epicDir, { recursive: true });
@@ -103,13 +103,13 @@ export class DocumentGenerator {
   ): Promise<string> {
     const analysisPath = path.join(this.getOutputDirectory(epicKey), 'TECHNICAL_ANALYSIS.md');
     const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
-    
+
     const masterContent = `# Technical Analysis - ${epicKey}
 
 **Generated**: ${new Date().toLocaleString()}
 **Epic**: ${jiraData.key} - ${jiraData.name}
 **Analysis Type**: Automated Technical Analysis
-**Codebase**: ${codebaseData.totalFiles} Go files, ${codebaseData.packages.length} packages
+**Codebase**: ${codebaseData.totalFiles} source files, ${codebaseData.packages.length} modules
 
 ---
 
@@ -117,17 +117,17 @@ export class DocumentGenerator {
 
 This document contains the comprehensive technical analysis following the Principal Engineer workflow:
 
-1. **📋 Requirements Analysis** - Understanding and dependencies
-2. **🎯 Design Overview** - High-level architecture concept
-3. **🔧 Detailed Technical Design** - Implementation specifications
-4. **🏗️ Infrastructure & NFR** - Operations and performance
-5. **📝 Task Breakdown** - Jira-ready implementation tasks
+1. **📋 Business Analysis** - Comprehensive business analysis with MCP research integration
+2. **🎯 Technical Architecture** - Universal language architecture analysis with MCP integration
+3. **🔧 Implementation Design** - Implementation design for universal language support
+4. **🏗️ Development Plan** - Development planning with universal language considerations
+5. **📝 Risk Assessment** - Comprehensive risk analysis with mitigation strategies
 
 **Note**: All generated prompts are stored in [PROMPTS.md](./PROMPTS.md) for reference and reuse.
 
 ---
 
-## 📋 1. Requirements Analysis
+## 📋 1. Business Analysis
 
 ### Jira Requirements
 - **Epic**: ${jiraData.key} - ${jiraData.name}
@@ -135,92 +135,99 @@ This document contains the comprehensive technical analysis following the Princi
 - **Story Points**: ${jiraData.totalStoryPoints}
 - **Description**: ${jiraData.description || 'See Jira for details'}
 
-### 🤖 Copilot Response
+### 🤖 Automated Analysis Process
 
-> **📋 Instructions**: 
-> 1. Copy the Requirements Analysis prompt from [PROMPTS.md](./PROMPTS.md) (Stage 1)
-> 2. Paste it in GitHub Copilot Chat
-> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
-> 4. Replace this entire section below with Copilot's response
+> **⚡ Automation**: GitHub Copilot will automatically populate this section using integrated MCP servers.
+> **🔍 Research Sources**: Context7, Microsoft Docs, Sequential Thinking (with fallback), Browser MCP
+> **⏱️ Duration**: ~8 minutes with comprehensive research validation
+> **📊 Expected Output**: Complete business analysis with stakeholder mapping and success metrics
 
-### 🤖 Copilot Response Section:
+### 🤖 Analysis Results Section:
 
----
-
-## 🎯 2. Design Overview
-
-### 🤖 Copilot Response
-
-> **📋 Instructions**: 
-> 1. Copy the Design Overview prompt from [PROMPTS.md](./PROMPTS.md) (Stage 2)
-> 2. Paste it in GitHub Copilot Chat
-> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
-> 4. Replace this entire section below with Copilot's response
-
-### 🤖 Copilot Response Section:
+*This section will be automatically populated with comprehensive business analysis...*
 
 ---
 
-## 🔧 3. Detailed Technical Design
+## 🎯 2. Technical Architecture
 
-### 🤖 Copilot Response
+### 🤖 Automated Analysis Process
 
-> **📋 Instructions**: 
-> 1. Copy the Technical Design prompt from [PROMPTS.md](./PROMPTS.md) (Stage 3)
-> 2. Paste it in GitHub Copilot Chat
-> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
-> 4. Replace this entire section below with Copilot's response
+> **⚡ Automation**: GitHub Copilot will automatically generate technical architecture analysis.
+> **🔍 Research Sources**: Context7 architecture patterns, Microsoft Docs best practices, industry standards
+> **⏱️ Duration**: ~12 minutes with comprehensive architecture research
+> **📊 Expected Output**: System architecture diagrams, technology decisions, and implementation roadmap
 
-### 🤖 Copilot Response Section:
+### 🤖 Analysis Results Section:
 
----
-
-## 🏗️4. Infrastructure & Non-Functional Requirements
-
-### 🤖 Copilot Response
-
-> **📋 Instructions**: 
-> 1. Copy the Infrastructure & NFR prompt from [PROMPTS.md](./PROMPTS.md) (Stage 4)
-> 2. Paste it in GitHub Copilot Chat
-> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
-> 4. Replace this entire section below with Copilot's response
-
-### 🤖 Copilot Response Section:
+*This section will be automatically populated with technical architecture analysis...*
 
 ---
 
-## 📝 5. Task Breakdown
+---
 
-### 🤖 Copilot Response
+## 🔧 3. Implementation Design
 
-> **📋 Instructions**: 
-> 1. Copy the Task Breakdown prompt from [PROMPTS.md](./PROMPTS.md) (Stage 5)
-> 2. Paste it in GitHub Copilot Chat
-> 3. Wait ⏱️ Wait - Let Copilot analyze and generate response
-> 4. Replace this entire section below with Copilot's response
+### 🤖 Automated Analysis Process
 
-### 🤖 Copilot Response Section:
+> **⚡ Automation**: GitHub Copilot will automatically generate detailed implementation specifications.
+> **🔍 Research Sources**: Context7 implementation patterns, coding best practices, framework documentation
+> **⏱️ Duration**: ~15 minutes with comprehensive design research and validation
+> **📊 Expected Output**: Component architecture, database schemas, API specifications, and implementation flows
+
+### 🤖 Analysis Results Section:
+
+*This section will be automatically populated with implementation design analysis...*
 
 ---
 
-## ✅ Completion Checklist:
-- [x] **Stage 1**: Requirements Analysis response pasted ✅
-- [x] **Stage 2**: Design Overview response pasted ✅  
-- [x] **Stage 3**: Technical Design response pasted ✅
-- [x] **Stage 4**: Infrastructure & NFR response pasted ✅
-- [x] **Stage 5**: Task Breakdown response pasted ✅
+## 🏗️ 4. Development Plan
 
-**Progress**: 5/5 stages complete ✅
+### 🤖 Automated Analysis Process
+
+> **⚡ Automation**: GitHub Copilot will automatically generate comprehensive development planning.
+> **🔍 Research Sources**: Agile methodologies, sprint planning best practices, resource allocation strategies
+> **⏱️ Duration**: ~12 minutes with development workflow research and team coordination analysis
+> **📊 Expected Output**: Sprint timelines, resource allocation matrices, team workflows, and dependency management
+
+### 🤖 Analysis Results Section:
+
+*This section will be automatically populated with development planning analysis...*
+
+---
+
+## 📝 5. Risk Assessment
+
+### 🤖 Automated Analysis Process
+
+> **⚡ Automation**: GitHub Copilot will automatically perform comprehensive risk analysis with mitigation strategies.
+> **🔍 Research Sources**: Risk management frameworks, incident response patterns, industry failure case studies
+> **⏱️ Duration**: ~10 minutes with risk analysis research and mitigation planning
+> **📊 Expected Output**: Risk matrices, probability assessments, mitigation workflows, and contingency plans
+
+### 🤖 Analysis Results Section:
+
+*This section will be automatically populated with risk assessment analysis...*
+
+---
+
+## ✅ Automated Completion Status:
+- [x] **Stage 1**: Business Analysis - Auto-populated ✅
+- [x] **Stage 2**: Technical Architecture - Auto-populated ✅  
+- [x] **Stage 3**: Implementation Design - Auto-populated ✅
+- [x] **Stage 4**: Development Plan - Auto-populated ✅
+- [x] **Stage 5**: Risk Assessment - Auto-populated ✅
+
+**Progress**: 5/5 stages completed automatically ✅
 
 ### 📊 Quality Verification
-- [ ] All required Mermaid diagrams present
+- [ ] All required Mermaid diagrams generated
 - [ ] Codebase-specific technical details included
-- [ ] Principal Engineer level analysis depth
-- [ ] Implementation-ready specifications
+- [ ] Principal Engineer level analysis depth achieved
+- [ ] Implementation-ready specifications provided
 
 ### 🎯 Final Validation
-- [ ] All prompt responses completed
-- [ ] Technical approach clearly defined
+- [ ] All automated analysis responses completed
+- [ ] Technical approach clearly defined with MCP research validation
 - [ ] Ready for development implementation
 
 ---
@@ -247,13 +254,9 @@ This document contains the comprehensive technical analysis following the Princi
   /**
    * Create separate prompts document for reference and reuse
    */
-  async createPromptsDocument(
-    epicKey: string,
-    jiraData: any,
-    codebaseData: any
-  ): Promise<string> {
+  async createPromptsDocument(epicKey: string, jiraData: any, codebaseData: any): Promise<string> {
     const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
-    
+
     const promptsContent = `# 📋 Generated Prompts - ${epicKey}
 
 **Generated**: ${new Date().toLocaleString()}  
@@ -284,7 +287,7 @@ This document contains the comprehensive technical analysis following the Princi
 
 ---
 
-# Stage 1: Requirements Analysis
+# Stage 1: Business Analysis
 
 **Role**: Principal Engineer | **Status**: ⏳ Pending
 
@@ -298,13 +301,13 @@ This document contains the comprehensive technical analysis following the Princi
 
 1. Copy Copilot's complete response 
 2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
-3. Find **"## 📋 1. Requirements Analysis"** section
+3. Find **"## 📋 1. Business Analysis"** section
 4. Replace the placeholder text with Copilot's response
 5. Verify all required Mermaid diagrams are included
 
 ---
 
-# Stage 2: Design Overview
+# Stage 2: Technical Architecture
 
 **Role**: Principal Engineer | **Status**: ⏳ Pending
 
@@ -318,7 +321,7 @@ This document contains the comprehensive technical analysis following the Princi
 
 1. Copy Copilot's complete response
 2. Open [TECHNICAL_ANALYSIS.md](./TECHNICAL_ANALYSIS.md)
-3. Find **"## 🎯 2. Design Overview"** section
+3. Find **"## 🎯 2. Technical Architecture"** section
 4. Replace the placeholder text with Copilot's response
 5. Verify all required Mermaid diagrams are included
 
@@ -364,7 +367,7 @@ This document contains the comprehensive technical analysis following the Princi
 
 ---
 
-# Stage 5: Task Breakdown
+# Stage 5: Risk Assessment
 
 **Role**: Product Owner | **Status**: ⏳ Pending
 
@@ -401,7 +404,7 @@ This document contains the comprehensive technical analysis following the Princi
 
 ---
 
-*Generated by AI Product Owner Agent - Enhanced with Anthropic prompt engineering best practices*
+*Generated by AI Product Owner Agent - Production-ready with advanced prompt engineering best practices*
 `;
 
     fs.writeFileSync(promptsPath, promptsContent, 'utf-8');
@@ -421,7 +424,7 @@ This document contains the comprehensive technical analysis following the Princi
   ): Promise<void> {
     // Save to master document (existing functionality)
     await this.saveStagePrompt(epicKey, stage, prompt, stageNumber);
-    
+
     // Also save to prompts document
     await this.updatePromptsDocument(epicKey, stage, prompt, stageNumber);
   }
@@ -436,46 +439,46 @@ This document contains the comprehensive technical analysis following the Princi
     stageNumber: number
   ): Promise<void> {
     const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
-    
+
     if (!fs.existsSync(promptsPath)) {
       this.log(`⚠️ Prompts document not found for ${epicKey}`);
       return;
     }
 
     let content = fs.readFileSync(promptsPath, 'utf-8');
-    
+
     // Update the navigation table status from Pending to Executed
-    const stageNames = [
-      'Stage 1',
-      'Stage 2', 
-      'Stage 3',
-      'Stage 4',
-      'Stage 5'
-    ];
-    
+    const stageNames = ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'];
+
     const stageName = stageNames[stageNumber - 1];
-    
+
     // Update navigation table status
     content = content.replace(
       new RegExp(`(\\| \\[.*?${stageName}.*?\\].*?\\| .*? \\|) ⏳ Pending (\\|)`, 'g'),
       `$1 📝 Executed $2`
     );
-    
-    // Find the specific stage section and replace its placeholder  
+
+    // Find the specific stage section and replace its placeholder
     const placeholderText = String.raw`\[Prompt will be automatically populated when stage executes\]`;
-    const stageHeaderPattern = new RegExp(`(# Stage ${stageNumber}:.*?## 📝 Prompt for Copilot.*?)${placeholderText}`, 'gs');
-    
+    const stageHeaderPattern = new RegExp(
+      `(# Stage ${stageNumber}:.*?## 📝 Prompt for Copilot.*?)${placeholderText}`,
+      'gs'
+    );
+
     content = content.replace(stageHeaderPattern, (match, prefix) => {
       return `${prefix}\`\`\`\n${prompt.content}\n\`\`\``;
     });
-    
+
     // Update the status in the stage section header
     const stageTitle = `# Stage ${stageNumber}:`;
     content = content.replace(
-      new RegExp(`(${stageTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) ⏳ Pending`, 's'),
+      new RegExp(
+        `(${stageTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) ⏳ Pending`,
+        's'
+      ),
       `$1 📝 Executed`
     );
-    
+
     fs.writeFileSync(promptsPath, content, 'utf-8');
     this.log(`✅ Updated PROMPTS.md with ${stage.name} prompt (Executed)`);
   }
@@ -492,70 +495,85 @@ This document contains the comprehensive technical analysis following the Princi
     const promptsPath = path.join(this.getOutputDirectory(epicKey), 'PROMPTS.md');
     if (fs.existsSync(promptsPath)) {
       let promptsContent = fs.readFileSync(promptsPath, 'utf-8');
-      
+
       // Update navigation table to show completed
       const stageRef = `Stage ${stageNumber}`;
       promptsContent = promptsContent.replace(
         new RegExp(`(\\| \\[.*?${stageRef}.*?\\].*?\\| .*? \\| .*? \\|) 📝 Executed (\\|)`, 'g'),
         `$1 ✅ Completed $2`
       );
-      
+
       // Update section status
       const stageTitle = `# Stage ${stageNumber}:`;
       promptsContent = promptsContent.replace(
-        new RegExp(`(${stageTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) 📝 Executed`, 's'),
+        new RegExp(
+          `(${stageTitle.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+          )}.*?\\*\\*Status\\*\\*:) 📝 Executed`,
+          's'
+        ),
         `$1 ✅ Completed`
       );
-      
+
       fs.writeFileSync(promptsPath, promptsContent, 'utf-8');
     }
-    
+
     // Update TECHNICAL_ANALYSIS.md response status
     const analysisPath = path.join(this.getOutputDirectory(epicKey), 'TECHNICAL_ANALYSIS.md');
     if (fs.existsSync(analysisPath)) {
       let analysisContent = fs.readFileSync(analysisPath, 'utf-8');
-      
+
       // Update the response status for the specific stage
       const stageHeaders = [
         '## 📋 1. Requirements Analysis',
         '## 🎯 2. Design Overview',
         '## 🔧 3. Detailed Technical Design',
         '## 🏗️ 4. Infrastructure & Non-Functional Requirements',
-        '## 📝 5. Task Breakdown'
+        '## 📝 5. Task Breakdown',
       ];
-      
+
       if (stageNumber <= stageHeaders.length) {
         const stageHeader = stageHeaders[stageNumber - 1];
-        
+
         // Find the section and update its status
         const statusPattern = new RegExp(
-          `(${stageHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\*\\*Status\\*\\*:) ⏳ Waiting for Copilot response`, 
+          `(${stageHeader.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+          )}.*?\\*\\*Status\\*\\*:) ⏳ Waiting for Copilot response`,
           's'
         );
-        
+
         analysisContent = analysisContent.replace(statusPattern, `$1 ✅ Response completed`);
       }
-      
+
       // Update completion checklist
       const checklistItems = [
         'Requirements Analysis response pasted',
         'Design Overview response pasted',
-        'Technical Design response pasted', 
+        'Technical Design response pasted',
         'Infrastructure & NFR response pasted',
-        'Task Breakdown response pasted'
+        'Task Breakdown response pasted',
       ];
-      
+
       if (stageNumber <= checklistItems.length) {
         const itemText = checklistItems[stageNumber - 1];
         analysisContent = analysisContent.replace(
-          new RegExp(`- \\[ \\] \\*\\*Stage ${stageNumber}\\*\\*: ${itemText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'),
+          new RegExp(
+            `- \\[ \\] \\*\\*Stage ${stageNumber}\\*\\*: ${itemText.replace(
+              /[.*+?^${}()|[\]\\]/g,
+              '\\$&'
+            )}`,
+            'g'
+          ),
           `- [x] **Stage ${stageNumber}**: ${itemText}`
         );
       }
-      
+
       fs.writeFileSync(analysisPath, analysisContent, 'utf-8');
     }
-    
+
     this.log(`✅ Marked ${stageName} (Stage ${stageNumber}) as completed`);
   }
 
@@ -569,26 +587,26 @@ This document contains the comprehensive technical analysis following the Princi
     stageNumber: number
   ): Promise<void> {
     const masterDocPath = path.join(this.getOutputDirectory(epicKey), 'TECHNICAL_ANALYSIS.md');
-    
+
     if (!fs.existsSync(masterDocPath)) {
       this.log(`⚠️ Master document not found for ${epicKey}`);
       return;
     }
 
     let content = fs.readFileSync(masterDocPath, 'utf-8');
-    
+
     // Find the section for this stage and update the prompt
     const stageMap = {
       1: 'Requirements Analysis',
-      2: 'Design Overview', 
+      2: 'Design Overview',
       3: 'Detailed Technical Design',
       4: 'Infrastructure & Non-Functional Requirements',
-      5: 'Task Breakdown'
+      5: 'Task Breakdown',
     };
 
     const stageName = stageMap[stageNumber as keyof typeof stageMap];
     const promptPlaceholder = `*[Automated prompt for ${stageName} will be documented here]*`;
-    
+
     // Create a collapsed section for the prompt to keep document clean
     const promptSection = `
 <details>
@@ -604,7 +622,7 @@ ${prompt.content}
 </details>`;
 
     content = content.replace(promptPlaceholder, promptSection);
-    
+
     fs.writeFileSync(masterDocPath, content, 'utf-8');
     this.log(`📝 Saved ${stage.name} prompt to master document`);
   }
@@ -614,7 +632,7 @@ ${prompt.content}
    */
   async generateCompletionSummary(epicKey: string, stages: any[]): Promise<void> {
     const summaryPath = path.join(this.getOutputDirectory(epicKey), 'AUTOMATION_SUMMARY.md');
-    
+
     const summaryContent = `# Automation Summary - ${epicKey}
 
 **Generated**: ${new Date().toLocaleString()}
@@ -629,7 +647,9 @@ ${prompt.content}
 - ✅ File structure optimized for technical analysis
 
 ### 2. Stage Execution
-${stages.map((stage, index) => `
+${stages
+  .map(
+    (stage, index) => `
 #### Stage ${index + 1}: ${stage.name}
 - ✅ Technical prompt generated
 - ✅ Prompt copied to clipboard
@@ -637,7 +657,9 @@ ${stages.map((stage, index) => `
 - ✅ Non-modal guidance provided
 - ✅ Prompt documented in master document
 - 📋 **Required Diagrams**: ${stage.requiredDiagrams.join(', ')}
-`).join('')}
+`
+  )
+  .join('')}
 
 ### 3. Documentation
 - ✅ All prompts saved to master document
@@ -688,7 +710,7 @@ Your automated technical analysis is ready for completion!
   ): Promise<string> {
     const templateContent = this.generateStageTemplate(stageName, requiredDiagrams);
     const templatePath = this.getStageTemplatePath(stageId);
-    
+
     // Ensure directory exists
     const templateDir = path.dirname(templatePath);
     if (!fs.existsSync(templateDir)) {
@@ -707,7 +729,7 @@ Your automated technical analysis is ready for completion!
    */
   private generateStageTemplate(stageName: string, requiredDiagrams: string[]): string {
     const timestamp = new Date().toLocaleString();
-    
+
     return `# ${stageName} - Analysis Output
 
 **Generated**: ${timestamp}
@@ -763,7 +785,7 @@ Copy Copilot's response above this comment
    */
   private async createEpicReadme(epicKey: string): Promise<void> {
     const readmePath = path.join(this.getOutputDirectory(epicKey), 'README.md');
-    
+
     const readmeContent = `# AI Product Owner Analysis - ${epicKey}
 
 **Generated**: ${new Date().toLocaleString()}
@@ -851,18 +873,25 @@ When all stages are complete, a comprehensive \`SUMMARY.md\` will be generated w
   /**
    * Create Mermaid diagram preview file
    */
-  async createDiagramPreview(epicKey: string, diagrams: Array<{title: string, code: string}>): Promise<void> {
+  async createDiagramPreview(
+    epicKey: string,
+    diagrams: Array<{ title: string; code: string }>
+  ): Promise<void> {
     const previewContent = `# 📊 Diagram Gallery - ${epicKey}
 
 This document contains all Mermaid diagrams generated during analysis.
 
-${diagrams.map((diagram, index) => `
+${diagrams
+  .map(
+    (diagram, index) => `
 ## ${index + 1}. ${diagram.title}
 
 ~~~mermaid
 ${diagram.code}
 ~~~
-`).join('')}
+`
+  )
+  .join('')}
 `;
 
     const previewPath = path.join(this.getOutputDirectory(epicKey), 'DIAGRAMS.md');

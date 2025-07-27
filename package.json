@@ -1,28 +1,39 @@
 {
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
-  "description": "Analyze Jira epics and Go codebases to generate visual technical documentation",
-  "version": "1.0.1",
+  "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
+  "version": "1.0.3",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Other",
     "Visualization",
-    "Documentation"
+    "Documentation",
+    "Extension Packs"
   ],
-  "publisher": "your-company-internal",
+  "keywords": [
+    "jira",
+    "analysis",
+    "documentation",
+    "copilot",
+    "product-owner",
+    "technical-writing",
+    "automation",
+    "codebase-analysis"
+  ],
+  "publisher": "ai-product-owner-team",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-company/ai-product-owner-extension.git"
+    "url": "https://github.com/Srinidhi94/Product-Owner-AI-Agent.git"
   },
   "bugs": {
-    "url": "https://github.com/your-company/ai-product-owner-extension/issues"
+    "url": "https://github.com/Srinidhi94/Product-Owner-AI-Agent/issues"
   },
   "activationEvents": [
-    "onWorkspaceContains:**/*.go"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -33,7 +44,7 @@
         "category": "AI Product Owner",
         "icon": "$(graph)",
         "enablement": "aiProductOwner.configured",
-        "description": "Analyze a Jira epic and Go codebase to generate technical documentation."
+        "description": "Analyze a Jira epic and universal codebase across 9 programming languages to generate technical documentation."
       },
       {
         "command": "aiProductOwner.configureSettings",
@@ -92,6 +103,13 @@
         "icon": "$(play)",
         "description": "Automatically proceed to the next analysis stage."
       },
+      {
+        "command": "aiProductOwner.cancelAnalysis",
+        "title": "Cancel Analysis",
+        "category": "AI Product Owner",
+        "icon": "$(stop)",
+        "description": "Cancel the current analysis workflow."
+      },
 
       {
         "command": "aiProductOwner.pasteCopilotResponse",
@@ -121,35 +139,12 @@
           "scope": "application",
           "order": 3
         },
-        "aiProductOwner.output.generateDiagrams": {
-          "type": "boolean",
-          "default": true,
-          "description": "Generate Mermaid diagrams in analysis output",
-          "scope": "workspace",
-          "order": 4
-        },
-        "aiProductOwner.analysis.maxSolutions": {
-          "type": "number",
-          "default": 2,
-          "minimum": 1,
-          "maximum": 3,
-          "description": "Maximum solution alternatives to generate (1-3)",
-          "scope": "workspace",
-          "order": 5
-        },
         "aiProductOwner.output.directory": {
           "type": "string",
           "default": "./docs/analysis",
           "description": "Output directory for generated documentation",
           "scope": "workspace",
           "order": 6
-        },
-        "aiProductOwner.codebase.includeTests": {
-          "type": "boolean",
-          "default": false,
-          "description": "Include test files in codebase analysis",
-          "scope": "workspace",
-          "order": 7
         },
         "aiProductOwner.network.retryAttempts": {
           "type": "number",
@@ -168,20 +163,6 @@
           "description": "Request timeout in seconds",
           "scope": "application",
           "order": 9
-        },
-        "aiProductOwner.ui.showDetailedProgress": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show detailed progress notifications",
-          "scope": "application",
-          "order": 10
-        },
-        "aiProductOwner.debug.enableVerboseLogging": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable verbose logging for troubleshooting",
-          "scope": "application",
-          "order": 11
         }
       }
     },
@@ -199,17 +180,20 @@
         {
           "id": "analysisResults",
           "name": "Analysis Results",
-          "when": "aiProductOwner.hasResults"
+          "when": "aiProductOwner.hasResults",
+          "icon": "$(graph)"
         },
         {
           "id": "currentAnalysis",
           "name": "Current Analysis",
-          "when": "aiProductOwner.analyzing"
+          "when": "aiProductOwner.analyzing",
+          "icon": "$(loading~spin)"
         },
         {
           "id": "quickActions",
           "name": "Quick Actions",
-          "when": "aiProductOwner.configured"
+          "when": "aiProductOwner.configured",
+          "icon": "$(zap)"
         }
       ]
     },
@@ -256,10 +240,10 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts --fix",
     "lint:check": "eslint src --ext ts",
-    "test": "node ./out/test/integration.test.js",
-    "test:unit": "node ./out/test/unit/GoCodebaseAnalyzer.test.js",
-    "test:coverage": "npm run test && npm run test:unit",
-    "test:verbose": "npm run test -- --verbose",
+    "test": "npm run compile-tests && npm run test:unit",
+    "test:unit": "node ./out/test/unit/CodebaseAnalyzer.test.js",
+    "test:coverage": "npm run compile-tests && npm run test:unit",
+    "test:verbose": "npm run compile-tests && npm run test:unit -- --verbose",
     "package-extension": "./scripts/package.sh",
     "vsce-package": "vsce package --no-dependencies",
     "vsce-publish": "vsce publish --no-dependencies",
@@ -272,7 +256,7 @@
     "format:check": "prettier --check 'src/**/*.ts'",
     "validate": "npm run typecheck && npm run lint:check && npm run format:check",
     "release": "npm run validate && npm run test:coverage && npm run build:prod && npm run vsce-package",
-    "release:quick": "npm run test && npm run build:prod && npm run vsce-package",
+    "release:quick": "npm run compile-tests && npm run test:unit && npm run build:prod && npm run vsce-package",
     "dev": "npm run watch",
     "start": "npm run compile && code --extensionDevelopmentPath=.",
     "debug": "npm run compile && code --extensionDevelopmentPath=. --verbose"
@@ -284,6 +268,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "^3.0.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",

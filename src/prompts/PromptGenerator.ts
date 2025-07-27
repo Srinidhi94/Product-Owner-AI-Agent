@@ -16,6 +16,9 @@ export interface GeneratedPrompt {
   estimatedDuration: number;
   requiredDiagrams: string[];
   maxApproaches: number;
+  mcpServersRequired: string[];
+  confidenceRequired: boolean;
+  researchRequired: boolean;
   timestamp: string;
 }
 
@@ -43,7 +46,7 @@ export class PromptGenerator {
     options: PromptGenerationOptions = {}
   ): Promise<GeneratedPrompt[]> {
     this.log('🎯 Generating 5 focused prompts with Mermaid diagrams...');
-    
+
     const timestamp = new Date().toISOString();
     const prompts: GeneratedPrompt[] = [];
 
@@ -53,7 +56,7 @@ export class PromptGenerator {
     // Generate each prompt sequentially to maintain context flow
     for (const template of PROMPT_TEMPLATES) {
       this.log(`📝 Generating: ${template.name}`);
-      
+
       const promptContent = this.substituteTemplateVariables(
         template.template,
         contextData,
@@ -67,7 +70,10 @@ export class PromptGenerator {
         estimatedDuration: template.estimatedDuration,
         requiredDiagrams: template.requiredDiagrams,
         maxApproaches: template.maxApproaches,
-        timestamp: timestamp
+        mcpServersRequired: template.mcpServersRequired,
+        confidenceRequired: template.confidenceRequired,
+        researchRequired: template.researchRequired,
+        timestamp: timestamp,
       };
 
       prompts.push(generatedPrompt);
@@ -84,7 +90,7 @@ export class PromptGenerator {
     }
 
     this.log(`🎉 All 5 prompts generated successfully!`);
-    
+
     return prompts;
   }
 
@@ -119,7 +125,10 @@ export class PromptGenerator {
       estimatedDuration: template.estimatedDuration,
       requiredDiagrams: template.requiredDiagrams,
       maxApproaches: template.maxApproaches,
-      timestamp: new Date().toISOString()
+      mcpServersRequired: template.mcpServersRequired,
+      confidenceRequired: template.confidenceRequired,
+      researchRequired: template.researchRequired,
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -136,13 +145,19 @@ export class PromptGenerator {
       epicName: jiraData.name,
       jiraContext: this.formatJiraContext(jiraData),
       codebaseContext: this.formatCodebaseContext(codebaseData),
-      businessAnalysis: this.previousResults.get('business-analysis') || '[To be generated in previous step]',
-      technicalArchitecture: this.previousResults.get('technical-architecture') || '[To be generated in previous step]',
-      implementationDesign: this.previousResults.get('implementation-design') || '[To be generated in previous step]',
-      developmentPlan: this.previousResults.get('development-plan') || '[To be generated in previous step]',
-      context7Docs: options.includeContext7 ? '[Context7 documentation would be included here]' : '',
+      businessAnalysis:
+        this.previousResults.get('business-analysis') || '[To be generated in previous step]',
+      technicalArchitecture:
+        this.previousResults.get('technical-architecture') || '[To be generated in previous step]',
+      implementationDesign:
+        this.previousResults.get('implementation-design') || '[To be generated in previous step]',
+      developmentPlan:
+        this.previousResults.get('development-plan') || '[To be generated in previous step]',
+      context7Docs: options.includeContext7
+        ? '[Context7 documentation would be included here]'
+        : '',
       maxSolutions: Math.min(options.maxSolutionCount || 2, 2).toString(), // Enforce max 2 approaches
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -168,10 +183,15 @@ export class PromptGenerator {
       sections.push(`   - Status: ${epic.status}`);
       sections.push(`   - Stories: ${epic.stories.length} (${epic.totalPoints} points)`);
       // Handle cases where description might be null, undefined, or not a string
-      const descriptionText = (epic.description && typeof epic.description === 'string') 
-        ? epic.description 
-        : 'No description provided';
-      sections.push(`   - Description: ${descriptionText.substring(0, 150)}${descriptionText.length > 150 ? '...' : ''}`);
+      const descriptionText =
+        epic.description && typeof epic.description === 'string'
+          ? epic.description
+          : 'No description provided';
+      sections.push(
+        `   - Description: ${descriptionText.substring(0, 150)}${
+          descriptionText.length > 150 ? '...' : ''
+        }`
+      );
       sections.push('');
     });
 
@@ -198,17 +218,23 @@ export class PromptGenerator {
     const sections: string[] = [];
 
     // Project Overview
-    sections.push(`### Go Codebase Overview`);
+    sections.push(`### Codebase Overview`);
     sections.push(`**Project Path**: ${codebaseData.projectPath}`);
-    sections.push(`**Total Files**: ${codebaseData.totalFiles} Go files`);
-    sections.push(`**Packages**: ${codebaseData.packages.length} (${codebaseData.packages.join(', ')})`);
-    sections.push(`**Complexity**: ${codebaseData.metrics.complexity} (${codebaseData.metrics.linesOfCode} estimated LOC)`);
+    sections.push(`**Total Files**: ${codebaseData.totalFiles} source files`);
+    sections.push(
+      `**Packages**: ${codebaseData.packages.length} (${codebaseData.packages.join(', ')})`
+    );
+    sections.push(
+      `**Complexity**: ${codebaseData.metrics.complexity} (${codebaseData.metrics.linesOfCode} estimated LOC)`
+    );
     sections.push('');
 
     // Architecture Patterns
     sections.push(`### Architecture Patterns`);
     codebaseData.patterns.forEach(pattern => {
-      sections.push(`- **${pattern.name}**: ${pattern.description} (${pattern.confidence}/10 confidence)`);
+      sections.push(
+        `- **${pattern.name}**: ${pattern.description} (${pattern.confidence}/10 confidence)`
+      );
     });
     sections.push('');
 
@@ -306,13 +332,17 @@ Use Context7 documentation and code context wherever applicable for your analysi
    */
   private validateMermaidDiagrams(content: string, templateId: string): void {
     const template = PROMPT_TEMPLATES.find(t => t.id === templateId);
-    if (!template) {return;}
+    if (!template) {
+      return;
+    }
 
     const mermaidBlocks = content.match(/~~~mermaid/g) || [];
     const requiredCount = template.requiredDiagrams.length;
 
     if (mermaidBlocks.length < requiredCount) {
-      this.log(`⚠️ Warning: ${templateId} has ${mermaidBlocks.length} Mermaid diagrams, but ${requiredCount} are required`);
+      this.log(
+        `⚠️ Warning: ${templateId} has ${mermaidBlocks.length} Mermaid diagrams, but ${requiredCount} are required`
+      );
     } else {
       this.log(`✅ ${templateId} has all ${requiredCount} required Mermaid diagrams`);
     }
@@ -326,8 +356,10 @@ Use Context7 documentation and code context wherever applicable for your analysi
     epicKey: string,
     outputDirectory?: string
   ): Promise<void> {
-    const outputDir = outputDirectory || path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '', 'output', 'prompts');
-    
+    const outputDir =
+      outputDirectory ||
+      path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '', 'output', 'prompts');
+
     // Ensure output directory exists
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
@@ -338,7 +370,7 @@ Use Context7 documentation and code context wherever applicable for your analysi
     for (const prompt of prompts) {
       const filename = `${timestamp}_${epicKey}_${prompt.id}.md`;
       const filepath = path.join(outputDir, filename);
-      
+
       try {
         fs.writeFileSync(filepath, prompt.content, 'utf-8');
         this.log(`💾 Saved: ${filename}`);
@@ -351,7 +383,7 @@ Use Context7 documentation and code context wherever applicable for your analysi
     const indexContent = this.createMasterIndex(prompts, epicKey);
     const indexFilename = `${timestamp}_${epicKey}_INDEX.md`;
     const indexFilepath = path.join(outputDir, indexFilename);
-    
+
     try {
       fs.writeFileSync(indexFilepath, indexContent, 'utf-8');
       this.log(`📋 Created master index: ${indexFilename}`);
@@ -365,15 +397,15 @@ Use Context7 documentation and code context wherever applicable for your analysi
    */
   private createMasterIndex(prompts: GeneratedPrompt[], epicKey: string): string {
     const sections: string[] = [];
-    
+
     sections.push(`# AI Product Owner - Analysis Prompts for ${epicKey}`);
     sections.push(`Generated: ${new Date().toLocaleString()}`);
     sections.push('');
-    
+
     sections.push('## 🎯 Analysis Workflow');
     sections.push('Use these prompts sequentially for comprehensive analysis:');
     sections.push('');
-    
+
     let totalTime = 0;
     prompts.forEach((prompt, index) => {
       totalTime += prompt.estimatedDuration;
@@ -383,10 +415,10 @@ Use Context7 documentation and code context wherever applicable for your analysi
       sections.push(`- **File**: \`${prompt.id}.md\``);
       sections.push('');
     });
-    
+
     // Total time calculation removed per user request
     sections.push('');
-    
+
     sections.push('## 📋 Usage Instructions');
     sections.push('1. Start with **Business Analysis** - copy and paste into GitHub Copilot');
     sections.push('2. Save the response, then move to **Technical Architecture**');
@@ -394,7 +426,7 @@ Use Context7 documentation and code context wherever applicable for your analysi
     sections.push('4. Each prompt builds on previous analysis results');
     sections.push('5. All prompts require specific Mermaid diagrams in responses');
     sections.push('');
-    
+
     sections.push('## ✅ Quality Checklist');
     sections.push('For each prompt response, ensure:');
     sections.push('- [ ] All required Mermaid diagrams are generated');
@@ -402,7 +434,7 @@ Use Context7 documentation and code context wherever applicable for your analysi
     sections.push('- [ ] Implementation details are specific and actionable');
     sections.push('- [ ] Visual diagrams clearly show system interactions');
     sections.push('- [ ] Technical decisions are well-justified');
-    
+
     return sections.join('\n');
   }
 
@@ -425,34 +457,59 @@ Use Context7 documentation and code context wherever applicable for your analysi
   ): Promise<GeneratedPrompt> {
     this.log(`🧠 Generating technical prompt for stage ${stageIndex + 1}: ${stage.name}`);
 
+    // Find the matching template from PROMPT_TEMPLATES using the stage ID
+    const template = PROMPT_TEMPLATES.find(t => t.id === stage.id);
+    
+    if (!template) {
+      this.log(`⚠️ Warning: No template found for stage ID '${stage.id}', using generic generation`);
+      const contextData = this.prepareContextData(jiraData, codebaseData, options);
+      const promptContent = this.generateGenericStagePrompt(contextData, stage);
+      
+      return {
+        id: stage.id,
+        name: stage.name,
+        content: promptContent,
+        estimatedDuration: parseInt(stage.duration.split(' ')[0]),
+        requiredDiagrams: stage.requiredDiagrams,
+        maxApproaches: 2,
+        mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking', 'browser'],
+        confidenceRequired: true,
+        researchRequired: true,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    // Prepare context data for template substitution
     const contextData = this.prepareContextData(jiraData, codebaseData, options);
     
-    // Generate stage-specific prompts based on the technical analysis process
-    const stagePrompts = {
-      'requirements-analysis': this.generateRequirementsAnalysisPrompt(contextData, stage),
-      'design-overview': this.generateDesignOverviewPrompt(contextData, stage),
-      'technical-design': this.generateTechnicalDesignPrompt(contextData, stage),
-      'infrastructure-nfr': this.generateInfrastructureNFRPrompt(contextData, stage),
-      'task-breakdown': this.generateTaskBreakdownPrompt(contextData, stage)
-    };
-
-    const promptContent = stagePrompts[stage.id as keyof typeof stagePrompts] || this.generateGenericStagePrompt(contextData, stage);
+    // Generate the prompt using the updated template system
+    const promptContent = this.substituteTemplateVariables(
+      template.template,
+      contextData,
+      template.id
+    );
 
     return {
-      id: stage.id,
-      name: stage.name,
+      id: template.id,
+      name: template.name,
       content: promptContent,
-      estimatedDuration: parseInt(stage.duration.split(' ')[0]),
-      requiredDiagrams: stage.requiredDiagrams,
-      maxApproaches: 2,
-      timestamp: new Date().toISOString()
+      estimatedDuration: template.estimatedDuration,
+      requiredDiagrams: template.requiredDiagrams,
+      maxApproaches: template.maxApproaches,
+      mcpServersRequired: template.mcpServersRequired,
+      confidenceRequired: template.confidenceRequired,
+      researchRequired: template.researchRequired,
+      timestamp: new Date().toISOString(),
     };
   }
 
   /**
    * Generate Requirements Analysis prompt
    */
-  private generateRequirementsAnalysisPrompt(contextData: Record<string, string>, stage: any): string {
+  private generateRequirementsAnalysisPrompt(
+    contextData: Record<string, string>,
+    stage: any
+  ): string {
     return `# Requirements Analysis - Principal Engineer Review
 
 You are a **Principal Engineer** analyzing requirements for epic ${contextData.epicKey}.
@@ -997,7 +1054,9 @@ Provide technical analysis for: ${stage.description}
 
 ## Required Mermaid Diagrams
 
-${stage.requiredDiagrams.map((diagram: string, index: number) => `${index + 1}. **${diagram}**`).join('\n')}
+${stage.requiredDiagrams
+  .map((diagram: string, index: number) => `${index + 1}. **${diagram}**`)
+  .join('\n')}
 
 **Focus**: ${stage.name}
 
@@ -1041,4 +1100,4 @@ Use Context7 documentation and code context wherever applicable for your analysi
   dispose(): void {
     this.outputChannel.dispose();
   }
-} 
+}

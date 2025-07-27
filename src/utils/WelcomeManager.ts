@@ -39,7 +39,7 @@ export class WelcomeManager {
     const state = this.getWelcomeState();
     const isFirstTime = !state.hasSeenWalkthrough;
     const isNewVersion = state.version !== this.CURRENT_VERSION;
-    
+
     // Update activation tracking
     state.lastActivation = new Date().toISOString();
     state.activationCount += 1;
@@ -51,7 +51,7 @@ export class WelcomeManager {
     this.logger.info(`Extension activated (${state.activationCount} times)`, {
       isFirstTime,
       isNewVersion,
-      version: this.CURRENT_VERSION
+      version: this.CURRENT_VERSION,
     });
 
     // Show welcome for first-time users or new version
@@ -69,7 +69,7 @@ export class WelcomeManager {
     this.logger.info('Showing first-time welcome');
 
     const action = await vscode.window.showInformationMessage(
-      '🎉 Welcome to AI Product Owner Agent!\n\nThis extension helps you analyze Jira epics and Go codebases to generate comprehensive technical documentation.',
+      '🎉 Welcome to AI Product Owner Agent!\n\nThis extension helps you analyze Jira epics and universal codebases across 9 programming languages to generate comprehensive technical documentation.',
       { modal: false },
       'Get Started',
       'Show Walkthrough',
@@ -111,13 +111,13 @@ export class WelcomeManager {
 
     const action = await vscode.window.showInformationMessage(
       `🆕 AI Product Owner Agent updated to v${this.CURRENT_VERSION}!\n\nCheck out the latest improvements and features.`,
-      'What\'s New',
+      "What's New",
       'Documentation',
       'Dismiss'
     );
 
     switch (action) {
-      case 'What\'s New':
+      case "What's New":
         await this.showChangeLog();
         break;
       case 'Documentation':
@@ -134,15 +134,15 @@ export class WelcomeManager {
 
     // Create walkthrough document
     const walkthroughContent = this.createWalkthroughContent();
-    
+
     const doc = await vscode.workspace.openTextDocument({
       content: walkthroughContent,
-      language: 'markdown'
+      language: 'markdown',
     });
-    
+
     await vscode.window.showTextDocument(doc, {
       viewColumn: vscode.ViewColumn.One,
-      preview: false
+      preview: false,
     });
 
     // Show interactive steps
@@ -158,26 +158,26 @@ export class WelcomeManager {
         title: 'Step 1: Configure Jira Settings',
         description: 'Set up your Jira URL, email, and API token',
         action: 'Configure',
-        command: 'aiProductOwner.configureSettings'
+        command: 'aiProductOwner.configureSettings',
       },
       {
         title: 'Step 2: Test Connection',
         description: 'Verify your Jira connection is working',
         action: 'Test',
-        command: 'aiProductOwner.testConnection'
+        command: 'aiProductOwner.testConnection',
       },
       {
         title: 'Step 3: Analyze an Epic',
         description: 'Run your first analysis on a Jira epic',
         action: 'Analyze',
-        command: 'aiProductOwner.analyzeEpic'
-      }
+        command: 'aiProductOwner.analyzeEpic',
+      },
     ];
 
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
       const isLast = i === steps.length - 1;
-      
+
       const action = await vscode.window.showInformationMessage(
         `${step.title}\n\n${step.description}`,
         { modal: true },
@@ -195,7 +195,7 @@ export class WelcomeManager {
     }
 
     vscode.window.showInformationMessage(
-      '✅ Quick start completed! You\'re ready to use AI Product Owner Agent.',
+      "✅ Quick start completed! You're ready to use AI Product Owner Agent.",
       'Great!'
     );
   }
@@ -214,15 +214,17 @@ export class WelcomeManager {
   async resetWelcomeState(): Promise<void> {
     await this.context.globalState.update(this.STATE_KEY, undefined);
     this.logger.info('Welcome state reset');
-    
-    vscode.window.showInformationMessage(
-      'Welcome state has been reset. The walkthrough will show on next activation.',
-      'Restart Extension'
-    ).then(action => {
-      if (action === 'Restart Extension') {
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
-      }
-    });
+
+    vscode.window
+      .showInformationMessage(
+        'Welcome state has been reset. The walkthrough will show on next activation.',
+        'Restart Extension'
+      )
+      .then(action => {
+        if (action === 'Restart Extension') {
+          vscode.commands.executeCommand('workbench.action.reloadWindow');
+        }
+      });
   }
 
   /**
@@ -238,13 +240,13 @@ export class WelcomeManager {
    */
   private getWelcomeState(): WelcomeState {
     const saved = this.context.globalState.get<WelcomeState>(this.STATE_KEY);
-    
+
     return {
       hasSeenWalkthrough: saved?.hasSeenWalkthrough || false,
       version: saved?.version || '0.0.0',
       firstActivation: saved?.firstActivation || new Date().toISOString(),
       lastActivation: saved?.lastActivation || new Date().toISOString(),
-      activationCount: saved?.activationCount || 0
+      activationCount: saved?.activationCount || 0,
     };
   }
 
@@ -268,7 +270,7 @@ Welcome to AI Product Owner Agent! This walkthrough will help you get started wi
 The AI Product Owner Agent is a powerful VS Code extension that:
 
 - **Analyzes Jira Epics**: Fetches comprehensive data from your Jira epics and stories
-- **Scans Go Codebases**: Identifies architectural patterns, tech stack, and code structure
+- **Scans Universal Codebases**: Identifies architectural patterns, tech stack, and code structure across 9 programming languages
 - **Generates Context-Rich Prompts**: Creates detailed prompts for GitHub Copilot/LLMs
 - **Produces Technical Documentation**: Helps create comprehensive analysis documents
 
@@ -314,7 +316,7 @@ Output: 5 detailed analysis prompts
 
 ### Common Issues
 - **401/403 Errors**: Check API token validity and permissions
-- **No Go Files**: Extension works with demo data if no codebase found  
+- **No Source Files**: Extension works with demo data if no codebase found  
 - **Epic Not Found**: Verify epic key and access permissions
 - **Slow Performance**: Large codebases are automatically optimized
 
@@ -341,13 +343,13 @@ Click the buttons below to start using the extension:
       'Type "AI Product Owner" to see available commands',
       'Start with "Configure Settings" to set up Jira',
       'Use "Test Connection" to verify setup',
-      'Run "Analyze Epic" on your first epic!'
+      'Run "Analyze Epic" on your first epic!',
     ];
 
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
       const isLast = i === steps.length - 1;
-      
+
       await vscode.window.showInformationMessage(
         `Walkthrough Step ${i + 1}/${steps.length}\n\n${step}`,
         { modal: false },
@@ -389,9 +391,9 @@ Click the buttons below to start using the extension:
 
     const doc = await vscode.workspace.openTextDocument({
       content: changelogContent,
-      language: 'markdown'
+      language: 'markdown',
     });
-    
+
     await vscode.window.showTextDocument(doc);
   }
 
@@ -400,10 +402,10 @@ Click the buttons below to start using the extension:
    */
   private async openDocumentation(): Promise<void> {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    
+
     if (workspaceFolder) {
       const docsPath = vscode.Uri.joinPath(workspaceFolder.uri, 'docs', 'USER_GUIDE.md');
-      
+
       try {
         await vscode.window.showTextDocument(docsPath);
       } catch {
@@ -432,4 +434,4 @@ Click the buttons below to start using the extension:
  */
 export const getWelcomeManager = (context: vscode.ExtensionContext): WelcomeManager => {
   return WelcomeManager.getInstance(context);
-}; 
+};

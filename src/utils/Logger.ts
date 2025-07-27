@@ -54,7 +54,7 @@ export class Logger {
    */
   error(message: string, error?: Error, data?: any): void {
     this.log(LogLevel.ERROR, message, data, error);
-    
+
     // Show VS Code error notification for critical errors
     if (this.shouldShowNotification(LogLevel.ERROR)) {
       vscode.window.showErrorMessage(`❌ ${this.component}: ${message}`);
@@ -66,7 +66,7 @@ export class Logger {
    */
   warn(message: string, data?: any): void {
     this.log(LogLevel.WARN, message, data);
-    
+
     // Show VS Code warning notification for important warnings
     if (this.shouldShowNotification(LogLevel.WARN)) {
       vscode.window.showWarningMessage(`⚠️ ${this.component}: ${message}`);
@@ -78,7 +78,7 @@ export class Logger {
    */
   info(message: string, data?: any): void {
     this.log(LogLevel.INFO, message, data);
-    
+
     // Show VS Code info notification for important info
     if (this.shouldShowNotification(LogLevel.INFO) && this.isImportantMessage(message)) {
       vscode.window.showInformationMessage(`ℹ️ ${this.component}: ${message}`);
@@ -111,7 +111,11 @@ export class Logger {
    */
   completeOperation(operation: string, duration?: number, epicKey?: string): void {
     const durationText = duration ? ` (${duration}ms)` : '';
-    this.info(`✅ Completed operation: ${operation}${durationText}`, { operation, duration, epicKey });
+    this.info(`✅ Completed operation: ${operation}${durationText}`, {
+      operation,
+      duration,
+      epicKey,
+    });
   }
 
   /**
@@ -159,7 +163,7 @@ export class Logger {
     const timestamp = entry.timestamp.toISOString();
     const levelName = LogLevel[entry.level];
     const component = `[${entry.component}]`;
-    
+
     let formatted = `${timestamp} ${levelName.padEnd(5)} ${component} ${entry.message}`;
 
     // Add data if present
@@ -184,7 +188,7 @@ export class Logger {
   private getConfiguredLogLevel(): LogLevel {
     const config = vscode.workspace.getConfiguration('aiProductOwner.debug');
     const enableVerbose = config.get<boolean>('enableVerboseLogging', false);
-    
+
     return enableVerbose ? LogLevel.TRACE : LogLevel.INFO;
   }
 
@@ -202,12 +206,12 @@ export class Logger {
   private shouldShowNotification(level: LogLevel): boolean {
     const config = vscode.workspace.getConfiguration('aiProductOwner.ui');
     const showDetailedProgress = config.get<boolean>('showDetailedProgress', true);
-    
+
     // Always show errors and warnings
     if (level <= LogLevel.WARN) {
       return true;
     }
-    
+
     // Show info only if detailed progress is enabled
     return level === LogLevel.INFO && showDetailedProgress;
   }
@@ -223,12 +227,10 @@ export class Logger {
       'error',
       'connection',
       'authentication',
-      'analysis'
+      'analysis',
     ];
-    
-    return importantKeywords.some(keyword => 
-      message.toLowerCase().includes(keyword)
-    );
+
+    return importantKeywords.some(keyword => message.toLowerCase().includes(keyword));
   }
 
   /**
@@ -251,9 +253,8 @@ export class Logger {
    * Get log entries for specific operation
    */
   getOperationEntries(operation: string): LogEntry[] {
-    return this.entries.filter(entry => 
-      entry.data?.operation === operation ||
-      entry.message.includes(operation)
+    return this.entries.filter(
+      entry => entry.data?.operation === operation || entry.message.includes(operation)
     );
   }
 
@@ -279,11 +280,13 @@ export class Logger {
         component: entry.component,
         message: entry.message,
         data: entry.data,
-        error: entry.error ? {
-          message: entry.error.message,
-          stack: entry.error.stack
-        } : undefined
-      }))
+        error: entry.error
+          ? {
+              message: entry.error.message,
+              stack: entry.error.stack,
+            }
+          : undefined,
+      })),
     };
 
     return JSON.stringify(exportData, null, 2);
@@ -318,9 +321,10 @@ export class Logger {
 export const createLogger = (component: string): Logger => Logger.getLogger(component);
 
 export const log = {
-  error: (message: string, error?: Error, data?: any) => Logger.getLogger('Global').error(message, error, data),
+  error: (message: string, error?: Error, data?: any) =>
+    Logger.getLogger('Global').error(message, error, data),
   warn: (message: string, data?: any) => Logger.getLogger('Global').warn(message, data),
   info: (message: string, data?: any) => Logger.getLogger('Global').info(message, data),
   debug: (message: string, data?: any) => Logger.getLogger('Global').debug(message, data),
   trace: (message: string, data?: any) => Logger.getLogger('Global').trace(message, data),
-}; 
+};

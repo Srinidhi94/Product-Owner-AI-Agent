@@ -179,7 +179,7 @@ if (uiConfig.showDetailedProgress) {
 1. **Configure First**: Set up Jira credentials before analysis
 2. **Test Connection**: Use test command to validate setup
 3. **Check Permissions**: Ensure Jira access to epics
-4. **Workspace Setup**: Open Go projects correctly
+4. **Workspace Setup**: Open projects correctly
 
 ### For Developers
 1. **Always Use ErrorHandler**: Centralized error management

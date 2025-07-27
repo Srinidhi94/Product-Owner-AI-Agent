@@ -1,33 +1,40 @@
 /**
  * AI Product Owner Agent - VS Code Extension Entry Point
- * Integrates Jira epic analysis with Go codebase analysis to generate comprehensive technical documentation
+ *
+ * Professional VS Code extension providing automated technical analysis for Jira epics
+ * and universal codebase analysis across multiple programming languages with GitHub Copilot integration.
+ *
+ * Supported Languages: JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, Rust
+ *
+ * @version 1.0.3
+ * @author AI Product Owner Team
  */
 
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { JiraClient } from './jira/JiraClient';
-import { GoCodebaseAnalyzer } from './analyzer/GoCodebaseAnalyzer';
+import { CodebaseAnalyzer } from './analyzer/CodebaseAnalyzer';
 import { MultiStageAnalysisEngine } from './analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from './utils/ConfigurationManager';
 import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
 import { WelcomeManager } from './utils/WelcomeManager';
-import { 
-  ExtensionState, 
-  JiraPortfolio, 
-  CodebaseAnalysis, 
+import {
+  ExtensionState,
+  JiraPortfolio,
+  CodebaseAnalysis,
   AnalysisProgress,
-  ProcessingStatus 
+  ProcessingStatus,
 } from './types';
 
 /**
- * Extension state management
+ * Extension state management for VS Code context and UI updates
  */
 class ExtensionStateManager {
   private static instance: ExtensionStateManager;
   private state: ExtensionState;
   private context: vscode.ExtensionContext;
-  public activeAnalysisEngine: any = null; // Store reference to active analysis engine
+  public activeAnalysisEngine: any = null; // Reference to active analysis engine for cancellation
 
   private constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -35,11 +42,14 @@ class ExtensionStateManager {
       configured: false,
       analyzing: false,
       hasResults: false,
-      analysisResults: []
+      analysisResults: [],
     };
     this.updateContextKeys();
   }
 
+  /**
+   * Singleton pattern implementation for state management
+   */
   static getInstance(context?: vscode.ExtensionContext): ExtensionStateManager {
     if (!ExtensionStateManager.instance && context) {
       ExtensionStateManager.instance = new ExtensionStateManager(context);
@@ -47,6 +57,9 @@ class ExtensionStateManager {
     return ExtensionStateManager.instance;
   }
 
+  /**
+   * Update extension state and VS Code context keys
+   */
   updateState(updates: Partial<ExtensionState>): void {
     this.state = { ...this.state, ...updates };
     this.updateContextKeys();
@@ -57,9 +70,17 @@ class ExtensionStateManager {
   }
 
   private updateContextKeys(): void {
-    vscode.commands.executeCommand('setContext', 'aiProductOwner.configured', this.state.configured);
+    vscode.commands.executeCommand(
+      'setContext',
+      'aiProductOwner.configured',
+      this.state.configured
+    );
     vscode.commands.executeCommand('setContext', 'aiProductOwner.analyzing', this.state.analyzing);
-    vscode.commands.executeCommand('setContext', 'aiProductOwner.hasResults', this.state.hasResults);
+    vscode.commands.executeCommand(
+      'setContext',
+      'aiProductOwner.hasResults',
+      this.state.hasResults
+    );
   }
 }
 
@@ -75,7 +96,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Initialize extension state
   const stateManager = ExtensionStateManager.getInstance(context);
   const configManager = new ConfigurationManager();
-  
+
   // Check initial configuration
   checkInitialConfiguration(stateManager, configManager);
 
@@ -103,7 +124,7 @@ export async function activate(context: vscode.ExtensionContext) {
  */
 export function deactivate() {
   console.log('👋 AI Product Owner Agent extension deactivated');
-  
+
   // Cleanup resources
   ErrorHandler.dispose();
 }
@@ -112,7 +133,7 @@ export function deactivate() {
  * Register all extension commands
  */
 function registerCommands(
-  context: vscode.ExtensionContext, 
+  context: vscode.ExtensionContext,
   stateManager: ExtensionStateManager,
   configManager: ConfigurationManager
 ) {
@@ -122,20 +143,20 @@ function registerCommands(
     async () => {
       const context: ErrorContext = {
         operation: 'Epic Analysis',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       try {
         await runEpicAnalysisWorkflow(stateManager, configManager, context);
       } catch (error) {
         console.error('Epic analysis error:', error);
-        
+
         // Use comprehensive error handling
         if (error && typeof error === 'object') {
           if ('status' in error || 'code' in error) {
             await ErrorHandler.handleJiraError(error, context);
           } else if ('message' in error && typeof error.message === 'string') {
-            if (error.message.includes('Go files') || error.message.includes('codebase')) {
+            if (error.message.includes('source files') || error.message.includes('codebase')) {
               await ErrorHandler.handleCodebaseError(error, context);
             } else if (error.message.includes('Copilot')) {
               await ErrorHandler.handleCopilotError(error, context);
@@ -212,27 +233,30 @@ function registerCommands(
     async () => {
       const errorContext: ErrorContext = {
         operation: 'Test Connection',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       try {
         await ErrorHandler.showProgressWithCancellation(
           'Testing Jira Connection',
-          async (progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => {
+          async (
+            progress: vscode.Progress<{ message?: string; increment?: number }>,
+            token: vscode.CancellationToken
+          ) => {
             progress.report({ increment: 0, message: 'Validating configuration...' });
-            
+
             const config = configManager.getJiraConfiguration();
             if (!config.baseUrl || !config.email || !config.token) {
               throw new Error('Jira configuration is incomplete. Please configure settings first.');
             }
 
             progress.report({ increment: 30, message: 'Connecting to Jira...' });
-            
+
             const jiraClient = new JiraClient(config);
             const isValid = await jiraClient.testConnection();
-            
+
             progress.report({ increment: 100, message: 'Connection test complete' });
-            
+
             if (isValid) {
               vscode.window.showInformationMessage('✅ Jira connection successful!');
             } else {
@@ -252,27 +276,31 @@ function registerCommands(
     async () => {
       try {
         const epicKey = await getEpicKeyFromUser();
-        if (!epicKey) {return;}
+        if (!epicKey) {
+          return;
+        }
 
         const config = configManager.getJiraConfiguration();
         const jiraClient = new JiraClient(config);
-        
-        await vscode.window.withProgress({
-          location: vscode.ProgressLocation.Notification,
-          title: 'Fetching Jira Data',
-          cancellable: false
-        }, async (progress) => {
-          progress.report({ increment: 50, message: `Fetching ${epicKey}...` });
-          
-          const jiraData = await jiraClient.fetchPortfolioOrEpic(epicKey);
-          if (!jiraData) {
-            throw new Error(`Epic ${epicKey} not found`);
-          }
 
-          progress.report({ increment: 100, message: 'Data fetched successfully' });
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Fetching Jira Data',
+            cancellable: false,
+          },
+          async progress => {
+            progress.report({ increment: 50, message: `Fetching ${epicKey}...` });
 
-          // Show the data in a new document
-          const dataDisplay = `# Jira Data for ${epicKey}
+            const jiraData = await jiraClient.fetchPortfolioOrEpic(epicKey);
+            if (!jiraData) {
+              throw new Error(`Epic ${epicKey} not found`);
+            }
+
+            progress.report({ increment: 100, message: 'Data fetched successfully' });
+
+            // Show the data in a new document
+            const dataDisplay = `# Jira Data for ${epicKey}
 
 ## Epic Overview
 - **Key**: ${jiraData.key}
@@ -282,15 +310,22 @@ function registerCommands(
 - **Total Story Points**: ${jiraData.totalStoryPoints}
 
 ## Epics (${jiraData.epics.length})
-${jiraData.epics.map((epic, i) => `
+${jiraData.epics
+  .map(
+    (epic, i) => `
 ${i + 1}. **${epic.key}**: ${epic.summary}
    - Status: ${epic.status}
    - Stories: ${epic.stories.length} (${epic.totalPoints} points)
-   - Description: ${epic.description ? epic.description.substring(0, 100) + '...' : 'No description'}
-`).join('')}
+   - Description: ${
+     epic.description ? epic.description.substring(0, 100) + '...' : 'No description'
+   }
+`
+  )
+  .join('')}
 
 ## Key Stories
-${jiraData.epics.flatMap(epic => epic.stories)
+${jiraData.epics
+  .flatMap(epic => epic.stories)
   .filter(story => story.storyPoints && story.storyPoints > 0)
   .sort((a, b) => (b.storyPoints || 0) - (a.storyPoints || 0))
   .slice(0, 5)
@@ -301,21 +336,24 @@ ${jiraData.epics.flatMap(epic => epic.stories)
 ✅ **This data SHOULD be included in your analysis prompts!**
 If you don't see this information in the generated prompts, there's a bug.`;
 
-          const doc = await vscode.workspace.openTextDocument({
-            content: dataDisplay,
-            language: 'markdown'
-          });
-          await vscode.window.showTextDocument(doc);
-          
-          vscode.window.showInformationMessage(
-            '✅ Jira data fetched successfully! This data should appear in your analysis prompts.',
-            'Continue with Analysis'
-          ).then(action => {
-            if (action === 'Continue with Analysis') {
-              vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-            }
-          });
-        });
+            const doc = await vscode.workspace.openTextDocument({
+              content: dataDisplay,
+              language: 'markdown',
+            });
+            await vscode.window.showTextDocument(doc);
+
+            vscode.window
+              .showInformationMessage(
+                '✅ Jira data fetched successfully! This data should appear in your analysis prompts.',
+                'Continue with Analysis'
+              )
+              .then(action => {
+                if (action === 'Continue with Analysis') {
+                  vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+                }
+              });
+          }
+        );
       } catch (error) {
         vscode.window.showErrorMessage(`❌ Failed to fetch Jira data: ${error}`);
       }
@@ -323,88 +361,124 @@ If you don't see this information in the generated prompts, there's a bug.`;
   );
 
   // Manual stage progression command - now provides actual progression options
-  const nextStageCommand = vscode.commands.registerCommand(
-    'aiProductOwner.nextStage',
-    async () => {
-      const state = stateManager.getState();
-      
-      if (!state.currentEpic) {
-        vscode.window.showInformationMessage(
+  const nextStageCommand = vscode.commands.registerCommand('aiProductOwner.nextStage', async () => {
+    const state = stateManager.getState();
+
+    if (!state.currentEpic) {
+      vscode.window
+        .showInformationMessage(
           'No active analysis. Start an epic analysis first.',
           'Start Analysis'
-        ).then(action => {
+        )
+        .then(action => {
           if (action === 'Start Analysis') {
             vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
           }
         });
-        return;
-      }
+      return;
+    }
 
-      const action = await vscode.window.showInformationMessage(
-        `🔄 Manual Stage Progression for ${state.currentEpic}\n\nChoose your next action:`,
-        'Open Output Folder',  
-        'Restart Analysis',
-        'Skip to Summary'
-      );
+    const action = await vscode.window.showInformationMessage(
+      `🔄 Manual Stage Progression for ${state.currentEpic}\n\nChoose your next action:`,
+      'Open Output Folder',
+      'Restart Analysis',
+      'Skip to Summary'
+    );
 
-      switch (action) {
-        case 'Open Output Folder': {
-          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-          if (workspaceFolder) {
-            const outputDir = path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', state.currentEpic);
-            if (fs.existsSync(outputDir)) {
-              const uri = vscode.Uri.file(outputDir);
-              await vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: true });
-            } else {
-              vscode.window.showWarningMessage(`Output directory not found: ${outputDir}`);
-            }
+    switch (action) {
+      case 'Open Output Folder': {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (workspaceFolder) {
+          const outputDir = path.join(
+            workspaceFolder.uri.fsPath,
+            'ai-analysis-output',
+            state.currentEpic
+          );
+          if (fs.existsSync(outputDir)) {
+            const uri = vscode.Uri.file(outputDir);
+            await vscode.commands.executeCommand('vscode.openFolder', uri, {
+              forceNewWindow: true,
+            });
+          } else {
+            vscode.window.showWarningMessage(`Output directory not found: ${outputDir}`);
           }
-          break;
         }
-        case 'Restart Analysis':
-          await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-          break;
-        case 'Skip to Summary':
-          vscode.window.showInformationMessage(
+        break;
+      }
+      case 'Restart Analysis':
+        await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+        break;
+      case 'Skip to Summary':
+        vscode.window
+          .showInformationMessage(
             '📋 To manually create a summary:\n1. Navigate to your output folder\n2. Create SUMMARY.md\n3. Consolidate findings from all stage files',
             'Open Output Folder'
-          ).then(response => {
+          )
+          .then(response => {
             if (response === 'Open Output Folder') {
               vscode.commands.executeCommand('aiProductOwner.nextStage');
             }
           });
-          break;
-      }
+        break;
     }
-  );
+  });
 
   // Register proceedToNextStage command for MultiStageAnalysisEngine
   const proceedToNextStageCommand = vscode.commands.registerCommand(
     'aiProductOwner.proceedToNextStage',
     async () => {
       // Route to the active analysis engine instance
-      if (stateManager.activeAnalysisEngine && 
-          typeof stateManager.activeAnalysisEngine.proceedToNextStage === 'function') {
+      if (
+        stateManager.activeAnalysisEngine &&
+        typeof stateManager.activeAnalysisEngine.proceedToNextStage === 'function'
+      ) {
         await stateManager.activeAnalysisEngine.proceedToNextStage();
       } else {
-        vscode.window.showInformationMessage(
-          'No active analysis workflow. Start an analysis first.',
-          'Start Analysis'
-        ).then(action => {
-          if (action === 'Start Analysis') {
-            vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-          }
-        });
+        vscode.window
+          .showInformationMessage(
+            'No active analysis workflow. Start an analysis first.',
+            'Start Analysis'
+          )
+          .then(action => {
+            if (action === 'Start Analysis') {
+              vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+            }
+          });
       }
     }
   );
 
-		// Register the new paste Copilot response command
-	context.subscriptions.push(
-		vscode.commands.registerCommand('aiProductOwner.pasteCopilotResponse', async () => {
-			await pasteCopilotResponse();
-		})
-	);
+  // Register cancel analysis command
+  const cancelAnalysisCommand = vscode.commands.registerCommand(
+    'aiProductOwner.cancelAnalysis',
+    async () => {
+      // Route to the active analysis engine instance
+      if (
+        stateManager.activeAnalysisEngine &&
+        typeof stateManager.activeAnalysisEngine.cancelAnalysis === 'function'
+      ) {
+        const confirmCancel = await vscode.window.showWarningMessage(
+          '⚠️ Cancel the current analysis workflow?\n\nThis will stop all remaining stages.',
+          'Yes, Cancel Analysis',
+          'No, Continue Analysis'
+        );
+
+        if (confirmCancel === 'Yes, Cancel Analysis') {
+          stateManager.activeAnalysisEngine.cancelAnalysis();
+          vscode.window.showInformationMessage('🛑 Analysis workflow cancelled');
+        }
+      } else {
+        vscode.window.showInformationMessage('No active analysis workflow to cancel.');
+      }
+    }
+  );
+
+  // Register the new paste Copilot response command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('aiProductOwner.pasteCopilotResponse', async () => {
+      await pasteCopilotResponse();
+    })
+  );
 
   // Add all commands to subscriptions
   context.subscriptions.push(
@@ -416,7 +490,8 @@ If you don't see this information in the generated prompts, there's a bug.`;
     testConnectionCommand,
     testJiraDataCommand,
     nextStageCommand,
-    proceedToNextStageCommand
+    proceedToNextStageCommand,
+    cancelAnalysisCommand
   );
 }
 
@@ -429,18 +504,20 @@ function checkInitialConfiguration(
 ): void {
   const config = configManager.getJiraConfiguration();
   const isConfigured = !!(config.baseUrl && config.email && config.token);
-  
+
   stateManager.updateState({ configured: isConfigured });
 
   if (!isConfigured) {
-    vscode.window.showWarningMessage(
-      'AI Product Owner Agent needs configuration. Click to set up Jira credentials.',
-      'Configure Now'
-    ).then(selection => {
-      if (selection === 'Configure Now') {
-        vscode.commands.executeCommand('aiProductOwner.configureSettings');
-      }
-    });
+    vscode.window
+      .showWarningMessage(
+        'AI Product Owner Agent needs configuration. Click to set up Jira credentials.',
+        'Configure Now'
+      )
+      .then(selection => {
+        if (selection === 'Configure Now') {
+          vscode.commands.executeCommand('aiProductOwner.configureSettings');
+        }
+      });
   }
 }
 
@@ -467,9 +544,9 @@ async function runEpicAnalysisWorkflow(
   }
 
   // Update state to analyzing
-  stateManager.updateState({ 
-    analyzing: true, 
-    currentEpic: epicKey 
+  stateManager.updateState({
+    analyzing: true,
+    currentEpic: epicKey,
   });
 
   try {
@@ -486,10 +563,10 @@ async function runEpicAnalysisWorkflow(
     );
 
     // Update state with success
-    stateManager.updateState({ 
-      analyzing: false, 
+    stateManager.updateState({
+      analyzing: false,
       hasResults: true,
-      lastAnalysis: new Date().toISOString()
+      lastAnalysis: new Date().toISOString(),
     });
 
     // Show completion message with more options
@@ -510,12 +587,18 @@ async function runEpicAnalysisWorkflow(
     } else if (action === 'Analyze Another Epic') {
       await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
     }
-
   } catch (error) {
     // Update state with error
     stateManager.updateState({ analyzing: false });
-    
+
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
+    // Check if this was a user cancellation - don't show error for cancellations
+    if (errorMessage.includes('cancelled by user') || errorMessage.includes('Analysis cancelled')) {
+      console.log(`ℹ️ Analysis cancelled for ${epicKey}`);
+      return; // Exit gracefully without error message
+    }
+
     throw new Error(`Analysis failed: ${errorMessage}`);
   }
 }
@@ -531,16 +614,16 @@ async function getEpicKeyFromUser(): Promise<string | undefined> {
       if (!value) {
         return 'Epic key is required';
       }
-      
+
       // Validate Jira key format (PROJECT-NUMBER)
       const jiraKeyPattern = /^[A-Z]([A-Z0-9])*-\d+$/;
       if (!jiraKeyPattern.test(value.trim().toUpperCase())) {
         return 'Please enter a valid Jira key format (e.g., PROJ-123)';
       }
-      
+
       return null;
     },
-    ignoreFocusOut: true
+    ignoreFocusOut: true,
   });
 
   return epicKey?.trim().toUpperCase();
@@ -556,27 +639,47 @@ async function runMultiStageAnalysis(
   progress: vscode.Progress<{ increment?: number; message?: string }>,
   errorContext: ErrorContext
 ): Promise<void> {
+  // Initialize state manager to check for cancellation
+  const stateManager = ExtensionStateManager.getInstance();
+
+  // Check if there's an active analysis engine that's already cancelled
+  if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
+    throw new Error('Analysis cancelled by user');
+  }
+
   // EXACT PORT from Python PoC workflow
-  
+
   // Stage 1: Initialize Jira client (0-10%)
   progress.report({ increment: 10, message: 'Initializing Jira client...' });
-  
+
   const jiraClient = new JiraClient(jiraConfig);
   jiraClient.showOutput(); // Show output channel for detailed logging
-  
+
   try {
     // Stage 2: Test connection (10-25%)
     progress.report({ increment: 15, message: 'Testing Jira connection...' });
-    
+
+    // Check for cancellation before Jira test
+    if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
+      throw new Error('Analysis cancelled by user');
+    }
+
     const connectionValid = await jiraClient.testConnection();
     if (!connectionValid) {
       jiraClient.showOutput(); // Show output for troubleshooting
-      throw new Error('❌ Jira connection failed. Check output panel for detailed error information.');
+      throw new Error(
+        '❌ Jira connection failed. Check output panel for detailed error information.'
+      );
     }
 
     // Stage 3: Fetch data (25-50%)
     progress.report({ increment: 25, message: `Fetching ${epicKey} data...` });
-    
+
+    // Check for cancellation before data fetch
+    if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
+      throw new Error('Analysis cancelled by user');
+    }
+
     const jiraData = await jiraClient.fetchPortfolioOrEpic(epicKey);
     if (!jiraData) {
       jiraClient.showOutput(); // Show output for troubleshooting
@@ -584,57 +687,63 @@ async function runMultiStageAnalysis(
     }
 
     // Stage 4: Analyze codebase (50-70%)
-    progress.report({ increment: 20, message: 'Analyzing Go codebase...' });
-    
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (!workspaceFolder) {
-      throw new Error('❌ No workspace folder found. Please open a Go project.');
+    progress.report({ increment: 20, message: 'Analyzing universal codebase...' });
+
+    // Check for cancellation before codebase analysis
+    if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
+      throw new Error('Analysis cancelled by user');
     }
 
-         const codebaseAnalyzer = new GoCodebaseAnalyzer(workspaceFolder.uri.fsPath);
-     const codebaseData = await codebaseAnalyzer.analyzeCodebase();
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+      throw new Error('❌ No workspace folder found. Please open a project.');
+    }
 
-     // Stage 5: Run interactive analysis workflow (70-100%)
-     progress.report({ increment: 5, message: 'Starting interactive analysis workflow...' });
-     
-     const analysisEngine = new MultiStageAnalysisEngine();
-     
-     // Register as active analysis engine for command routing
-     const stateManager = ExtensionStateManager.getInstance();
-     stateManager.activeAnalysisEngine = analysisEngine;
-     
-     try {
-       // Run the interactive analysis workflow
-       await analysisEngine.runFullAnalysis(epicKey, jiraData, codebaseData);
-     } finally {
-       // Clear active analysis engine when done
-       stateManager.activeAnalysisEngine = null;
-     }
+    const codebaseAnalyzer = new CodebaseAnalyzer();
+    const codebaseData = await codebaseAnalyzer.analyzeCodebase();
+
+    // Stage 5: Run interactive analysis workflow (70-100%)
+    progress.report({ increment: 5, message: 'Starting interactive analysis workflow...' });
+
+    const analysisEngine = new MultiStageAnalysisEngine();
+
+    // Register as active analysis engine for command routing
+    stateManager.activeAnalysisEngine = analysisEngine;
+
+    try {
+      // Run the interactive analysis workflow
+      await analysisEngine.runFullAnalysis(epicKey, jiraData, codebaseData);
+    } finally {
+      // Clear active analysis engine when done
+      stateManager.activeAnalysisEngine = null;
+    }
 
     // Show success message with interactive workflow completion
     const totalStories = jiraData.epics.reduce((sum, epic) => sum + epic.stories.length, 0);
     const totalPoints = jiraData.totalStoryPoints;
     const totalFiles = codebaseData.totalFiles;
 
-         // Display completion message
-     vscode.window.showInformationMessage(
-       `🎉 Interactive analysis workflow completed! Epic: ${epicKey} | Analysis: ${totalStories} stories (${totalPoints} points) + ${totalFiles} Go files`,
-       'Show Output', 'Open Output Folder'
-     ).then(selection => {
-       if (selection === 'Show Output') {
-         analysisEngine.showOutput();
-               } else if (selection === 'Open Output Folder') {
+    // Display completion message
+    vscode.window
+      .showInformationMessage(
+        `🎉 Interactive analysis workflow completed! Epic: ${epicKey} | Analysis: ${totalStories} stories (${totalPoints} points) + ${totalFiles} Go files`,
+        'Show Output',
+        'Open Output Folder'
+      )
+      .then(selection => {
+        if (selection === 'Show Output') {
+          analysisEngine.showOutput();
+        } else if (selection === 'Open Output Folder') {
           const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-          const outputDir = workspaceFolder ? 
-            path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', epicKey) : 
-            configManager.getOutputConfiguration().directory;
+          const outputDir = workspaceFolder
+            ? path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', epicKey)
+            : configManager.getOutputConfiguration().directory;
           vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
         }
-     });
+      });
 
-     // Clean up analysis engine
-     analysisEngine.dispose();
-
+    // Clean up analysis engine
+    analysisEngine.dispose();
   } finally {
     // Clean up resources
     jiraClient.dispose();
@@ -647,14 +756,14 @@ async function runMultiStageAnalysis(
 async function openConfigurationSettings(configManager: ConfigurationManager): Promise<void> {
   const options = [
     'Configure Jira Settings',
-    'Configure Output Settings', 
+    'Configure Output Settings',
     'Configure Analysis Settings',
-    'Open Settings JSON'
+    'Open Settings JSON',
   ];
 
   const selection = await vscode.window.showQuickPick(options, {
     placeHolder: 'Select configuration to modify',
-    ignoreFocusOut: true
+    ignoreFocusOut: true,
   });
 
   switch (selection) {
@@ -685,16 +794,20 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     value: config.get('baseUrl', ''),
     placeHolder: 'company.atlassian.net',
     ignoreFocusOut: true,
-    validateInput: (value) => {
-      if (!value) {return 'Jira URL is required';}
+    validateInput: value => {
+      if (!value) {
+        return 'Jira URL is required';
+      }
       if (value.includes('http://') || value.includes('https://')) {
         return 'Enter domain only (without http:// or https://)';
       }
       return null;
-    }
+    },
   });
 
-  if (!baseUrl) {return;}
+  if (!baseUrl) {
+    return;
+  }
 
   // Get email
   const email = await vscode.window.showInputBox({
@@ -702,14 +815,20 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
     value: config.get('email', ''),
     placeHolder: 'your.email@company.com',
     ignoreFocusOut: true,
-    validateInput: (value) => {
-      if (!value) {return 'Email is required';}
-      if (!value.includes('@')) {return 'Please enter a valid email address';}
+    validateInput: value => {
+      if (!value) {
+        return 'Email is required';
+      }
+      if (!value.includes('@')) {
+        return 'Please enter a valid email address';
+      }
       return null;
-    }
+    },
   });
 
-  if (!email) {return;}
+  if (!email) {
+    return;
+  }
 
   // Get API token with security notice
   const tokenInfo = await vscode.window.showInformationMessage(
@@ -719,24 +838,34 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
   );
 
   if (tokenInfo === 'Open token page') {
-    await vscode.env.openExternal(vscode.Uri.parse('https://id.atlassian.com/manage-profile/security/api-tokens'));
+    await vscode.env.openExternal(
+      vscode.Uri.parse('https://id.atlassian.com/manage-profile/security/api-tokens')
+    );
     return;
   }
 
-  if (tokenInfo !== 'I have a token') {return;}
+  if (tokenInfo !== 'I have a token') {
+    return;
+  }
 
   const token = await vscode.window.showInputBox({
     prompt: 'Enter your Jira API token',
     password: true,
     ignoreFocusOut: true,
-    validateInput: (value) => {
-      if (!value) {return 'API token is required';}
-      if (value.length < 10) {return 'API token seems too short';}
+    validateInput: value => {
+      if (!value) {
+        return 'API token is required';
+      }
+      if (value.length < 10) {
+        return 'API token seems too short';
+      }
       return null;
-    }
+    },
   });
 
-  if (!token) {return;}
+  if (!token) {
+    return;
+  }
 
   // Save configuration
   await config.update('baseUrl', baseUrl, vscode.ConfigurationTarget.Global);
@@ -744,23 +873,28 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
   await config.update('token', token, vscode.ConfigurationTarget.Global);
 
   // Test the connection
-  const testResult = await vscode.window.withProgress({
-    location: vscode.ProgressLocation.Notification,
-    title: 'Testing Jira connection...',
-    cancellable: false
-  }, async () => {
-    const jiraClient = new JiraClient({ baseUrl, email, token, timeout: 10000 });
-    return await jiraClient.testConnection();
-  });
+  const testResult = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Testing Jira connection...',
+      cancellable: false,
+    },
+    async () => {
+      const jiraClient = new JiraClient({ baseUrl, email, token, timeout: 10000 });
+      return await jiraClient.testConnection();
+    }
+  );
 
   if (testResult) {
     vscode.window.showInformationMessage('✅ Jira configuration saved and tested successfully!');
-    
+
     // Update extension state
     const stateManager = ExtensionStateManager.getInstance();
     stateManager.updateState({ configured: true });
   } else {
-    vscode.window.showErrorMessage('❌ Jira connection test failed. Please check your credentials.');
+    vscode.window.showErrorMessage(
+      '❌ Jira connection test failed. Please check your credentials.'
+    );
   }
 }
 
@@ -783,16 +917,18 @@ async function configureAnalysisSettings(): Promise<void> {
  */
 async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager): Promise<void> {
   const state = stateManager.getState();
-  
+
   if (!state.currentEpic) {
-    vscode.window.showInformationMessage(
-      'No analysis results to refresh. Run an epic analysis first.',
-      'Run Analysis'
-    ).then(action => {
-      if (action === 'Run Analysis') {
-        vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        'No analysis results to refresh. Run an epic analysis first.',
+        'Run Analysis'
+      )
+      .then(action => {
+        if (action === 'Run Analysis') {
+          vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+        }
+      });
     return;
   }
 
@@ -807,7 +943,7 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
   const possibleFiles = [
     { name: 'README.md', label: 'Analysis Overview' },
     { name: 'SUMMARY.md', label: 'Analysis Summary' },
-    { name: 'stages', label: 'Stage Files' }
+    { name: 'stages', label: 'Stage Files' },
   ];
 
   // Check which files exist
@@ -817,18 +953,20 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
   });
 
   if (availableFiles.length === 0) {
-    vscode.window.showInformationMessage(
-      `No analysis files found for ${state.currentEpic}. The analysis may not have completed successfully.`,
-      'Open Output Folder',
-      'Restart Analysis'
-    ).then(action => {
-      if (action === 'Open Output Folder') {
-        const uri = vscode.Uri.file(outputDir);
-        vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: true });
-      } else if (action === 'Restart Analysis') {
-        vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        `No analysis files found for ${state.currentEpic}. The analysis may not have completed successfully.`,
+        'Open Output Folder',
+        'Restart Analysis'
+      )
+      .then(action => {
+        if (action === 'Open Output Folder') {
+          const uri = vscode.Uri.file(outputDir);
+          vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: true });
+        } else if (action === 'Restart Analysis') {
+          vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+        }
+      });
     return;
   }
 
@@ -836,21 +974,23 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
   const quickPickItems = availableFiles.map(file => ({
     label: file.label,
     description: file.name === 'stages' ? 'Open stages folder' : `Open ${file.name}`,
-    filePath: path.join(outputDir, file.name)
+    filePath: path.join(outputDir, file.name),
   }));
 
   quickPickItems.push({
     label: '📁 Open Output Folder',
     description: 'Open entire analysis folder',
-    filePath: outputDir
+    filePath: outputDir,
   });
 
   const selection = await vscode.window.showQuickPick(quickPickItems, {
     placeHolder: `Select analysis document to open (${state.currentEpic})`,
-    ignoreFocusOut: true
+    ignoreFocusOut: true,
   });
 
-  if (!selection) {return;}
+  if (!selection) {
+    return;
+  }
 
   try {
     if (selection.label === '📁 Open Output Folder' || selection.filePath.endsWith('stages')) {
@@ -860,7 +1000,7 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
       const uri = vscode.Uri.file(selection.filePath);
       await vscode.window.showTextDocument(uri);
     }
-    
+
     vscode.window.showInformationMessage(`📊 Opened ${selection.label} for ${state.currentEpic}`);
   } catch (error) {
     vscode.window.showErrorMessage(`❌ Failed to open ${selection.label}: ${error}`);
@@ -890,9 +1030,11 @@ async function pasteCopilotResponse(): Promise<void> {
 
     // Look for TECHNICAL_ANALYSIS.md files in ai-analysis-output folders
     const files = await vscode.workspace.findFiles('**/ai-analysis-output/*/TECHNICAL_ANALYSIS.md');
-    
+
     if (files.length === 0) {
-      vscode.window.showWarningMessage('No TECHNICAL_ANALYSIS.md files found. Please run the analysis first.');
+      vscode.window.showWarningMessage(
+        'No TECHNICAL_ANALYSIS.md files found. Please run the analysis first.'
+      );
       return;
     }
 
@@ -904,11 +1046,11 @@ async function pasteCopilotResponse(): Promise<void> {
       const fileItems = files.map(file => ({
         label: path.basename(path.dirname(file.fsPath)),
         description: file.fsPath,
-        uri: file
+        uri: file,
       }));
 
       const selected = await vscode.window.showQuickPick(fileItems, {
-        placeHolder: 'Select which analysis to update'
+        placeHolder: 'Select which analysis to update',
       });
 
       if (!selected) {
@@ -922,13 +1064,19 @@ async function pasteCopilotResponse(): Promise<void> {
     const stages = [
       { label: 'Stage 1: Requirements Analysis', section: '## 📋 1. Requirements Analysis' },
       { label: 'Stage 2: Design Overview', section: '## 🎯 2. Design Overview' },
-      { label: 'Stage 3: Detailed Technical Design', section: '## 🔧 3. Detailed Technical Design' },
-      { label: 'Stage 4: Infrastructure & NFR', section: '## 🏗️ 4. Infrastructure & Non-Functional Requirements' },
-      { label: 'Stage 5: Task Breakdown', section: '## 📝 5. Task Breakdown' }
+      {
+        label: 'Stage 3: Detailed Technical Design',
+        section: '## 🔧 3. Detailed Technical Design',
+      },
+      {
+        label: 'Stage 4: Infrastructure & NFR',
+        section: '## 🏗️ 4. Infrastructure & Non-Functional Requirements',
+      },
+      { label: 'Stage 5: Task Breakdown', section: '## 📝 5. Task Breakdown' },
     ];
 
     const selectedStage = await vscode.window.showQuickPick(stages, {
-      placeHolder: 'Which stage response do you want to paste?'
+      placeHolder: 'Which stage response do you want to paste?',
     });
 
     if (!selectedStage) {
@@ -938,7 +1086,9 @@ async function pasteCopilotResponse(): Promise<void> {
     // Get Copilot response from clipboard
     const clipboardText = await vscode.env.clipboard.readText();
     if (!clipboardText.trim()) {
-      vscode.window.showWarningMessage('Clipboard is empty. Please copy your Copilot response first.');
+      vscode.window.showWarningMessage(
+        'Clipboard is empty. Please copy your Copilot response first.'
+      );
       return;
     }
 
@@ -949,12 +1099,14 @@ async function pasteCopilotResponse(): Promise<void> {
     // Find the section and replace the placeholder
     const sectionStart = content.indexOf(selectedStage.section);
     if (sectionStart === -1) {
-      vscode.window.showErrorMessage(`Section "${selectedStage.section}" not found in the document`);
+      vscode.window.showErrorMessage(
+        `Section "${selectedStage.section}" not found in the document`
+      );
       return;
     }
 
-		// Find the next section start or end of document
-		const nextSectionPattern = /^## [\u{1f527}\u{1f3af}\u{1f4cb}\u{1f3d7}\u{1f4dd}] \d+\./gmu;
+    // Find the next section start or end of document
+    const nextSectionPattern = /^## [\u{1f527}\u{1f3af}\u{1f4cb}\u{1f3d7}\u{1f4dd}] \d+\./gmu;
     nextSectionPattern.lastIndex = sectionStart + selectedStage.section.length;
     const nextSectionMatch = nextSectionPattern.exec(content);
     const sectionEnd = nextSectionMatch ? nextSectionMatch.index : content.length;
@@ -971,32 +1123,37 @@ async function pasteCopilotResponse(): Promise<void> {
 
     // Replace everything from "**Status**:" onwards in the Copilot Response section
     const statusPattern = /\*\*Status\*\*:.*$/ms;
-    const updatedSectionContent = sectionContent.replace(statusPattern, `**Status**: ✅ Response completed
+    const updatedSectionContent = sectionContent.replace(
+      statusPattern,
+      `**Status**: ✅ Response completed
 
 ---
 
 ${clipboardText.trim()}
 
----`);
+---`
+    );
 
     // Replace the section in the full document
-    const updatedContent = content.substring(0, sectionStart) + updatedSectionContent + content.substring(sectionEnd);
+    const updatedContent =
+      content.substring(0, sectionStart) + updatedSectionContent + content.substring(sectionEnd);
 
     // Apply the edit
     const edit = new vscode.WorkspaceEdit();
     edit.replace(targetFile, new vscode.Range(0, 0, document.lineCount, 0), updatedContent);
-    
+
     const success = await vscode.workspace.applyEdit(edit);
     if (success) {
-      vscode.window.showInformationMessage(`✅ ${selectedStage.label} response pasted successfully!`);
-      
+      vscode.window.showInformationMessage(
+        `✅ ${selectedStage.label} response pasted successfully!`
+      );
+
       // Open the file to show the update
       await vscode.window.showTextDocument(document);
     } else {
       vscode.window.showErrorMessage('Failed to update the document');
     }
-
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to paste Copilot response: ${error.message}`);
   }
-} 
+}

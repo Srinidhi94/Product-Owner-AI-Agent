@@ -3,7 +3,7 @@
 ---
 
 ## What is the PoC?
-The PoC (`simple_poc.py`) is a standalone Python tool that demonstrates the core analysis and prompt generation logic of the AI Product Owner Agent, independent of the VS Code extension. It can analyze a Go codebase and Jira epic (real or mock) and generate a single comprehensive prompt for Copilot or any LLM.
+The PoC (`simple_poc.py`) is a standalone Python tool that demonstrates the core analysis and prompt generation logic of the AI Product Owner Agent, independent of the VS Code extension. It can analyze a codebase and Jira epic (real or mock) and generate a single comprehensive prompt for Copilot or any LLM.
 
 - **Purpose:** Showcase the core AI-driven analysis and prompt engineering logic in a minimal, scriptable form.
 - **Audience:** Engineering leaders, product owners, and technical evaluators who want to see the engine in action without installing the full extension.
@@ -19,7 +19,7 @@ For the full product vision, see the [Product Requirements Document](./PRODUCT_R
 python simple_poc.py --demo
 ```
 - Uses mock Jira data
-- Analyzes Go codebase in current directory
+- Analyzes codebase in current directory
 - Generates a comprehensive prompt in ~30 seconds
 
 ### Real Jira Analysis
@@ -27,15 +27,15 @@ python simple_poc.py --demo
 python simple_poc.py --key PROJ-123 --email user@company.com --token YOUR_TOKEN --url company.atlassian.net
 ```
 - Fetches real Jira epic/portfolio data
-- Analyzes Go codebase in current directory
+- Analyzes codebase in current directory
 - Generates a comprehensive prompt with real context
 
 ### Custom Project Path
 ```bash
-python simple_poc.py --demo --project /path/to/your/go/project
+python simple_poc.py --demo --project /path/to/your/project
 ```
 - Uses demo Jira data
-- Analyzes specified Go project
+- Analyzes specified project
 
 ---
 
@@ -44,7 +44,7 @@ python simple_poc.py --demo --project /path/to/your/go/project
 - `--email, -e`: Jira email address
 - `--token, -t`: Jira API token
 - `--url, -u`: Jira URL (no https://)
-- `--project, -p`: Path to Go project directory (default: current directory)
+- `--project, -p`: Path to project directory (default: current directory)
 - `--demo, -d`: Use demo mode with mock data
 - `--help, -h`: Show all options
 
@@ -69,7 +69,7 @@ python simple_poc.py --demo --project /path/to/your/go/project
 ## Troubleshooting
 - **Missing required arguments:** Use `--demo` or provide all Jira credentials
 - **Failed to connect to Jira:** Check API token, email, and URL
-- **No Go files found:** Check project path or use `--project` option
+- **No source files found:** Check project path or use `--project` option
 - **Output not generated:** Check for errors in the terminal
 
 ---

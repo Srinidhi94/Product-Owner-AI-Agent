@@ -290,7 +290,7 @@ Customize the extension behavior:
 ## First Analysis
 
 ### Quick Start
-1. **Open Go Project** (optional):
+1. **Open Project** (optional):
    \`\`\`bash
    code /path/to/your/go/project
    \`\`\`
@@ -357,7 +357,7 @@ your-project/
 
 #### ❌ "No Go files found"
 **Cause:** No Go files in current workspace.  
-**Solution:** Either open a Go project or continue with Jira-only analysis.
+**Solution:** Either open a project or continue with Jira-only analysis.
 
 ### Getting Help
 

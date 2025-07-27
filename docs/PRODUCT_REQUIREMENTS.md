@@ -81,7 +81,7 @@ graph TD
 ### Component Overview
 - **VS Code Extension/CLI:** User interface and workflow orchestration
 - **Jira Client:** Fetches and parses Jira epic/portfolio data
-- **Go Codebase Analyzer:** Analyzes Go project structure, patterns, and complexity
+- **Universal Codebase Analyzer:** Analyzes project structure, patterns, and complexity across multiple programming languages
 - **Prompt Generator:** Creates context-rich, multi-stage prompts using best practices
 - **Document Generator:** Manages output files and documentation
 - **Copilot/LLM Integration:** Executes prompts and generates technical analysis
@@ -93,7 +93,7 @@ sequenceDiagram
     participant VSCode
     participant AnalysisEngine
     participant JiraClient
-    participant GoAnalyzer
+    participant UniversalAnalyzer
     participant PromptGen
     participant Copilot
     participant DocGen
@@ -101,9 +101,9 @@ sequenceDiagram
     User->>VSCode: Run "Analyze Epic"
     VSCode->>AnalysisEngine: Start analysis
     AnalysisEngine->>JiraClient: Fetch epic data
-    AnalysisEngine->>GoAnalyzer: Analyze codebase
+    AnalysisEngine->>UniversalAnalyzer: Analyze codebase
     JiraClient-->>AnalysisEngine: Jira data
-    GoAnalyzer-->>AnalysisEngine: Codebase data
+    UniversalAnalyzer-->>AnalysisEngine: Codebase data
     AnalysisEngine->>PromptGen: Generate prompts
     PromptGen-->>AnalysisEngine: Prompts
     AnalysisEngine->>DocGen: Save prompts

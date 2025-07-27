@@ -249,7 +249,7 @@ export class ConfigurationManager {
   }
 
   /**
-   * Check if workspace is a Go project
+   * Check if workspace contains supported source files
    */
   isGoProject(): boolean {
     const workspacePath = this.getWorkspacePath();
@@ -259,15 +259,17 @@ export class ConfigurationManager {
       const fs = require('fs');
       const path = require('path');
       
-      // Check for go.mod file
-      const goModPath = path.join(workspacePath, 'go.mod');
-      if (fs.existsSync(goModPath)) {return true;}
+      // Check for supported file extensions
+      const supportedExtensions = ['.js', '.ts', '.py', '.java', '.go', '.cs', '.php', '.rb', '.rs'];
       
-      // Check for any .go files
+      // Check for any supported source files
       const files = fs.readdirSync(workspacePath);
-      return files.some((file: string) => file.endsWith('.go'));
+      return files.some((file: string) => {
+        const ext = path.extname(file);
+        return supportedExtensions.includes(ext);
+      });
     } catch (error) {
-      console.warn('⚠️ Could not check if workspace is Go project:', error);
+      console.warn('⚠️ Could not check if workspace contains source files:', error);
       return false;
     }
   }
@@ -396,7 +398,7 @@ export class ConfigurationManager {
 
 **Workspace**
 - Path: ${this.getWorkspacePath() || 'No workspace open'}
-- Go Project: ${this.isGoProject() ? 'Yes' : 'No'}
+- Source Files: ${this.isGoProject() ? 'Yes' : 'No'}
 `;
   }
 

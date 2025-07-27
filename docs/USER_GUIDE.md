@@ -12,92 +12,173 @@
 
 ## 🚀 Getting Started
 
-The AI Product Owner Agent helps you analyze Jira epics and Go codebases to generate comprehensive technical documentation using GitHub Copilot or any LLM. This extension transforms business requirements into actionable technical designs with visual diagrams and implementation plans.
+The AI Product Owner Agent is a professional VS Code extension that analyzes Jira epics and performs universal codebase analysis across multiple programming languages. It generates comprehensive technical documentation through GitHub Copilot integration and a sophisticated multi-stage analysis workflow.
 
-### What You'll Need
-- ✅ VS Code (version 1.74.0 or higher)
+### Supported Programming Languages
+- **JavaScript** (.js, .mjs) - Frontend/backend applications
+- **TypeScript** (.ts, .tsx) - Type-safe JavaScript development
+- **Python** (.py) - Data science, web development, automation
+- **Java** (.java) - Enterprise applications, microservices
+- **Go** (.go) - Cloud-native applications, APIs
+- **C#** (.cs) - .NET applications, enterprise solutions
+- **PHP** (.php) - Web applications, content management
+- **Ruby** (.rb) - Web applications, scripting
+- **Rust** (.rs) - Systems programming, performance-critical applications
+
+### System Requirements
+- ✅ VS Code version 1.74.0 or higher
 - ✅ Jira instance with API access
-- ✅ Jira API token
-- ✅ Go workspace (optional but recommended)
-- ✅ GitHub Copilot extension (or any LLM)
+- ✅ Valid Jira API token
+- ✅ Project workspace with supported languages
+- ✅ GitHub Copilot extension (recommended)
 
-### Key Features
-- 🔍 **Epic Analysis**: Fetch and analyze Jira epics with stories
-- 🏗️ **Codebase Integration**: Analyze Go project structure and patterns
-- 🤖 **AI-Powered Prompts**: Generate specialized prompts for Copilot/LLMs
-- 📊 **Visual Documentation**: Create Mermaid diagrams and technical specs
-- 🔄 **Multi-Stage Analysis**: 5-stage comprehensive analysis workflow
+### Core Capabilities
+- 🔍 **Epic Analysis**: Comprehensive Jira epic and story analysis
+- � **Universal Codebase Analysis**: Multi-language code structure analysis
+- 🤖 **AI-Optimized Prompts**: Context-rich prompts for GitHub Copilot
+- 📊 **Technical Documentation**: Automated generation of technical specifications
+- 🔄 **Five-Stage Workflow**: Systematic analysis methodology
+- 📈 **Visual Diagrams**: Mermaid-based architecture and flow diagrams
 
 ## 📦 Installation & Setup
 
-### Step 1: Install the Extension
+### Step 1: Extension Installation
 1. Open VS Code
-2. Go to Extensions (Ctrl+Shift+X / Cmd+Shift+X)
+2. Navigate to Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`)
 3. Search for "AI Product Owner Agent"
-4. Click "Install"
+4. Click "Install" and wait for completion
 
-### Step 2: Get Your Jira API Token
-1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
+### Step 2: Jira API Configuration
+1. Access [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Click "Create API token"
-3. Give it a name like "AI Product Owner Agent"
-4. Copy the generated token (save it securely!)
+3. Provide a descriptive name: "AI Product Owner Agent"
+4. Copy and securely store the generated token
 
-### Step 3: First-Time Setup
-When you first activate the extension, you'll see a welcome message:
+### Step 3: Initial Configuration
+Upon first activation, the extension displays a welcome dialog:
 
 ```
 🚀 Welcome to AI Product Owner Agent!
-Would you like a quick walkthrough to get started?
+Ready to configure your Jira integration and begin analysis?
 ```
 
-Choose "Configure Now" to set up your credentials immediately.
+Select "Configure Now" to initiate the setup wizard.
 
 ## ⚙️ Configuration
 
-### Open Configuration Settings
-Use any of these methods:
+### Configuration Access Methods
+Access configuration through any of these methods:
 - **Command Palette**: `Ctrl+Shift+P` → "AI Product Owner: Configure Settings"
-- **Activity Bar**: Click the robot icon → Configure Settings
-- **Settings Menu**: File → Preferences → Settings → Search "AI Product Owner"
+- **Activity Bar**: Click the robot icon → "Configure Settings"
+- **VS Code Settings**: File → Preferences → Settings → Search "AI Product Owner"
 
-### Required Settings
+### Required Configuration
 
-#### Jira Configuration
+#### Jira Integration Settings
 ```json
 {
-  "aiProductOwner.jira.baseUrl": "your-company.atlassian.net",
-  "aiProductOwner.jira.email": "your-email@company.com",
-  "aiProductOwner.jira.token": "your-api-token-here"
+  "aiProductOwner.jira.baseUrl": "your-organization.atlassian.net",
+  "aiProductOwner.jira.email": "your-email@organization.com",
+  "aiProductOwner.jira.token": "your-secure-api-token"
 }
 ```
 
-**⚠️ Important**: Don't include `https://` in the base URL - just use `company.atlassian.net`
+**Security Note**: Exclude `https://` from baseUrl - use only `organization.atlassian.net`
 
-#### Output Configuration
+#### Analysis Output Configuration
 ```json
 {
   "aiProductOwner.output.directory": "./docs/analysis",
-  "aiProductOwner.output.generateDiagrams": true
+  "aiProductOwner.output.generateDiagrams": true,
+  "aiProductOwner.output.includeMetadata": true
 }
 ```
 
-#### Analysis Configuration
+#### Universal Codebase Analysis Settings
 ```json
 {
   "aiProductOwner.analysis.maxSolutions": 2,
-  "aiProductOwner.codebase.includeTests": false
+  "aiProductOwner.codebase.includeTests": false,
+  "aiProductOwner.codebase.supportedLanguages": [
+    "javascript", "typescript", "python", "java", 
+    "go", "csharp", "php", "ruby", "rust"
+  ],
+  "aiProductOwner.analysis.depthLevel": "comprehensive"
 }
 ```
 
-### Test Your Configuration
-After setting up, test your connection:
+### Configuration Validation
+After configuration, validate your setup:
 1. Open Command Palette (`Ctrl+Shift+P`)
-2. Run "AI Product Owner: Test Jira Connection"
-3. Wait for the connection test to complete
+2. Execute "AI Product Owner: Test Jira Connection"
+3. Wait for validation completion
 
-You should see: ✅ "Jira connection successful!"
+Success indicator: ✅ "Jira connection established successfully!"
 
 ## 🎯 Using the Extension
+
+### Analysis Workflow Overview
+
+The extension follows a structured five-stage analysis process:
+
+1. **Epic Analysis**: Jira data extraction and requirement analysis
+2. **Codebase Discovery**: Universal language detection and structure mapping
+3. **Architecture Analysis**: Cross-language dependency and pattern analysis
+4. **Technical Planning**: Implementation strategy and approach definition
+5. **Documentation Generation**: Comprehensive technical documentation creation
+
+### Starting an Analysis
+
+#### Method 1: Command Palette
+1. Open Command Palette (`Ctrl+Shift+P`)
+2. Type "AI Product Owner: Analyze Epic"
+3. Select your target epic from the list
+4. Follow the guided workflow
+
+#### Method 2: Activity Bar Interface
+1. Click the robot icon in the Activity Bar
+2. Navigate to "Quick Actions" panel
+3. Click "Analyze Epic"
+4. Select your epic and workspace
+
+### Interactive Analysis Process
+
+```mermaid
+graph LR
+    A[Start Analysis] --> B[Epic Selection]
+    B --> C[Codebase Scan]
+    C --> D[Language Detection]
+    D --> E[Analysis Generation]
+    E --> F[Copilot Integration]
+    F --> G[Documentation Output]
+```
+
+#### Stage-by-Stage Workflow
+
+**Stage 1: Epic Analysis**
+- Fetches Jira epic details, stories, and acceptance criteria
+- Extracts business requirements and technical constraints
+- Generates initial context for technical analysis
+
+**Stage 2: Codebase Discovery**
+- Scans workspace for supported programming languages
+- Identifies project structure, frameworks, and patterns
+- Maps file organization and module dependencies
+
+**Stage 3: Architecture Analysis**
+- Analyzes cross-language integrations and dependencies
+- Identifies architectural patterns and design approaches
+- Evaluates technical complexity and implementation challenges
+
+**Stage 4: Technical Planning**
+- Generates implementation strategies and approaches
+- Creates task breakdown and development sequencing
+- Identifies risks, dependencies, and technical decisions
+
+**Stage 5: Documentation Generation**
+- Produces comprehensive technical analysis
+- Creates visual diagrams and architectural documentation
+- Generates Copilot-ready prompts for detailed analysis
 
 ### Visual Workflow Overview
 ```mermaid
@@ -112,10 +193,10 @@ graph TD
 
 ### Basic Workflow
 
-#### 1. Open Your Go Project
+#### 1. Open Your Project
 ```bash
-# Open your Go project in VS Code
-code /path/to/your/go/project
+# Open your project in VS Code
+code /path/to/your/project
 ```
 
 #### 2. Start Epic Analysis
@@ -190,7 +271,7 @@ your-project/
 ### Common Issues & Solutions
 - **Jira authentication failed:** Check API token and email.
 - **Epic not found:** Verify epic key and permissions.
-- **No Go files found:** Check project path and structure.
+- **No source files found:** Check project path and structure.
 - **Copilot integration issue:** Ensure Copilot extension is installed and active.
 - **Rate limit exceeded:** Wait and retry, or adjust network settings.
 

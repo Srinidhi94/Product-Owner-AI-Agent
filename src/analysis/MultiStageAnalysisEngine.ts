@@ -1,6 +1,16 @@
 /**
- * Multi-Stage Analysis Engine - Interactive 5-Prompt Workflow
- * Orchestrates sequential prompt generation with VS Code integration
+ * Multi-Stage Analysis Engine - Professional Five-Stage Analysis Workflow
+ *
+ * Orchestrates comprehensive technical analysis through sequential prompt generation
+ * with VS Code integration and GitHub Copilot optimization. Supports universal
+ * codebase analysis across multiple programming languages.
+ *
+ * Workflow Stages:
+ * 1. Epic Analysis - Jira requirements extraction
+ * 2. Codebase Architecture - Universal language structure analysis
+ * 3. Technical Dependencies - Cross-language integration mapping
+ * 4. Implementation Planning - Development strategy and approach
+ * 5. Documentation Generation - Comprehensive technical documentation
  */
 
 import * as vscode from 'vscode';
@@ -30,54 +40,57 @@ export class MultiStageAnalysisEngine {
   private promptGenerator: PromptGenerator;
   private documentGenerator: DocumentGenerator;
   private outputChannel: vscode.OutputChannel;
-  
+  private cancelled: boolean = false;
+
   private stages: AnalysisStage[] = [
     {
-      id: 'requirements-analysis',
-      name: 'Requirements Analysis',
-      duration: '5 minutes',
-      icon: '📋',
-      description: 'Principal Engineer: Analyze Jira requirements, dependencies, and use cases',
-      requiredDiagrams: ['Requirements Overview', 'Dependencies Map']
-    },
-    {
-      id: 'design-overview',
-      name: 'Design Overview',
-      duration: '6 minutes', 
-      icon: '🎯',
-      description: 'Principal Engineer: High-level design concept with core architecture',
-      requiredDiagrams: ['Design Overview Diagram', 'Component Interaction']
-    },
-    {
-      id: 'technical-design',
-      name: 'Detailed Technical Design',
-      duration: '15 minutes',
-      icon: '🔧',
-      description: 'Principal Engineer: DB, API, business logic specific to current codebase',
-      requiredDiagrams: ['Database Schema Changes', 'API Design', 'Business Logic Flow', 'Component Architecture']
-    },
-    {
-      id: 'infrastructure-nfr',
-      name: 'Infrastructure & Non-Functional Requirements',
+      id: 'product-requirements-analysis',
+      name: 'Product Requirements Analysis',
       duration: '8 minutes',
-      icon: '🏗️',
-      description: 'Principal Engineer: Infrastructure, testing, performance, backward compatibility',
-      requiredDiagrams: ['Infrastructure Changes', 'Performance Architecture']
+      icon: '📋',
+      description: 'Senior Product Manager: Product requirements, user needs, and business context',
+      requiredDiagrams: ['User Journey Map', 'Product Requirements Matrix', 'Stakeholder Impact Map'],
     },
     {
-      id: 'task-breakdown',
-      name: 'Task Breakdown',
-      duration: '6 minutes',
-      icon: '📝',
-      description: 'Product Owner: Break into Jira tasks with acceptance criteria and DoD',
-      requiredDiagrams: ['Task Breakdown Structure', 'Implementation Timeline']
-    }
+      id: 'system-architecture-design',
+      name: 'System Architecture Design',
+      duration: '12 minutes',
+      icon: '�️',
+      description: 'Principal Engineer (Architecture): High-level system design and technology decisions',
+      requiredDiagrams: ['System Architecture Overview', 'Technology Stack Diagram', 'Service Dependencies Map'],
+    },
+    {
+      id: 'technical-design-specification',
+      name: 'Technical Design Specification',
+      duration: '15 minutes',
+      icon: '⚙️',
+      description: 'Principal Engineer (Technical Design): Detailed API design, data models, and interfaces',
+      requiredDiagrams: ['API Design Specification', 'Database Schema', 'Component Interaction Flow'],
+    },
+    {
+      id: 'implementation-deployment-strategy',
+      name: 'Implementation & Deployment Strategy',
+      duration: '12 minutes',
+      icon: '🚀',
+      description: 'Principal Engineer (Implementation & DevOps): Implementation approach and deployment strategy',
+      requiredDiagrams: ['Deployment Architecture', 'CI/CD Pipeline', 'Infrastructure Design'],
+    },
+    {
+      id: 'sprint-planning-jira-breakdown',
+      name: 'Sprint Planning & Jira Breakdown',
+      duration: '10 minutes',
+      icon: '�',
+      description: 'Product Owner: Jira epic/story breakdown with DoD, AC, and sprint planning',
+      requiredDiagrams: ['Epic Breakdown Structure', 'Sprint Planning Timeline', 'Story Dependencies Map'],
+    },
   ];
 
   constructor() {
     this.promptGenerator = new PromptGenerator();
     this.documentGenerator = new DocumentGenerator();
-    this.outputChannel = vscode.window.createOutputChannel('AI Product Owner - Multi-Stage Analysis');
+    this.outputChannel = vscode.window.createOutputChannel(
+      'AI Product Owner - Multi-Stage Analysis'
+    );
   }
 
   /**
@@ -89,42 +102,74 @@ export class MultiStageAnalysisEngine {
     codebaseData: CodebaseAnalysis
   ): Promise<void> {
     this.log(`🚀 Starting automated technical analysis for ${epicKey}`);
-    
+    this.cancelled = false; // Reset cancellation flag
+
     try {
       // Initialize clean output structure (10%)
       await this.documentGenerator.initializeCleanOutputStructure(epicKey);
-      
-      // Create master analysis document (10%)  
-      const masterDocPath = await this.documentGenerator.createMasterAnalysisDocument(epicKey, jiraData, codebaseData);
-      
+
+      // Create master analysis document (10%)
+      const masterDocPath = await this.documentGenerator.createMasterAnalysisDocument(
+        epicKey,
+        jiraData,
+        codebaseData
+      );
+
       // Show workflow overview (5%)
       await this.showSequentialWorkflowOverview(epicKey, this.stages);
-      
+
+      // Check if cancelled after overview
+      if (this.cancelled) {
+        this.log('❌ Analysis cancelled by user during overview');
+        throw new Error('Analysis cancelled by user');
+      }
+
       // Run sequential analysis stages with user confirmation (75% total)
       for (let i = 0; i < this.stages.length; i++) {
+        // Check cancellation before each stage
+        if (this.cancelled) {
+          this.log(`❌ Analysis cancelled by user before stage ${i + 1}`);
+          throw new Error('Analysis cancelled by user');
+        }
+
         const stage = this.stages[i];
         this.log(`🔄 Starting Stage ${i + 1}/${this.stages.length}: ${stage.name}`);
-        
+
         // Generate stage-specific prompt with codebase context
-        const stagePrompt = await this.generateTechnicalStagePrompt(stage, jiraData, codebaseData, i);
-        
+        const stagePrompt = await this.generateTechnicalStagePrompt(
+          stage,
+          jiraData,
+          codebaseData,
+          i
+        );
+
         // Save prompt to both documentation files
         await this.documentGenerator.saveStagePromptToDocuments(epicKey, stage, stagePrompt, i + 1);
-        
+
         // Execute stage and wait for completion
         await this.executeSequentialStage(epicKey, stage, stagePrompt, i + 1);
-        
+
         this.log(`✅ Completed Stage ${i + 1}: ${stage.name}`);
       }
-      
+
+      // Check if cancelled before finalization
+      if (this.cancelled) {
+        this.log('❌ Analysis cancelled by user before finalization');
+        throw new Error('Analysis cancelled by user');
+      }
+
       // Finalize and open results (total: 10% + 10% + 5% + 75% = 100%)
       await this.finalizeAndOpenResults(epicKey, masterDocPath);
-      
-      this.log(`✅ Automated technical analysis completed for ${epicKey}`);
 
+      this.log(`✅ Automated technical analysis completed for ${epicKey}`);
     } catch (error: any) {
-      this.log(`❌ Analysis workflow failed: ${error.message}`);
-      vscode.window.showErrorMessage(`Technical analysis failed: ${error.message}`);
+      if (error.message === 'Analysis cancelled by user') {
+        this.log(`⏹️ Analysis workflow cancelled by user for ${epicKey}`);
+        vscode.window.showWarningMessage(`Analysis cancelled for ${epicKey}`);
+      } else {
+        this.log(`❌ Analysis workflow failed: ${error.message}`);
+        vscode.window.showErrorMessage(`Technical analysis failed: ${error.message}`);
+      }
       throw error;
     }
   }
@@ -141,11 +186,15 @@ export class MultiStageAnalysisEngine {
 
 ## 📋 Analysis Stages
 
-${this.stages.map((stage, index) => `
+${this.stages
+  .map(
+    (stage, index) => `
 ${index + 1}. **${stage.icon} ${stage.name}** (${stage.duration})
    - ${stage.description}
    - Required diagrams: ${stage.requiredDiagrams.join(', ')}
-`).join('')}
+`
+  )
+  .join('')}
 
 ## 🔄 Interactive Workflow
 
@@ -168,21 +217,23 @@ Ready to begin?`;
       // Show overview in new document
       const doc = await vscode.workspace.openTextDocument({
         content: overview,
-        language: 'markdown'
+        language: 'markdown',
       });
       await vscode.window.showTextDocument(doc);
-      
+
       // Ask again after showing overview
       const startAction = await vscode.window.showInformationMessage(
         'Ready to start the analysis?',
         'Start Analysis',
         'Cancel'
       );
-      
+
       if (startAction !== 'Start Analysis') {
+        this.cancelled = true;
         throw new Error('Analysis cancelled by user');
       }
     } else if (action !== 'Start Analysis') {
+      this.cancelled = true;
       throw new Error('Analysis cancelled by user');
     }
 
@@ -200,7 +251,7 @@ Ready to begin?`;
     const prompt = await this.promptGenerator.generatePrompt(stageId, jiraData, codebaseData, {
       includeContext7: false,
       maxSolutionCount: 2,
-      saveToFiles: false
+      saveToFiles: false,
     });
 
     if (!prompt) {
@@ -232,7 +283,9 @@ Ready to begin?`;
     );
 
     // Step 3: Show stage instructions with actions
-    const instructions = `**Stage ${stageNumber}/${this.stages.length}: ${stage.icon} ${stage.name}**
+    const instructions = `**Stage ${stageNumber}/${this.stages.length}: ${stage.icon} ${
+      stage.name
+    }**
 
 ✅ Prompt copied to clipboard
 📁 Output file created: ${path.basename(outputFilePath)}
@@ -259,14 +312,14 @@ Ready to begin?`;
       case 'Open Copilot Chat':
         await this.openCopilotChat();
         return await this.waitForStageCompletion(stage, outputFilePath);
-        
+
       case 'Open Output File':
         await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(outputFilePath));
         return await this.waitForStageCompletion(stage, outputFilePath);
-        
+
       case 'Stage Complete':
         return true;
-        
+
       case 'Skip Stage': {
         const confirmSkip = await vscode.window.showWarningMessage(
           `Skip ${stage.name}? This will reduce analysis quality.`,
@@ -275,7 +328,7 @@ Ready to begin?`;
         );
         return confirmSkip !== 'Skip Stage';
       }
-        
+
       default:
         return false;
     }
@@ -287,25 +340,25 @@ Ready to begin?`;
   private async openCopilotChat(): Promise<void> {
     const copilotCommands = [
       'github.copilot.chat.open',
-      'github.copilot.openChatView', 
+      'github.copilot.openChatView',
       'workbench.panel.chat.view.copilot.focus',
-      'workbench.view.extension.github-copilot-chat'
+      'workbench.view.extension.github-copilot-chat',
     ];
 
     let success = false;
-    
+
     for (const command of copilotCommands) {
       try {
         await vscode.commands.executeCommand(command);
         this.log(`🤖 Opened GitHub Copilot Chat using: ${command}`);
         success = true;
-        
+
         // Show helpful message about the prompt
         vscode.window.showInformationMessage(
           '🤖 Copilot Chat opened! The prompt is already copied to your clipboard - just paste it (Cmd+V / Ctrl+V)',
           'Got it!'
         );
-        
+
         break;
       } catch (error) {
         this.log(`⚠️ Command '${command}' failed, trying next...`);
@@ -315,13 +368,13 @@ Ready to begin?`;
 
     if (!success) {
       this.log('⚠️ Could not auto-open Copilot Chat with any known command');
-      
+
       const action = await vscode.window.showWarningMessage(
         '🤖 Could not auto-open Copilot Chat. Please open it manually and paste the prompt.',
         'Show Instructions',
-        'I\'ll open it manually'
+        "I'll open it manually"
       );
-      
+
       if (action === 'Show Instructions') {
         const instructions = `# How to Open GitHub Copilot Chat
 
@@ -346,7 +399,7 @@ Ready to begin?`;
 
         const doc = await vscode.workspace.openTextDocument({
           content: instructions,
-          language: 'markdown'
+          language: 'markdown',
         });
         await vscode.window.showTextDocument(doc);
       }
@@ -356,12 +409,15 @@ Ready to begin?`;
   /**
    * Wait for user to complete the current stage with persistent UX
    */
-  private async waitForStageCompletion(stage: AnalysisStage, outputFilePath: string): Promise<boolean> {
+  private async waitForStageCompletion(
+    stage: AnalysisStage,
+    outputFilePath: string
+  ): Promise<boolean> {
     // Show initial setup actions
     const setupAction = await vscode.window.showInformationMessage(
       `🎯 ${stage.icon} ${stage.name} - Ready!\n\n✅ Prompt copied to clipboard\n📁 Output file created\n\nChoose your next action:`,
       'Open Copilot Chat',
-      'Open Output File', 
+      'Open Output File',
       'Show Instructions',
       'Proceed to Next Stage'
     );
@@ -374,7 +430,7 @@ Ready to begin?`;
           'Got it!'
         );
         break;
-        
+
       case 'Open Output File':
         await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(outputFilePath));
         vscode.window.showInformationMessage(
@@ -382,18 +438,18 @@ Ready to begin?`;
           'Got it!'
         );
         break;
-        
+
       case 'Show Instructions':
         await this.showStageHelp(stage);
         break;
-        
+
       case 'Proceed to Next Stage':
         // User wants to skip directly
         return true;
     }
 
     // Return a promise that resolves when user clicks the status bar item
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.stageCompletionResolver = resolve;
     });
   }
@@ -411,7 +467,7 @@ Ready to begin?`;
     }
 
     const { stage, statusBarItem } = this.currentStageInfo;
-    
+
     const action = await vscode.window.showInformationMessage(
       `Complete ${stage.icon} ${stage.name}?\n\nMake sure you've:\n• Pasted the prompt in Copilot Chat\n• Received and reviewed the response\n• Copied any important information`,
       'Stage Complete ✅',
@@ -427,7 +483,7 @@ Ready to begin?`;
         this.stageCompletionResolver = null;
         vscode.window.showInformationMessage(`✅ ${stage.name} completed! Moving to next stage...`);
         break;
-        
+
       case 'Skip This Stage': {
         const confirmSkip = await vscode.window.showWarningMessage(
           `Skip ${stage.name}? This will reduce analysis quality.`,
@@ -442,7 +498,7 @@ Ready to begin?`;
         }
         break;
       }
-        
+
       case 'Not Yet - Continue Working':
       default:
         // Keep working - status bar stays active
@@ -451,6 +507,35 @@ Ready to begin?`;
         );
         break;
     }
+  }
+
+  /**
+   * Cancel the current analysis workflow
+   */
+  public cancelAnalysis(): void {
+    this.cancelled = true;
+    this.log('❌ Analysis cancellation requested');
+
+    // If there's an active stage completion resolver, reject it immediately
+    if (this.stageCompletionResolver) {
+      this.stageCompletionResolver(false);
+      this.stageCompletionResolver = null;
+    }
+
+    // Clean up current stage info
+    if (this.currentStageInfo && this.currentStageInfo.statusBarItem) {
+      this.currentStageInfo.statusBarItem.dispose();
+      this.currentStageInfo = null;
+    }
+
+    vscode.window.showWarningMessage('🛑 Analysis workflow cancelled.');
+  }
+
+  /**
+   * Check if analysis is cancelled
+   */
+  public isCancelled(): boolean {
+    return this.cancelled;
   }
 
   /**
@@ -482,7 +567,7 @@ ${stage.requiredDiagrams.map(diagram => `• ${diagram}`).join('\n')}
 
     const doc = await vscode.workspace.openTextDocument({
       content: help,
-      language: 'markdown'
+      language: 'markdown',
     });
     await vscode.window.showTextDocument(doc);
   }
@@ -493,10 +578,15 @@ ${stage.requiredDiagrams.map(diagram => `• ${diagram}`).join('\n')}
   private async showProgressUpdate(progress: StageProgress): Promise<void> {
     const completedCount = progress.completed.filter(Boolean).length;
     const remaining = progress.totalStages - completedCount;
-    
-    const progressMessage = `📊 Analysis Progress: ${completedCount}/${progress.totalStages} stages complete
 
-✅ Completed: ${this.stages.slice(0, completedCount).map(s => s.icon + ' ' + s.name).join(', ')}
+    const progressMessage = `📊 Analysis Progress: ${completedCount}/${
+      progress.totalStages
+    } stages complete
+
+✅ Completed: ${this.stages
+      .slice(0, completedCount)
+      .map(s => s.icon + ' ' + s.name)
+      .join(', ')}
 🔄 Remaining: ${remaining} stages
 
 Ready for next stage?`;
@@ -532,7 +622,7 @@ Ready for next stage?`;
     progress: StageProgress
   ): Promise<void> {
     this.log('📋 Generating final analysis summary...');
-    
+
     await this.documentGenerator.generateFinalSummary(
       epicKey,
       jiraData,
@@ -548,7 +638,7 @@ Ready for next stage?`;
   private async showCompletionSummary(epicKey: string, progress: StageProgress): Promise<void> {
     const completedCount = progress.completed.filter(Boolean).length;
     const totalTime = Math.round((new Date().getTime() - progress.startTime.getTime()) / 1000 / 60);
-    
+
     const summary = `🎉 Analysis Complete!
 
 **Epic**: ${epicKey}
@@ -571,19 +661,21 @@ Your comprehensive analysis is ready for implementation!`;
         await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(summaryPath));
         break;
       }
-        
+
       case 'Open Output Folder': {
         const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
         await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
         break;
       }
-        
+
       case 'Share Results':
         await this.shareResults(epicKey);
         break;
     }
 
-    this.log(`🎉 Analysis completed: ${completedCount}/${progress.totalStages} stages in ${totalTime} minutes`);
+    this.log(
+      `🎉 Analysis completed: ${completedCount}/${progress.totalStages} stages in ${totalTime} minutes`
+    );
   }
 
   /**
@@ -593,10 +685,10 @@ Your comprehensive analysis is ready for implementation!`;
     const summaryPath = this.documentGenerator.getSummaryPath(epicKey);
     const summaryContent = await vscode.workspace.fs.readFile(vscode.Uri.file(summaryPath));
     const content = Buffer.from(summaryContent).toString('utf8');
-    
+
     // Copy summary to clipboard
     await vscode.env.clipboard.writeText(content);
-    
+
     vscode.window.showInformationMessage(
       '📋 Analysis summary copied to clipboard! Ready to share with your team.',
       'Open in Browser',
@@ -614,24 +706,39 @@ Your comprehensive analysis is ready for implementation!`;
     stageIndex: number
   ): Promise<GeneratedPrompt> {
     this.log(`🧠 Generating technical prompt for ${stage.name}...`);
-    return await this.promptGenerator.generateTechnicalStagePrompt(stage, jiraData, codebaseData, stageIndex);
+    return await this.promptGenerator.generateTechnicalStagePrompt(
+      stage,
+      jiraData,
+      codebaseData,
+      stageIndex
+    );
   }
 
   /**
    * Show sequential workflow overview
    */
-  private async showSequentialWorkflowOverview(epicKey: string, stages: AnalysisStage[]): Promise<void> {
-    const totalTime = stages.reduce((sum, stage) => sum + parseInt(stage.duration.split(' ')[0]), 0);
-    
+  private async showSequentialWorkflowOverview(
+    epicKey: string,
+    stages: AnalysisStage[]
+  ): Promise<void> {
+    const totalTime = stages.reduce(
+      (sum, stage) => sum + parseInt(stage.duration.split(' ')[0]),
+      0
+    );
+
     const overview = `🚀 **Sequential Automated Workflow Started for ${epicKey}**
 
 ## 📋 Analysis Stages (${stages.length} total)
 
-${stages.map((stage, index) => `
+${stages
+  .map(
+    (stage, index) => `
 **${index + 1}. ${stage.icon} ${stage.name}** (${stage.duration})
    - ${stage.description}
    - Diagrams: ${stage.requiredDiagrams.join(', ')}
-`).join('')}
+`
+  )
+  .join('')}
 
 ## 🔄 Sequential Execution Process
 
@@ -669,34 +776,47 @@ Ready to begin sequential execution!`;
     stageNumber: number
   ): Promise<void> {
     this.log(`🔄 Executing sequential stage ${stageNumber}: ${stage.name}`);
-    
+
     // Copy prompt to clipboard
     await vscode.env.clipboard.writeText(prompt.content);
-    
+
     // Open Copilot Chat automatically
     await this.openCopilotChat();
-    
+
     // Show stage start notification with flat timing
     vscode.window.showInformationMessage(
       `🤖 Stage ${stageNumber}/5: ${stage.name}\n\n✅ Prompt copied to clipboard\n🤖 Copilot Chat opened\n\n📋 Paste the prompt in Copilot Chat and wait for response.\n🔔 Completion check will appear in 30 seconds.`,
       { modal: false }
     );
-    
+
     // Wait for user confirmation that stage is complete
     await this.waitForSequentialStageCompletion(stage, stageNumber);
-    
+
     this.log(`✅ Sequential stage ${stageNumber} completed: ${stage.name}`);
   }
 
   /**
    * Wait for user confirmation that a sequential stage is complete
    */
-  private async waitForSequentialStageCompletion(stage: AnalysisStage, stageNumber: number): Promise<void> {
-    return new Promise<void>((resolve) => {
+  private async waitForSequentialStageCompletion(
+    stage: AnalysisStage,
+    stageNumber: number
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       // Show completion confirmation dialog
       const checkCompletion = async () => {
+        // Check global cancellation flag
+        if (this.cancelled) {
+          reject(new Error('Analysis cancelled by user'));
+          return;
+        }
+
         const action = await vscode.window.showInformationMessage(
-          `🔍 Stage ${stageNumber}: ${stage.name}\n\nHas Copilot completed the analysis?\n\n📋 Expected output:\n${stage.requiredDiagrams.map(d => `• ${d}`).join('\n')}\n\nConfirm completion to proceed to next stage.`,
+          `🔍 Stage ${stageNumber}: ${
+            stage.name
+          }\n\nHas Copilot completed the analysis?\n\n📋 Expected output:\n${stage.requiredDiagrams
+            .map(d => `• ${d}`)
+            .join('\n')}\n\nConfirm completion to proceed to next stage.`,
           { modal: true },
           'Copilot Analysis Complete',
           'Still Working...',
@@ -708,7 +828,7 @@ Ready to begin sequential execution!`;
             this.log(`✅ User confirmed completion of stage ${stageNumber}: ${stage.name}`);
             resolve();
             break;
-            
+
           case 'Still Working...': {
             // Wait 30 seconds before checking again
             const recheckMs = 30 * 1000; // 30 seconds
@@ -716,23 +836,25 @@ Ready to begin sequential execution!`;
             setTimeout(checkCompletion, recheckMs);
             break;
           }
-            
+
           case 'Show Stage Help':
             await this.showStageHelp(stage);
             // Check again after showing help
             setTimeout(checkCompletion, 2000);
             break;
-            
+
           default:
-            // User closed dialog - check again in 30 seconds
-            setTimeout(checkCompletion, 30000);
+            // User cancelled or closed dialog
+            this.cancelled = true;
+            this.log(`❌ User cancelled analysis during stage ${stageNumber}: ${stage.name}`);
+            reject(new Error('Analysis cancelled by user'));
             break;
         }
       };
 
       // Wait 30 seconds before first completion check
       const checkIntervalMs = 30 * 1000; // 30 seconds
-      
+
       this.log(`⏱️ Waiting 30 seconds before checking stage completion...`);
       setTimeout(checkCompletion, checkIntervalMs);
     });
@@ -743,27 +865,29 @@ Ready to begin sequential execution!`;
    */
   private async finalizeAndOpenResults(epicKey: string, masterDocPath: string): Promise<void> {
     this.log(`🎉 Finalizing analysis for ${epicKey}`);
-    
+
     // Generate completion summary
     await this.documentGenerator.generateCompletionSummary(epicKey, this.stages);
-    
+
     // Open master analysis document
     await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(masterDocPath));
-    
+
     // Show completion message
-    vscode.window.showInformationMessage(
-      `🎉 Technical Analysis Complete!\n\n✅ 5 automated stages executed\n📁 Analysis document opened\n📋 All prompts documented\n\nReview the analysis and copy Copilot responses to complete the documentation.`,
-      'Open Output Folder',
-      'Show Documentation Guide'
-    ).then(action => {
-      if (action === 'Open Output Folder') {
-        const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
-        vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
-      } else if (action === 'Show Documentation Guide') {
-        this.showDocumentationGuide(epicKey);
-      }
-    });
-    
+    vscode.window
+      .showInformationMessage(
+        `🎉 Technical Analysis Complete!\n\n✅ 5 automated stages executed\n📁 Analysis document opened\n📋 All prompts documented\n\nReview the analysis and copy Copilot responses to complete the documentation.`,
+        'Open Output Folder',
+        'Show Documentation Guide'
+      )
+      .then(action => {
+        if (action === 'Open Output Folder') {
+          const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
+        } else if (action === 'Show Documentation Guide') {
+          this.showDocumentationGuide(epicKey);
+        }
+      });
+
     this.log(`✅ Analysis finalized and results opened for ${epicKey}`);
   }
 
@@ -817,7 +941,7 @@ Your technical analysis is ready for completion!`;
 
     const doc = await vscode.workspace.openTextDocument({
       content: guide,
-      language: 'markdown'
+      language: 'markdown',
     });
     await vscode.window.showTextDocument(doc);
   }
@@ -840,13 +964,13 @@ Your technical analysis is ready for completion!`;
   ): Promise<void> {
     // Copy prompt to clipboard
     await vscode.env.clipboard.writeText(prompt.content);
-    
+
     // Open template file
     await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(templatePath));
-    
+
     // Open Copilot Chat
     await this.openCopilotChat();
-    
+
     // Show streamlined guidance
     vscode.window.showInformationMessage(
       `🚀 Streamlined Workflow Ready!\n\n✅ Prompt copied to clipboard\n📁 Template file opened\n🤖 Copilot Chat opened\n\n➡️ Next: Paste prompt in Copilot Chat and wait for comprehensive response!`,
@@ -863,7 +987,7 @@ Your technical analysis is ready for completion!`;
       'Open Template File',
       'Open Copilot Chat',
       'Open Both',
-      'I\'ll handle it'
+      "I'll handle it"
     );
 
     switch (action) {
@@ -917,7 +1041,7 @@ Ready to proceed with this comprehensive approach?`;
 
     const doc = await vscode.workspace.openTextDocument({
       content: planContent,
-      language: 'markdown'
+      language: 'markdown',
     });
     await vscode.window.showTextDocument(doc);
   }
@@ -926,18 +1050,20 @@ Ready to proceed with this comprehensive approach?`;
    * Show guidance for manual workflow
    */
   private async showManualWorkflowGuidance(epicKey: string, templatePath: string): Promise<void> {
-    vscode.window.showInformationMessage(
-      `📁 Analysis files created for ${epicKey}\n\nYou can work at your own pace:\n• Template file is ready for responses\n• Use "Open Analysis Result" to access files\n• Use "Copy Prompt to Clipboard" if needed`,
-      'Open Template File',
-      'Open Output Folder'
-    ).then(action => {
-      if (action === 'Open Template File') {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(templatePath));
-      } else if (action === 'Open Output Folder') {
-        const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
-        vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        `📁 Analysis files created for ${epicKey}\n\nYou can work at your own pace:\n• Template file is ready for responses\n• Use "Open Analysis Result" to access files\n• Use "Copy Prompt to Clipboard" if needed`,
+        'Open Template File',
+        'Open Output Folder'
+      )
+      .then(action => {
+        if (action === 'Open Template File') {
+          vscode.commands.executeCommand('vscode.open', vscode.Uri.file(templatePath));
+        } else if (action === 'Open Output Folder') {
+          const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
+        }
+      });
   }
 
   /**
@@ -966,8 +1092,9 @@ Ready to proceed with this comprehensive approach?`;
    * Clean up resources
    */
   dispose(): void {
+    this.cancelled = true; // Stop any ongoing operations
     this.outputChannel.dispose();
     this.promptGenerator.dispose();
     this.documentGenerator.dispose();
   }
-} 
+}

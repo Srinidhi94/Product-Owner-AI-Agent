@@ -39,11 +39,14 @@ export interface PerformanceSummary {
     average: number;
     current: number;
   };
-  operationBreakdown: Record<string, {
-    count: number;
-    averageDuration: number;
-    successRate: number;
-  }>;
+  operationBreakdown: Record<
+    string,
+    {
+      count: number;
+      averageDuration: number;
+      successRate: number;
+    }
+  >;
 }
 
 export class PerformanceMonitor {
@@ -75,7 +78,7 @@ export class PerformanceMonitor {
       epicKey,
       stage,
       success: false,
-      memoryUsage: process.memoryUsage()
+      memoryUsage: process.memoryUsage(),
     };
 
     this.activeOperations.set(operationId, metric);
@@ -85,7 +88,12 @@ export class PerformanceMonitor {
   /**
    * End tracking an operation
    */
-  endOperation(operationId: string, success: boolean = true, error?: string, metadata?: Record<string, any>): void {
+  endOperation(
+    operationId: string,
+    success: boolean = true,
+    error?: string,
+    metadata?: Record<string, any>
+  ): void {
     const metric = this.activeOperations.get(operationId);
     if (!metric) {
       this.logger.warn(`Attempted to end unknown operation: ${operationId}`);
@@ -121,7 +129,7 @@ export class PerformanceMonitor {
     stage?: string
   ): Promise<T> {
     this.startOperation(operationId, operation, epicKey, stage);
-    
+
     try {
       const result = await fn();
       this.endOperation(operationId, true);
@@ -141,7 +149,7 @@ export class PerformanceMonitor {
       heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
       heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
       external: `${Math.round(memUsage.external / 1024 / 1024)}MB`,
-      rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`
+      rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`,
     });
     return memUsage;
   }
@@ -151,7 +159,7 @@ export class PerformanceMonitor {
    */
   getSummary(): PerformanceSummary {
     const completedMetrics = this.metrics.filter(m => m.endTime !== undefined);
-    
+
     if (completedMetrics.length === 0) {
       return {
         totalOperations: 0,
@@ -161,17 +169,20 @@ export class PerformanceMonitor {
         slowestOperation: {} as PerformanceMetric,
         fastestOperation: {} as PerformanceMetric,
         memoryTrend: { peak: 0, average: 0, current: 0 },
-        operationBreakdown: {}
+        operationBreakdown: {},
       };
     }
 
     const successful = completedMetrics.filter(m => m.success);
     const failed = completedMetrics.filter(m => !m.success);
     const durations = completedMetrics.map(m => m.duration!);
-    
+
     // Calculate operation breakdown
-    const operationBreakdown: Record<string, { count: number; averageDuration: number; successRate: number }> = {};
-    
+    const operationBreakdown: Record<
+      string,
+      { count: number; averageDuration: number; successRate: number }
+    > = {};
+
     for (const metric of completedMetrics) {
       if (!operationBreakdown[metric.operation]) {
         operationBreakdown[metric.operation] = { count: 0, averageDuration: 0, successRate: 0 };
@@ -181,7 +192,8 @@ export class PerformanceMonitor {
 
     for (const [operation, data] of Object.entries(operationBreakdown)) {
       const operationMetrics = completedMetrics.filter(m => m.operation === operation);
-      data.averageDuration = operationMetrics.reduce((sum, m) => sum + m.duration!, 0) / operationMetrics.length;
+      data.averageDuration =
+        operationMetrics.reduce((sum, m) => sum + m.duration!, 0) / operationMetrics.length;
       data.successRate = operationMetrics.filter(m => m.success).length / operationMetrics.length;
     }
 
@@ -189,26 +201,26 @@ export class PerformanceMonitor {
     const memoryUsages = completedMetrics
       .filter(m => m.memoryUsage)
       .map(m => m.memoryUsage!.heapUsed);
-    
+
     const currentMemory = process.memoryUsage().heapUsed;
-    
+
     return {
       totalOperations: completedMetrics.length,
       successfulOperations: successful.length,
       failedOperations: failed.length,
       averageDuration: durations.reduce((a, b) => a + b, 0) / durations.length,
-      slowestOperation: completedMetrics.reduce((prev, curr) => 
-        (curr.duration! > prev.duration!) ? curr : prev
+      slowestOperation: completedMetrics.reduce((prev, curr) =>
+        curr.duration! > prev.duration! ? curr : prev
       ),
-      fastestOperation: completedMetrics.reduce((prev, curr) => 
-        (curr.duration! < prev.duration!) ? curr : prev
+      fastestOperation: completedMetrics.reduce((prev, curr) =>
+        curr.duration! < prev.duration! ? curr : prev
       ),
       memoryTrend: {
         peak: Math.max(...memoryUsages),
         average: memoryUsages.reduce((a, b) => a + b, 0) / memoryUsages.length,
-        current: currentMemory
+        current: currentMemory,
       },
-      operationBreakdown
+      operationBreakdown,
     };
   }
 
@@ -253,20 +265,34 @@ Generated: ${new Date().toISOString()}
 
 ## Operation Breakdown
 ${Object.entries(summary.operationBreakdown)
-  .map(([op, data]) => 
-    `- **${op}**: ${data.count} operations, ${data.averageDuration.toFixed(2)}ms avg, ${(data.successRate * 100).toFixed(1)}% success rate`
-  ).join('\n')}
+  .map(
+    ([op, data]) =>
+      `- **${op}**: ${data.count} operations, ${data.averageDuration.toFixed(2)}ms avg, ${(
+        data.successRate * 100
+      ).toFixed(1)}% success rate`
+  )
+  .join('\n')}
 
 ## Performance Issues
-${slowOps.length > 0 ? `
+${
+  slowOps.length > 0
+    ? `
 ### Slow Operations (>5s)
-${slowOps.map(op => `- ${op.operation}: ${op.duration!.toFixed(2)}ms (Epic: ${op.epicKey || 'N/A'})`).join('\n')}
-` : '✅ No slow operations detected'}
+${slowOps
+  .map(op => `- ${op.operation}: ${op.duration!.toFixed(2)}ms (Epic: ${op.epicKey || 'N/A'})`)
+  .join('\n')}
+`
+    : '✅ No slow operations detected'
+}
 
-${failedOps.length > 0 ? `
+${
+  failedOps.length > 0
+    ? `
 ### Failed Operations
 ${failedOps.map(op => `- ${op.operation}: ${op.error} (Epic: ${op.epicKey || 'N/A'})`).join('\n')}
-` : '✅ No failed operations'}
+`
+    : '✅ No failed operations'
+}
 
 ## Memory Trend
 - **Peak Usage**: ${Math.round(summary.memoryTrend.peak / 1024 / 1024)}MB
@@ -282,50 +308,69 @@ ${this.generateRecommendations(summary, slowOps, failedOps)}
    * Generate performance recommendations
    */
   private generateRecommendations(
-    summary: PerformanceSummary, 
-    slowOps: PerformanceMetric[], 
+    summary: PerformanceSummary,
+    slowOps: PerformanceMetric[],
     failedOps: PerformanceMetric[]
   ): string {
     const recommendations: string[] = [];
 
     // Success rate recommendations
     if (summary.successfulOperations / summary.totalOperations < 0.9) {
-      recommendations.push('- **Low Success Rate**: Consider improving error handling and retry logic');
+      recommendations.push(
+        '- **Low Success Rate**: Consider improving error handling and retry logic'
+      );
     }
 
     // Performance recommendations
     if (summary.averageDuration > 10000) {
-      recommendations.push('- **Slow Performance**: Average operation time is high, consider optimization');
+      recommendations.push(
+        '- **Slow Performance**: Average operation time is high, consider optimization'
+      );
     }
 
     // Memory recommendations
-    if (summary.memoryTrend.current > 100 * 1024 * 1024) { // 100MB
+    if (summary.memoryTrend.current > 100 * 1024 * 1024) {
+      // 100MB
       recommendations.push('- **High Memory Usage**: Consider implementing memory optimizations');
     }
 
     // Specific operation recommendations
     for (const [operation, data] of Object.entries(summary.operationBreakdown)) {
       if (data.averageDuration > 15000) {
-        recommendations.push(`- **${operation}**: Consider optimizing this operation (${data.averageDuration.toFixed(0)}ms avg)`);
+        recommendations.push(
+          `- **${operation}**: Consider optimizing this operation (${data.averageDuration.toFixed(
+            0
+          )}ms avg)`
+        );
       }
       if (data.successRate < 0.8) {
-        recommendations.push(`- **${operation}**: Improve reliability (${(data.successRate * 100).toFixed(1)}% success rate)`);
+        recommendations.push(
+          `- **${operation}**: Improve reliability (${(data.successRate * 100).toFixed(
+            1
+          )}% success rate)`
+        );
       }
     }
 
-    return recommendations.length > 0 ? recommendations.join('\n') : '✅ No specific recommendations at this time';
+    return recommendations.length > 0
+      ? recommendations.join('\n')
+      : '✅ No specific recommendations at this time';
   }
 
   /**
    * Export performance data
    */
   exportData(): string {
-    return JSON.stringify({
-      timestamp: new Date().toISOString(),
-      summary: this.getSummary(),
-      metrics: this.metrics,
-      activeOperations: Array.from(this.activeOperations.entries())
-    }, null, 2);
+    return JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        summary: this.getSummary(),
+        metrics: this.metrics,
+        activeOperations: Array.from(this.activeOperations.entries()),
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -344,7 +389,7 @@ ${this.generateRecommendations(summary, slowOps, failedOps)}
     const duration = metric.duration!;
     const status = metric.success ? '✅' : '❌';
     const message = `${status} ${metric.operation} completed in ${duration.toFixed(2)}ms`;
-    
+
     if (metric.success) {
       if (duration > 10000) {
         this.logger.warn(`Slow operation: ${message}`, { metric });
@@ -381,10 +426,19 @@ export const trackOperation = async <T>(
   return perf.trackOperation(operationId, operation, fn, epicKey, stage);
 };
 
-export const startOperation = (operationId: string, operation: string, epicKey?: string, stage?: string): void => {
+export const startOperation = (
+  operationId: string,
+  operation: string,
+  epicKey?: string,
+  stage?: string
+): void => {
   perf.startOperation(operationId, operation, epicKey, stage);
 };
 
-export const endOperation = (operationId: string, success: boolean = true, error?: string): void => {
+export const endOperation = (
+  operationId: string,
+  success: boolean = true,
+  error?: string
+): void => {
   perf.endOperation(operationId, success, error);
-}; 
+};
