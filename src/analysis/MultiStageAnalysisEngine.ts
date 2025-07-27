@@ -22,18 +22,9 @@ import { DocumentGenerator } from '../output/DocumentGenerator';
 export interface AnalysisStage {
   id: string;
   name: string;
-  duration: string;
   icon: string;
   description: string;
   requiredDiagrams: string[];
-}
-
-export interface StageProgress {
-  currentStage: number;
-  totalStages: number;
-  stageName: string;
-  completed: boolean[];
-  startTime: Date;
 }
 
 export class MultiStageAnalysisEngine {
@@ -46,7 +37,6 @@ export class MultiStageAnalysisEngine {
     {
       id: 'product-requirements-analysis',
       name: 'Product Requirements Analysis',
-      duration: '8 minutes',
       icon: '📋',
       description: 'Senior Product Manager: Product requirements, user needs, and business context',
       requiredDiagrams: ['User Journey Map', 'Product Requirements Matrix', 'Stakeholder Impact Map'],
@@ -54,7 +44,6 @@ export class MultiStageAnalysisEngine {
     {
       id: 'system-architecture-design',
       name: 'System Architecture Design',
-      duration: '12 minutes',
       icon: '🏗️',
       description: 'Principal Engineer (Architecture): High-level system design and technology decisions',
       requiredDiagrams: ['System Architecture Overview', 'Technology Stack Diagram', 'Service Dependencies Map'],
@@ -62,7 +51,6 @@ export class MultiStageAnalysisEngine {
     {
       id: 'technical-design-specification',
       name: 'Technical Design Specification',
-      duration: '15 minutes',
       icon: '⚙️',
       description: 'Principal Engineer (Technical Design): Detailed API design, data models, and interfaces',
       requiredDiagrams: ['API Design Specification', 'Database Schema', 'Component Interaction Flow'],
@@ -70,7 +58,6 @@ export class MultiStageAnalysisEngine {
     {
       id: 'implementation-deployment-strategy',
       name: 'Implementation & Deployment Strategy',
-      duration: '12 minutes',
       icon: '🚀',
       description: 'Principal Engineer (Implementation & DevOps): Implementation approach and deployment strategy',
       requiredDiagrams: ['Deployment Architecture', 'CI/CD Pipeline', 'Infrastructure Design'],
@@ -78,7 +65,6 @@ export class MultiStageAnalysisEngine {
     {
       id: 'sprint-planning-jira-breakdown',
       name: 'Sprint Planning & Jira Breakdown',
-      duration: '10 minutes',
       icon: '📊',
       description: 'Product Owner: Jira epic/story breakdown with DoD, AC, and sprint planning',
       requiredDiagrams: ['Epic Breakdown Structure', 'Sprint Planning Timeline', 'Story Dependencies Map'],
@@ -105,17 +91,17 @@ export class MultiStageAnalysisEngine {
     this.cancelled = false; // Reset cancellation flag
 
     try {
-      // Initialize clean output structure (10%)
+      // Initialize clean output structure
       await this.documentGenerator.initializeCleanOutputStructure(epicKey);
 
-      // Create master analysis document (10%)
+      // Create master analysis document
       const masterDocPath = await this.documentGenerator.createMasterAnalysisDocument(
         epicKey,
         jiraData,
         codebaseData
       );
 
-      // Show workflow overview (5%)
+      // Show workflow overview
       await this.showSequentialWorkflowOverview(epicKey, this.stages);
 
       // Check if cancelled after overview
@@ -124,7 +110,7 @@ export class MultiStageAnalysisEngine {
         throw new Error('Analysis cancelled by user');
       }
 
-      // Run sequential analysis stages with user confirmation (75% total)
+      // Run sequential analysis stages with user confirmation
       for (let i = 0; i < this.stages.length; i++) {
         // Check cancellation before each stage
         if (this.cancelled) {
@@ -158,7 +144,7 @@ export class MultiStageAnalysisEngine {
         throw new Error('Analysis cancelled by user');
       }
 
-      // Finalize and open results (total: 10% + 10% + 5% + 75% = 100%)
+      // Finalize and open results
       await this.finalizeAndOpenResults(epicKey, masterDocPath);
 
       this.log(`✅ Automated technical analysis completed for ${epicKey}`);
@@ -189,7 +175,7 @@ export class MultiStageAnalysisEngine {
 ${this.stages
   .map(
     (stage, index) => `
-${index + 1}. **${stage.icon} ${stage.name}** (${stage.duration})
+${index + 1}. **${stage.icon} ${stage.name}**
    - ${stage.description}
    - Required diagrams: ${stage.requiredDiagrams.join(', ')}
 `
@@ -293,7 +279,7 @@ Ready to begin?`;
 **Next Steps:**
 1. Click "Open Copilot Chat" to launch GitHub Copilot
 2. Paste the prompt (Cmd+V / Ctrl+V) into Copilot Chat
-3. Wait for Copilot's complete response (~${stage.duration})
+3. Wait for Copilot's complete response
 4. Copy Copilot's response to the output file
 5. Return here and click "Stage Complete"
 
@@ -546,7 +532,7 @@ Ready to begin?`;
 
 ## What to do:
 1. **Paste the prompt** into GitHub Copilot Chat
-2. **Wait for response** (~${stage.duration})
+2. **Wait for response**
 3. **Verify diagrams** - Copilot should generate ${stage.requiredDiagrams.length} Mermaid diagrams
 4. **Copy response** to the output markdown file
 5. **Click "Stage Complete"** to continue
@@ -573,53 +559,12 @@ ${stage.requiredDiagrams.map(diagram => `• ${diagram}`).join('\n')}
   }
 
   /**
-   * Show progress update between stages
-   */
-  private async showProgressUpdate(progress: StageProgress): Promise<void> {
-    const completedCount = progress.completed.filter(Boolean).length;
-    const remaining = progress.totalStages - completedCount;
-
-    const progressMessage = `📊 Analysis Progress: ${completedCount}/${
-      progress.totalStages
-    } stages complete
-
-✅ Completed: ${this.stages
-      .slice(0, completedCount)
-      .map(s => s.icon + ' ' + s.name)
-      .join(', ')}
-🔄 Remaining: ${remaining} stages
-
-Ready for next stage?`;
-
-    const action = await vscode.window.showInformationMessage(
-      progressMessage,
-      'Continue',
-      'Show Progress',
-      'Pause Analysis'
-    );
-
-    if (action === 'Show Progress') {
-      await this.documentGenerator.showProgressDocument(progress, this.stages);
-    } else if (action === 'Pause Analysis') {
-      const resume = await vscode.window.showInformationMessage(
-        'Analysis paused. Resume when ready.',
-        'Resume',
-        'Cancel Analysis'
-      );
-      if (resume !== 'Resume') {
-        throw new Error('Analysis cancelled by user');
-      }
-    }
-  }
-
-  /**
    * Generate final summary document
    */
   private async generateFinalSummary(
     epicKey: string,
     jiraData: JiraPortfolio,
-    codebaseData: CodebaseAnalysis,
-    progress: StageProgress
+    codebaseData: CodebaseAnalysis
   ): Promise<void> {
     this.log('📋 Generating final analysis summary...');
 
@@ -627,54 +572,7 @@ Ready for next stage?`;
       epicKey,
       jiraData,
       codebaseData,
-      progress,
       this.stages
-    );
-  }
-
-  /**
-   * Show completion summary
-   */
-  private async showCompletionSummary(epicKey: string, progress: StageProgress): Promise<void> {
-    const completedCount = progress.completed.filter(Boolean).length;
-    const totalTime = Math.round((new Date().getTime() - progress.startTime.getTime()) / 1000 / 60);
-
-    const summary = `🎉 Analysis Complete!
-
-**Epic**: ${epicKey}
-**Completed**: ${completedCount}/${progress.totalStages} stages
-**Duration**: ${totalTime} minutes
-**Quality**: ${completedCount === progress.totalStages ? 'Complete' : 'Partial'}
-
-Your comprehensive analysis is ready for implementation!`;
-
-    const action = await vscode.window.showInformationMessage(
-      summary,
-      'Open Summary',
-      'Open Output Folder',
-      'Share Results'
-    );
-
-    switch (action) {
-      case 'Open Summary': {
-        const summaryPath = this.documentGenerator.getSummaryPath(epicKey);
-        await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(summaryPath));
-        break;
-      }
-
-      case 'Open Output Folder': {
-        const outputDir = this.documentGenerator.getOutputDirectory(epicKey);
-        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
-        break;
-      }
-
-      case 'Share Results':
-        await this.shareResults(epicKey);
-        break;
-    }
-
-    this.log(
-      `🎉 Analysis completed: ${completedCount}/${progress.totalStages} stages in ${totalTime} minutes`
     );
   }
 
@@ -721,11 +619,6 @@ Your comprehensive analysis is ready for implementation!`;
     epicKey: string,
     stages: AnalysisStage[]
   ): Promise<void> {
-    const totalTime = stages.reduce(
-      (sum, stage) => sum + parseInt(stage.duration.split(' ')[0]),
-      0
-    );
-
     const overview = `🚀 **Sequential Automated Workflow Started for ${epicKey}**
 
 ## 📋 Analysis Stages (${stages.length} total)
@@ -733,7 +626,7 @@ Your comprehensive analysis is ready for implementation!`;
 ${stages
   .map(
     (stage, index) => `
-**${index + 1}. ${stage.icon} ${stage.name}** (${stage.duration})
+**${index + 1}. ${stage.icon} ${stage.name}**
    - ${stage.description}
    - Diagrams: ${stage.requiredDiagrams.join(', ')}
 `

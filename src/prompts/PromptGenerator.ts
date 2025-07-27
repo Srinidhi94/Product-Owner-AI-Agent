@@ -469,7 +469,7 @@ Use Context7 documentation and code context wherever applicable for your analysi
         id: stage.id,
         name: stage.name,
         content: promptContent,
-        estimatedDuration: parseInt(stage.duration.split(' ')[0]),
+        estimatedDuration: 10, // Default estimated duration in minutes
         requiredDiagrams: stage.requiredDiagrams,
         maxApproaches: 2,
         mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking', 'browser'],

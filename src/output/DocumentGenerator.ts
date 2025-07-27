@@ -12,18 +12,9 @@ import { JiraPortfolio, CodebaseAnalysis } from '../types';
 interface AnalysisStage {
   id: string;
   name: string;
-  duration: string;
   icon: string;
   description: string;
   requiredDiagrams: string[];
-}
-
-interface StageProgress {
-  currentStage: number;
-  totalStages: number;
-  stageName: string;
-  completed: boolean[];
-  startTime: Date;
 }
 
 export class DocumentGenerator {
@@ -139,7 +130,6 @@ This document contains the comprehensive technical analysis following the Princi
 
 > **⚡ Automation**: GitHub Copilot will automatically populate this section using integrated MCP servers.
 > **🔍 Research Sources**: Context7, Microsoft Docs, Sequential Thinking (with fallback), Browser MCP
-> **⏱️ Duration**: ~8 minutes with comprehensive research validation
 > **📊 Expected Output**: Complete business analysis with stakeholder mapping and success metrics
 
 ### 🤖 Analysis Results Section:
@@ -152,10 +142,9 @@ This document contains the comprehensive technical analysis following the Princi
 
 ### 🤖 Automated Analysis Process
 
-> **⚡ Automation**: GitHub Copilot will automatically generate technical architecture analysis.
-> **🔍 Research Sources**: Context7 architecture patterns, Microsoft Docs best practices, industry standards
-> **⏱️ Duration**: ~12 minutes with comprehensive architecture research
-> **📊 Expected Output**: System architecture diagrams, technology decisions, and implementation roadmap
+> **⚡ Automation**: GitHub Copilot will automatically populate this section using integrated MCP servers.
+> **🔍 Research Sources**: Context7, Microsoft Docs, Sequential Thinking (with fallback), Browser MCP
+> **📊 Expected Output**: Comprehensive system architecture with technology decisions and scalability analysis
 
 ### 🤖 Analysis Results Section:
 
@@ -171,7 +160,6 @@ This document contains the comprehensive technical analysis following the Princi
 
 > **⚡ Automation**: GitHub Copilot will automatically generate detailed implementation specifications.
 > **🔍 Research Sources**: Context7 implementation patterns, coding best practices, framework documentation
-> **⏱️ Duration**: ~15 minutes with comprehensive design research and validation
 > **📊 Expected Output**: Component architecture, database schemas, API specifications, and implementation flows
 
 ### 🤖 Analysis Results Section:
@@ -186,7 +174,6 @@ This document contains the comprehensive technical analysis following the Princi
 
 > **⚡ Automation**: GitHub Copilot will automatically generate comprehensive development planning.
 > **🔍 Research Sources**: Agile methodologies, sprint planning best practices, resource allocation strategies
-> **⏱️ Duration**: ~12 minutes with development workflow research and team coordination analysis
 > **📊 Expected Output**: Sprint timelines, resource allocation matrices, team workflows, and dependency management
 
 ### 🤖 Analysis Results Section:
@@ -201,7 +188,6 @@ This document contains the comprehensive technical analysis following the Princi
 
 > **⚡ Automation**: GitHub Copilot will automatically perform comprehensive risk analysis with mitigation strategies.
 > **🔍 Research Sources**: Risk management frameworks, incident response patterns, industry failure case studies
-> **⏱️ Duration**: ~10 minutes with risk analysis research and mitigation planning
 > **📊 Expected Output**: Risk matrices, probability assessments, mitigation workflows, and contingency plans
 
 ### 🤖 Analysis Results Section:
@@ -897,14 +883,6 @@ ${diagram.code}
     const previewPath = path.join(this.getOutputDirectory(epicKey), 'DIAGRAMS.md');
     fs.writeFileSync(previewPath, previewContent, 'utf-8');
     this.log(`📊 Created diagram preview: ${path.basename(previewPath)}`);
-  }
-
-  /**
-   * Show progress document (stub for compatibility)
-   */
-  async showProgressDocument(progress: any, stages: any[]): Promise<void> {
-    this.log('showProgressDocument called (stub)');
-    // No-op for now
   }
 
   /**
