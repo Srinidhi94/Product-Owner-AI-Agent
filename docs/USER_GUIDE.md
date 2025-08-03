@@ -186,7 +186,7 @@ graph TD
     A[User Triggers Analysis] --> B[Extension Generates Prompts]
     B --> C[User Copies Prompt to Copilot/LLM]
     C --> D[LLM Generates Response]
-    D --> E[User Pastes Response into Output File]
+    D --> E[User Uses "Paste Copilot Response" Command]
     E --> F[Extension Updates Documentation]
     F --> G[Ready for Review/Implementation]
 ```

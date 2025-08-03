@@ -6,45 +6,48 @@
 
 ## Overview
 
-The **AI Product Owner Agent** is a professional VS Code extension that automates technical analysis of Jira epics and codebases across multiple programming languages. It generates comprehensive, implementation-ready technical documentation and structured prompt workflows for GitHub Copilot and other language models, significantly reducing manual effort while ensuring consistent, high-quality output.
+The **AI Product Owner Agent** is a VS Code extension that provides technical analysis of Jira epics and codebases across multiple programming languages. It generates comprehensive, implementation-ready technical documentation through a manual copy-paste workflow with GitHub Copilot, significantly improving productivity while ensuring consistent, high-quality output.
 
-### Key Features
+### ✨ Key Features
 
-- **Universal Codebase Analysis**: Supports JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, and Rust
-- **Jira Integration**: Automated epic and story analysis with comprehensive data extraction
-- **Multi-Stage Analysis**: Context-rich prompt generation following industry best practices
-- **GitHub Copilot Integration**: Streamlined workflow for AI-assisted development
-- **Professional Documentation**: Structured output including technical specifications, architecture diagrams, and implementation plans
-- **Risk Assessment**: Automated identification of technical risks and mitigation strategies
+- **🤖 Manual Copilot Integration**: Streamlined copy-paste workflow with GitHub Copilot
+- **� Clipboard Management**: Automatic prompt copying and response processing
+- **🌐 Multi-Language Analysis**: Supports JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, and Rust
+- **🎯 Jira Integration**: Epic and story analysis with comprehensive data extraction
+- **📊 Multi-Stage Analysis**: Context-rich processing following industry best practices
+- **💾 Documentation Generation**: Structured technical specifications and implementation guides
+- **⚠️ Risk Assessment**: Identification of technical risks and mitigation strategies
+- **📈 Progress Tracking**: Visual progress indicators during analysis
 
-## Quick Start
+## 🚀 Quick Start
 
 1. **Install the Extension**: Download and install the `.vsix` package in VS Code
 2. **Configure Settings**: Set up Jira credentials and output preferences
-3. **Analyze Project**: Use Command Palette → "AI Product Owner: Analyze Epic"
-4. **Follow Guided Workflow**: Complete 5-stage analysis with Copilot integration
-5. **Review Documentation**: Access generated technical specifications and implementation guides
+3. **Ensure Copilot**: Verify GitHub Copilot extension is installed and active
+4. **Analyze Project**: Use Command Palette → "AI Product Owner: Analyze Epic"
+5. **Manual Workflow**: Copy prompts to Copilot, paste responses back using extension commands
+6. **Review Results**: Access complete technical specifications and implementation guides
 
-## System Requirements
+## 🔧 System Requirements
 
 - **VS Code**: Version 1.74.0 or higher
-- **GitHub Copilot**: Active subscription and extension installed
+- **GitHub Copilot**: Extension installed (required for AI-powered analysis)
 - **Jira Access**: Valid API credentials (email + token)
 - **Supported Languages**: Any of the 9 supported programming languages
 
-## Documentation
+## 📚 Documentation
 
 - **[Installation Guide](INSTALLATION.md)** - Detailed setup instructions
-- **[User Guide](docs/USER_GUIDE.md)** - Complete usage documentation
+- **[User Guide](docs/USER_GUIDE.md)** - Complete workflow documentation
 - **[Architecture Overview](docs/ARCHITECTURE.md)** - Technical architecture and design
 - **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Development and contribution guidelines
 - **[Product Requirements](docs/PRODUCT_REQUIREMENTS.md)** - Feature specifications and roadmap
 
-## Contributing
+## 🤝 Contributing
 
 We welcome contributions from authorized team members. Please review the [Developer Guide](docs/DEVELOPER_GUIDE.md) for coding standards, development setup, and contribution process.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

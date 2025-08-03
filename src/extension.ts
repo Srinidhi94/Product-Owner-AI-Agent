@@ -19,13 +19,8 @@ import { MultiStageAnalysisEngine } from './analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from './utils/ConfigurationManager';
 import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
 import { WelcomeManager } from './utils/WelcomeManager';
-import {
-  ExtensionState,
-  JiraPortfolio,
-  CodebaseAnalysis,
-  AnalysisProgress,
-  ProcessingStatus,
-} from './types';
+import { ExtensionState } from './types';
+import { QuickActionsProvider } from './utils/QuickActionsProvider';
 
 /**
  * Extension state management for VS Code context and UI updates
@@ -102,6 +97,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Register commands
   registerCommands(context, stateManager, configManager);
+
+  // Register Quick Actions Tree Data Provider
+  const quickActionsProvider = new QuickActionsProvider();
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('quickActions', quickActionsProvider)
+  );
 
   // Register configuration change listener
   context.subscriptions.push(
@@ -473,11 +474,16 @@ If you don't see this information in the generated prompts, there's a bug.`;
     }
   );
 
-  // Register the new paste Copilot response command
-  context.subscriptions.push(
-    vscode.commands.registerCommand('aiProductOwner.pasteCopilotResponse', async () => {
-      await pasteCopilotResponse();
-    })
+
+
+  // Add progress tracking command
+  const showAnalysisProgressCommand = vscode.commands.registerCommand(
+    'aiProductOwner.showAnalysisProgress',
+    async () => {
+      vscode.window.showInformationMessage(
+        'Analysis progress tracking is available in the output panel.'
+      );
+    }
   );
 
   // Add all commands to subscriptions
@@ -491,7 +497,8 @@ If you don't see this information in the generated prompts, there's a bug.`;
     testJiraDataCommand,
     nextStageCommand,
     proceedToNextStageCommand,
-    cancelAnalysisCommand
+    cancelAnalysisCommand,
+    showAnalysisProgressCommand
   );
 }
 
@@ -656,24 +663,8 @@ async function runMultiStageAnalysis(
   jiraClient.showOutput(); // Show output channel for detailed logging
 
   try {
-    // Stage 2: Test connection (10-25%)
-    progress.report({ increment: 15, message: 'Testing Jira connection...' });
-
-    // Check for cancellation before Jira test
-    if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
-      throw new Error('Analysis cancelled by user');
-    }
-
-    const connectionValid = await jiraClient.testConnection();
-    if (!connectionValid) {
-      jiraClient.showOutput(); // Show output for troubleshooting
-      throw new Error(
-        '❌ Jira connection failed. Check output panel for detailed error information.'
-      );
-    }
-
-    // Stage 3: Fetch data (25-50%)
-    progress.report({ increment: 25, message: `Fetching ${epicKey} data...` });
+    // Stage 2: Fetch data directly (10-50%) - Skip connection test to avoid notifications
+    progress.report({ increment: 40, message: `Fetching ${epicKey} data...` });
 
     // Check for cancellation before data fetch
     if (stateManager.activeAnalysisEngine && stateManager.activeAnalysisEngine.isCancelled()) {
@@ -686,7 +677,7 @@ async function runMultiStageAnalysis(
       throw new Error(`❌ ${epicKey} not found or not accessible. Check output panel for details.`);
     }
 
-    // Stage 4: Analyze codebase (50-70%)
+    // Stage 3: Analyze codebase (50-70%)
     progress.report({ increment: 20, message: 'Analyzing universal codebase...' });
 
     // Check for cancellation before codebase analysis
@@ -702,7 +693,7 @@ async function runMultiStageAnalysis(
     const codebaseAnalyzer = new CodebaseAnalyzer();
     const codebaseData = await codebaseAnalyzer.analyzeCodebase();
 
-    // Stage 5: Run interactive analysis workflow (70-100%)
+    // Stage 4: Run interactive analysis workflow (70-100%)
     progress.report({ increment: 5, message: 'Starting interactive analysis workflow...' });
 
     const analysisEngine = new MultiStageAnalysisEngine();
@@ -712,35 +703,46 @@ async function runMultiStageAnalysis(
 
     try {
       // Run the interactive analysis workflow
-      await analysisEngine.runFullAnalysis(epicKey, jiraData, codebaseData);
+      await analysisEngine.executeAnalysis(epicKey, jiraData, codebaseData);
+
+      // Show success message only after successful completion
+      const totalStories = jiraData.epics.reduce((sum, epic) => sum + epic.stories.length, 0);
+      const totalPoints = jiraData.totalStoryPoints;
+      const totalFiles = codebaseData.totalFiles;
+
+      // Display completion message only on success
+      vscode.window
+        .showInformationMessage(
+          `🎉 Interactive analysis workflow completed! Epic: ${epicKey} | Analysis: ${totalStories} stories (${totalPoints} points) + ${totalFiles} files`,
+          'Show Output',
+          'Open Output Folder'
+        )
+        .then(selection => {
+          if (selection === 'Show Output') {
+            // Show the output channel instead
+            vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+          } else if (selection === 'Open Output Folder') {
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            const outputDir = workspaceFolder
+              ? path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', epicKey)
+              : configManager.getOutputConfiguration().directory;
+            vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
+          }
+        });
+    } catch (error) {
+      // Check if this was a user cancellation - handle gracefully
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      if (errorMessage.includes('cancelled by user') || errorMessage.includes('Analysis cancelled')) {
+        console.log(`ℹ️ Analysis cancelled for ${epicKey}`);
+        // Don't throw error for cancellations - let parent handle gracefully
+        throw error;
+      }
+      // Re-throw other errors
+      throw error;
     } finally {
       // Clear active analysis engine when done
       stateManager.activeAnalysisEngine = null;
     }
-
-    // Show success message with interactive workflow completion
-    const totalStories = jiraData.epics.reduce((sum, epic) => sum + epic.stories.length, 0);
-    const totalPoints = jiraData.totalStoryPoints;
-    const totalFiles = codebaseData.totalFiles;
-
-    // Display completion message
-    vscode.window
-      .showInformationMessage(
-        `🎉 Interactive analysis workflow completed! Epic: ${epicKey} | Analysis: ${totalStories} stories (${totalPoints} points) + ${totalFiles} Go files`,
-        'Show Output',
-        'Open Output Folder'
-      )
-      .then(selection => {
-        if (selection === 'Show Output') {
-          analysisEngine.showOutput();
-        } else if (selection === 'Open Output Folder') {
-          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-          const outputDir = workspaceFolder
-            ? path.join(workspaceFolder.uri.fsPath, 'ai-analysis-output', epicKey)
-            : configManager.getOutputConfiguration().directory;
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), true);
-        }
-      });
 
     // Clean up analysis engine
     analysisEngine.dispose();
@@ -1014,146 +1016,4 @@ function handleError(error: unknown, context: string): never {
   const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
   console.error(`${context}:`, error);
   throw new Error(`${context}: ${errorMessage}`);
-}
-
-/**
- * Help users paste Copilot responses into the correct section of TECHNICAL_ANALYSIS.md
- */
-async function pasteCopilotResponse(): Promise<void> {
-  try {
-    // Find the TECHNICAL_ANALYSIS.md file in the current workspace
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (!workspaceFolder) {
-      vscode.window.showErrorMessage('No workspace folder found');
-      return;
-    }
-
-    // Look for TECHNICAL_ANALYSIS.md files in ai-analysis-output folders
-    const files = await vscode.workspace.findFiles('**/ai-analysis-output/*/TECHNICAL_ANALYSIS.md');
-
-    if (files.length === 0) {
-      vscode.window.showWarningMessage(
-        'No TECHNICAL_ANALYSIS.md files found. Please run the analysis first.'
-      );
-      return;
-    }
-
-    let targetFile: vscode.Uri;
-    if (files.length === 1) {
-      targetFile = files[0];
-    } else {
-      // Let user choose which analysis file
-      const fileItems = files.map(file => ({
-        label: path.basename(path.dirname(file.fsPath)),
-        description: file.fsPath,
-        uri: file,
-      }));
-
-      const selected = await vscode.window.showQuickPick(fileItems, {
-        placeHolder: 'Select which analysis to update',
-      });
-
-      if (!selected) {
-        return;
-      }
-
-      targetFile = selected.uri;
-    }
-
-    // Ask which stage they want to update
-    const stages = [
-      { label: 'Stage 1: Requirements Analysis', section: '## 📋 1. Requirements Analysis' },
-      { label: 'Stage 2: Design Overview', section: '## 🎯 2. Design Overview' },
-      {
-        label: 'Stage 3: Detailed Technical Design',
-        section: '## 🔧 3. Detailed Technical Design',
-      },
-      {
-        label: 'Stage 4: Infrastructure & NFR',
-        section: '## 🏗️ 4. Infrastructure & Non-Functional Requirements',
-      },
-      { label: 'Stage 5: Task Breakdown', section: '## 📝 5. Task Breakdown' },
-    ];
-
-    const selectedStage = await vscode.window.showQuickPick(stages, {
-      placeHolder: 'Which stage response do you want to paste?',
-    });
-
-    if (!selectedStage) {
-      return;
-    }
-
-    // Get Copilot response from clipboard
-    const clipboardText = await vscode.env.clipboard.readText();
-    if (!clipboardText.trim()) {
-      vscode.window.showWarningMessage(
-        'Clipboard is empty. Please copy your Copilot response first.'
-      );
-      return;
-    }
-
-    // Read the current file content
-    const document = await vscode.workspace.openTextDocument(targetFile);
-    const content = document.getText();
-
-    // Find the section and replace the placeholder
-    const sectionStart = content.indexOf(selectedStage.section);
-    if (sectionStart === -1) {
-      vscode.window.showErrorMessage(
-        `Section "${selectedStage.section}" not found in the document`
-      );
-      return;
-    }
-
-    // Find the next section start or end of document
-    const nextSectionPattern = /^## [\u{1f527}\u{1f3af}\u{1f4cb}\u{1f3d7}\u{1f4dd}] \d+\./gmu;
-    nextSectionPattern.lastIndex = sectionStart + selectedStage.section.length;
-    const nextSectionMatch = nextSectionPattern.exec(content);
-    const sectionEnd = nextSectionMatch ? nextSectionMatch.index : content.length;
-
-    // Extract the section content
-    const sectionContent = content.substring(sectionStart, sectionEnd);
-
-    // Find the Copilot Response section within this stage
-    const responseStart = sectionContent.indexOf('### 🤖 Copilot Response');
-    if (responseStart === -1) {
-      vscode.window.showErrorMessage('Copilot Response section not found in the selected stage');
-      return;
-    }
-
-    // Replace everything from "**Status**:" onwards in the Copilot Response section
-    const statusPattern = /\*\*Status\*\*:.*$/ms;
-    const updatedSectionContent = sectionContent.replace(
-      statusPattern,
-      `**Status**: ✅ Response completed
-
----
-
-${clipboardText.trim()}
-
----`
-    );
-
-    // Replace the section in the full document
-    const updatedContent =
-      content.substring(0, sectionStart) + updatedSectionContent + content.substring(sectionEnd);
-
-    // Apply the edit
-    const edit = new vscode.WorkspaceEdit();
-    edit.replace(targetFile, new vscode.Range(0, 0, document.lineCount, 0), updatedContent);
-
-    const success = await vscode.workspace.applyEdit(edit);
-    if (success) {
-      vscode.window.showInformationMessage(
-        `✅ ${selectedStage.label} response pasted successfully!`
-      );
-
-      // Open the file to show the update
-      await vscode.window.showTextDocument(document);
-    } else {
-      vscode.window.showErrorMessage('Failed to update the document');
-    }
-  } catch (error: any) {
-    vscode.window.showErrorMessage(`Failed to paste Copilot response: ${error.message}`);
-  }
 }

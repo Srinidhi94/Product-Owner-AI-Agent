@@ -1,461 +1,375 @@
+/**
+ * CodebaseAnalyzer - Automated Project Analysis for Technical Context
+ *
+ * Provides comprehensive project structure analysis and technical stack detection
+ * for AI-driven technical analysis workflows. Supports multi-language codebases
+ * with optimized performance for VS Code extension integration.
+ */
+
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CodebaseAnalysis, ArchitecturalPattern, TechStackComponent, CodebaseMetrics } from '../types';
+import { CodebaseAnalysis, TechStackComponent, CodebaseMetrics } from '../types';
+import { Logger, createLogger } from '../utils/Logger';
 
-/**
- * CodebaseAnalyzer - Essential codebase type detection
- * Provides technical context for prompt templates with minimal overhead
- * Optimized for lean, focused analysis across all programming languages
- */
+interface ProjectContext {
+  type: 'web-app' | 'api' | 'library' | 'mobile' | 'desktop' | 'full-stack' | 'other';
+  mainLanguage: string;
+  framework: string | null;
+  keyDirectories: string[];
+  entryPoints: string[];
+  description: string;
+}
+
 export class CodebaseAnalyzer {
-  private readonly outputChannel: vscode.OutputChannel;
-  private readonly projectPath: string;
+  private logger: Logger;
+  private projectPath: string;
 
-  constructor() {
-    this.outputChannel = vscode.window.createOutputChannel('Codebase Analyzer');
-    this.projectPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+  // Simplified mappings for essential detection
+  private readonly languageExtensions = new Map([
+    ['.ts', 'TypeScript'],
+    ['.tsx', 'TypeScript'],
+    ['.js', 'JavaScript'],
+    ['.jsx', 'JavaScript'],
+    ['.py', 'Python'],
+    ['.pyw', 'Python'],
+    ['.java', 'Java'],
+    ['.kt', 'Kotlin'],
+    ['.cs', 'C#'],
+    ['.go', 'Go'],
+    ['.rb', 'Ruby'],
+    ['.php', 'PHP'],
+    ['.swift', 'Swift'],
+    ['.rs', 'Rust'],
+  ]);
+
+  private readonly frameworkIndicators = new Map([
+    ['react', 'React'],
+    ['next', 'Next.js'],
+    ['vue', 'Vue.js'],
+    ['angular', 'Angular'],
+    ['express', 'Express.js'],
+    ['fastapi', 'FastAPI'],
+    ['django', 'Django'],
+    ['flask', 'Flask'],
+    ['spring', 'Spring Boot'],
+    ['laravel', 'Laravel'],
+    ['rails', 'Ruby on Rails'],
+  ]);
+
+  constructor(projectPath: string = '') {
+    this.logger = createLogger('CodebaseAnalyzer');
+    this.projectPath = projectPath || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
   }
 
   /**
-   * Core language detection mappings - Essential file extensions only
-   */
-  private readonly languageMap = new Map([
-    ['.js', 'javascript'], ['.jsx', 'javascript'], ['.mjs', 'javascript'],
-    ['.ts', 'typescript'], ['.tsx', 'typescript'],
-    ['.py', 'python'], ['.pyw', 'python'],
-    ['.java', 'java'],
-    ['.go', 'go'],
-    ['.cs', 'csharp'],
-    ['.php', 'php'],
-    ['.rb', 'ruby'],
-    ['.rs', 'rust'],
-    ['.cpp', 'cpp'], ['.cc', 'cpp'], ['.cxx', 'cpp'],
-    ['.c', 'c'], ['.h', 'c'],
-    ['.swift', 'swift'],
-    ['.kt', 'kotlin'], ['.kts', 'kotlin']
-  ]);
-
-  /**
-   * Essential architecture patterns detection
-   */
-  private readonly patternKeywords = new Map([
-    ['mvc', 'MVC Architecture'],
-    ['api', 'REST API'],
-    ['microservice', 'Microservices'],
-    ['handler', 'Handler Pattern'],
-    ['service', 'Service Layer'],
-    ['repository', 'Repository Pattern'],
-    ['controller', 'Controller Pattern'],
-    ['middleware', 'Middleware Pattern'],
-    ['auth', 'Authentication'],
-    ['jwt', 'JWT Authentication'],
-    ['docker', 'Containerized'],
-    ['kubernetes', 'Kubernetes Ready'],
-    ['test', 'Testing Framework'],
-    ['clean architecture', 'Clean Architecture'],
-    ['ddd', 'Domain-Driven Design'],
-    ['cqrs', 'CQRS Pattern']
-  ]);
-
-  /**
-   * Essential tech stack detection
-   */
-  private readonly techStackMap = new Map([
-    // JavaScript/TypeScript
-    ['react', { name: 'React', type: 'framework' }],
-    ['angular', { name: 'Angular', type: 'framework' }],
-    ['vue', { name: 'Vue.js', type: 'framework' }],
-    ['express', { name: 'Express.js', type: 'framework' }],
-    ['nestjs', { name: 'NestJS', type: 'framework' }],
-    ['next', { name: 'Next.js', type: 'framework' }],
-    
-    // Python
-    ['django', { name: 'Django', type: 'framework' }],
-    ['flask', { name: 'Flask', type: 'framework' }],
-    ['fastapi', { name: 'FastAPI', type: 'framework' }],
-    
-    // Java
-    ['spring', { name: 'Spring', type: 'framework' }],
-    ['hibernate', { name: 'Hibernate', type: 'library' }],
-    
-    // Go
-    ['gin', { name: 'Gin', type: 'framework' }],
-    ['gorm', { name: 'GORM', type: 'library' }],
-    
-    // C#
-    ['aspnetcore', { name: 'ASP.NET Core', type: 'framework' }],
-    
-    // Databases
-    ['mongodb', { name: 'MongoDB', type: 'database' }],
-    ['postgresql', { name: 'PostgreSQL', type: 'database' }],
-    ['mysql', { name: 'MySQL', type: 'database' }],
-    ['redis', { name: 'Redis', type: 'database' }]
-  ]);
-
-  /**
-   * Project type classification based on detected patterns
-   */
-  private readonly projectTypes = new Map([
-    ['web_api', ['api', 'rest', 'endpoint', 'controller']],
-    ['web_app', ['react', 'angular', 'vue', 'next', 'django', 'laravel']],
-    ['microservices', ['microservice', 'service', 'docker', 'kubernetes']],
-    ['mobile_app', ['react-native', 'flutter', 'swift', 'kotlin']],
-    ['desktop_app', ['electron', 'wpf', 'javafx', 'qt']],
-    ['library', ['lib', 'package', 'module', 'component']],
-    ['data_processing', ['pandas', 'numpy', 'spark', 'kafka']],
-    ['game', ['unity', 'unreal', 'godot', 'pygame']]
-  ]);
-
-  /**
-   * Main analysis entry point - Streamlined codebase analysis
+   * Simple, focused project analysis for AI context
    */
   async analyzeCodebase(): Promise<CodebaseAnalysis> {
-    this.log('🚀 Starting streamlined codebase analysis...');
-
-    if (!this.projectPath) {
-      this.log('⚠️ Project path not found, using minimal analysis');
-      return this.createMinimalAnalysis();
-    }
+    this.logger.info('Starting simplified codebase analysis');
 
     try {
-      // Step 1: Quick language detection (limit to 50 files for performance)
-      const { primaryLanguage, allLanguages, totalFiles } = await this.detectLanguages();
-      
-      // Step 2: Essential pattern detection
-      const patterns = await this.detectEssentialPatterns();
-      
-      // Step 3: Basic tech stack identification
-      const techStack = await this.identifyTechStack();
-      
-      // Step 4: Project type classification
-      const projectType = this.classifyProjectType(patterns, techStack);
-      
-      // Step 5: Calculate basic metrics
-      const metrics = this.calculateBasicMetrics(totalFiles, allLanguages.length);
+      const context = await this.getProjectContext();
 
-      const analysis: CodebaseAnalysis = {
+      return {
         projectPath: this.projectPath,
-        totalFiles,
-        packages: [`${primaryLanguage}_project`, projectType],
-        structs: this.generateBasicStructures(primaryLanguage),
-        functions: this.generateBasicFunctions(primaryLanguage),
-        imports: techStack.map(t => t.name.toLowerCase()),
-        patterns: this.createArchitecturalPatterns(patterns),
-        techStack,
-        metrics
+        totalFiles: await this.getFileCount(),
+        packages: [context.type],
+        structs: context.keyDirectories,
+        functions: context.entryPoints,
+        imports: context.framework ? [context.framework] : [],
+        patterns: [
+          {
+            name: context.type,
+            description: context.description,
+            confidence: 8,
+            files: context.entryPoints,
+            examples: [],
+          },
+        ],
+        techStack: this.createTechStack(context),
+        metrics: this.createSimpleMetrics(context),
       };
-
-      this.log(`✅ Analysis complete - Primary: ${primaryLanguage}, Type: ${projectType}`);
-      this.log(`🏗️ Patterns: ${patterns.join(', ')}`);
-      return analysis;
-
     } catch (error: any) {
-      this.log(`❌ Analysis failed: ${error.message}`);
-      return this.createMinimalAnalysis();
+      this.logger.error('Analysis failed', error);
+      return this.createFallbackAnalysis();
     }
   }
 
   /**
-   * Quick language detection - Essential only
+   * Get essential project context for AI
    */
-  private async detectLanguages(): Promise<{
-    primaryLanguage: string;
-    allLanguages: string[];
-    totalFiles: number;
-  }> {
-    const languageCounts = new Map<string, number>();
-    
-    // Find code files (limited search for performance)
-    const codeFiles = await vscode.workspace.findFiles(
-      '**/*.{js,jsx,ts,tsx,py,java,go,cs,php,rb,rs,cpp,c,swift,kt}',
-      '{**/node_modules/**,**/vendor/**,**/target/**,**/build/**,**/dist/**,**/.git/**}',
-      50 // Limit for performance
-    );
+  private async getProjectContext(): Promise<ProjectContext> {
+    const [language, framework, directories, entryPoints] = await Promise.all([
+      this.detectMainLanguage(),
+      this.detectFramework(),
+      this.getKeyDirectories(),
+      this.findEntryPoints(),
+    ]);
 
-    for (const fileUri of codeFiles) {
-      const ext = path.extname(fileUri.fsPath).toLowerCase();
-      const language = this.languageMap.get(ext);
-      if (language) {
-        languageCounts.set(language, (languageCounts.get(language) || 0) + 1);
-      }
-    }
-
-    const sortedLanguages = Array.from(languageCounts.entries())
-      .sort(([, a], [, b]) => b - a)
-      .map(([lang]) => lang);
+    const type = this.determineProjectType(framework, directories);
+    const description = this.generateDescription(type, language, framework);
 
     return {
-      primaryLanguage: sortedLanguages[0] || 'unknown',
-      allLanguages: sortedLanguages,
-      totalFiles: codeFiles.length
+      type,
+      mainLanguage: language,
+      framework,
+      keyDirectories: directories,
+      entryPoints: entryPoints,
+      description,
     };
   }
 
   /**
-   * Essential pattern detection - Focused on key architectural patterns
+   * Detect primary language (not all languages)
    */
-  private async detectEssentialPatterns(): Promise<string[]> {
-    const patterns: string[] = [];
-    
+  private async detectMainLanguage(): Promise<string> {
     try {
-      // Quick file content scan (first 10 files)
-      const files = await vscode.workspace.findFiles('**/*.{js,ts,py,java,go,cs,php}', undefined, 10);
-      let allContent = '';
-      let allPaths = '';
+      const files = await vscode.workspace.findFiles(
+        '**/*.{ts,tsx,js,jsx,py,java,cs,go,rb,php,swift,rs}',
+        '**/node_modules/**',
+        50
+      );
+
+      const langCounts = new Map<string, number>();
 
       for (const file of files) {
-        try {
-          const document = await vscode.workspace.openTextDocument(file);
-          allContent += document.getText().toLowerCase() + ' ';
-          allPaths += file.fsPath.toLowerCase() + ' ';
-        } catch {
-          continue;
+        const ext = path.extname(file.fsPath).toLowerCase();
+        const lang = this.languageExtensions.get(ext);
+        if (lang) {
+          langCounts.set(lang, (langCounts.get(lang) || 0) + 1);
         }
       }
 
-      // Check for essential patterns
-      for (const [keyword, pattern] of this.patternKeywords) {
-        if (allContent.includes(keyword) || allPaths.includes(keyword)) {
-          patterns.push(pattern);
+      // Return most common language
+      let maxCount = 0;
+      let mainLang = 'JavaScript';
+
+      for (const [lang, count] of langCounts) {
+        if (count > maxCount) {
+          maxCount = count;
+          mainLang = lang;
         }
       }
 
-      // Check package/config files for additional context
-      await this.checkConfigFiles(patterns);
-
-    } catch (error: any) {
-      this.log(`⚠️ Pattern detection warning: ${error.message}`);
+      return mainLang;
+    } catch (error) {
+      this.logger.debug('Language detection failed, defaulting to JavaScript');
+      return 'JavaScript';
     }
-
-    return [...new Set(patterns)]; // Remove duplicates
   }
 
   /**
-   * Check configuration files for framework/pattern detection
+   * Detect main framework (if any)
    */
-  private async checkConfigFiles(patterns: string[]): Promise<void> {
+  private async detectFramework(): Promise<string | null> {
     try {
       // Check package.json for JS/TS projects
-      const packageFiles = await vscode.workspace.findFiles('**/package.json', undefined, 1);
+      const packageFiles = await vscode.workspace.findFiles(
+        '**/package.json',
+        '**/node_modules/**',
+        1
+      );
       if (packageFiles.length > 0) {
-        const packageDoc = await vscode.workspace.openTextDocument(packageFiles[0]);
-        const packageContent = packageDoc.getText().toLowerCase();
-        
-        if (packageContent.includes('react')) patterns.push('React Framework');
-        if (packageContent.includes('angular')) patterns.push('Angular Framework');
-        if (packageContent.includes('express')) patterns.push('Express.js Framework');
-        if (packageContent.includes('next')) patterns.push('Next.js Framework');
+        const doc = await vscode.workspace.openTextDocument(packageFiles[0]);
+        const content = doc.getText().toLowerCase();
+
+        for (const [indicator, framework] of this.frameworkIndicators) {
+          if (content.includes(`"${indicator}"`)) {
+            return framework;
+          }
+        }
       }
 
       // Check requirements.txt for Python projects
-      const requirementsFiles = await vscode.workspace.findFiles('**/requirements.txt', undefined, 1);
-      if (requirementsFiles.length > 0) {
-        const reqDoc = await vscode.workspace.openTextDocument(requirementsFiles[0]);
-        const reqContent = reqDoc.getText().toLowerCase();
-        
-        if (reqContent.includes('django')) patterns.push('Django Framework');
-        if (reqContent.includes('flask')) patterns.push('Flask Framework');
-        if (reqContent.includes('fastapi')) patterns.push('FastAPI Framework');
+      const reqFiles = await vscode.workspace.findFiles('**/requirements*.txt', undefined, 1);
+      if (reqFiles.length > 0) {
+        const doc = await vscode.workspace.openTextDocument(reqFiles[0]);
+        const content = doc.getText().toLowerCase();
+
+        for (const [indicator, framework] of this.frameworkIndicators) {
+          if (content.includes(indicator)) {
+            return framework;
+          }
+        }
       }
 
-      // Check for Docker
-      const dockerFiles = await vscode.workspace.findFiles('**/Dockerfile', undefined, 1);
-      if (dockerFiles.length > 0) {
-        patterns.push('Containerized');
-      }
-
-    } catch (error: any) {
-      this.log(`⚠️ Config file check warning: ${error.message}`);
+      return null;
+    } catch (error) {
+      this.logger.debug('Framework detection failed');
+      return null;
     }
   }
 
   /**
-   * Identify basic tech stack from detected patterns
+   * Get key directories (top-level only)
    */
-  private async identifyTechStack(): Promise<TechStackComponent[]> {
-    const techStack: TechStackComponent[] = [];
-    
+  private async getKeyDirectories(): Promise<string[]> {
     try {
-      // Quick scan for tech stack keywords
-      const files = await vscode.workspace.findFiles('**/*.{json,txt,yml,yaml}', undefined, 5);
-      let allContent = '';
+      const workspaceUri = vscode.workspace.workspaceFolders?.[0]?.uri;
+      if (!workspaceUri) return [];
 
-      for (const file of files) {
-        try {
-          const document = await vscode.workspace.openTextDocument(file);
-          allContent += document.getText().toLowerCase() + ' ';
-        } catch {
-          continue;
-        }
-      }
+      const entries = await vscode.workspace.fs.readDirectory(workspaceUri);
+      const directories = entries
+        .filter(([name, type]) => type === vscode.FileType.Directory)
+        .map(([name]) => name)
+        .filter(name => !name.startsWith('.') && name !== 'node_modules')
+        .slice(0, 6); // Top 6 directories
 
-      // Map tech stack from content
-      for (const [keyword, tech] of this.techStackMap) {
-        if (allContent.includes(keyword)) {
-          techStack.push({
-            name: tech.name,
-            version: undefined,
-            type: tech.type as any,
-            usage: 'primary'
-          });
-        }
-      }
-
-    } catch (error: any) {
-      this.log(`⚠️ Tech stack detection warning: ${error.message}`);
+      return directories;
+    } catch (error) {
+      this.logger.debug('Directory scan failed');
+      return [];
     }
-
-    return techStack;
   }
 
   /**
-   * Classify project type based on detected patterns and tech stack
+   * Find main entry points
    */
-  private classifyProjectType(patterns: string[], techStack: TechStackComponent[]): string {
-    const allIndicators = [
-      ...patterns.map(p => p.toLowerCase()),
-      ...techStack.map(t => t.name.toLowerCase())
-    ].join(' ');
+  private async findEntryPoints(): Promise<string[]> {
+    const entryPatterns = [
+      'index.*',
+      'main.*',
+      'app.*',
+      'server.*',
+      'src/index.*',
+      'src/main.*',
+      'src/app.*',
+    ];
 
-    for (const [type, keywords] of this.projectTypes) {
-      if (keywords.some(keyword => allIndicators.includes(keyword))) {
-        return type;
+    const entryPoints: string[] = [];
+
+    for (const pattern of entryPatterns) {
+      try {
+        const files = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 2);
+        for (const file of files) {
+          const relativePath = vscode.workspace.asRelativePath(file);
+          if (!entryPoints.includes(relativePath)) {
+            entryPoints.push(relativePath);
+          }
+        }
+      } catch (error) {
+        // Continue with other patterns
       }
     }
 
-    return 'general_application';
+    return entryPoints.slice(0, 4); // Top 4 entry points
   }
 
   /**
-   * Calculate basic metrics with minimal computation
+   * Determine project type based on context
    */
-  private calculateBasicMetrics(totalFiles: number, languageCount: number): CodebaseMetrics {
+  private determineProjectType(
+    framework: string | null,
+    directories: string[]
+  ): ProjectContext['type'] {
+    const dirStr = directories.join(' ').toLowerCase();
+
+    if (framework) {
+      if (['React', 'Vue.js', 'Angular'].includes(framework)) return 'web-app';
+      if (['Express.js', 'FastAPI', 'Django', 'Flask'].includes(framework)) return 'api';
+    }
+
+    if (dirStr.includes('src') && dirStr.includes('api')) return 'full-stack';
+    if (dirStr.includes('public') || dirStr.includes('static')) return 'web-app';
+    if (dirStr.includes('api') || dirStr.includes('server')) return 'api';
+    if (dirStr.includes('lib') || dirStr.includes('dist')) return 'library';
+
+    return 'other';
+  }
+
+  /**
+   * Generate concise project description
+   */
+  private generateDescription(type: string, language: string, framework: string | null): string {
+    const base = `${language} ${type.replace('-', ' ')}`;
+    return framework ? `${base} using ${framework}` : base;
+  }
+
+  /**
+   * Create simple tech stack
+   */
+  private createTechStack(context: ProjectContext): TechStackComponent[] {
+    const stack: TechStackComponent[] = [
+      {
+        name: context.mainLanguage,
+        type: 'framework' as const, // Using 'framework' as it's the closest valid type
+        usage: 'primary',
+      },
+    ];
+
+    if (context.framework) {
+      stack.push({
+        name: context.framework,
+        type: 'framework',
+        usage: 'primary',
+      });
+    }
+
+    return stack;
+  }
+
+  /**
+   * Create simple metrics
+   */
+  private createSimpleMetrics(context: ProjectContext): CodebaseMetrics {
     return {
-      linesOfCode: totalFiles * 50, // Rough estimate
-      complexity: totalFiles > 100 ? 'high' : totalFiles > 25 ? 'medium' : 'low',
-      technicalDebt: languageCount > 3 ? 'high' : languageCount > 1 ? 'medium' : 'low',
-      maintainability: Math.max(1, Math.min(10, 8 - (languageCount - 1)))
+      linesOfCode: 0, // Not needed for AI context
+      complexity: 'medium',
+      technicalDebt: 'low',
+      maintainability: 8,
     };
   }
 
   /**
-   * Generate basic structures based on primary language
+   * Get approximate file count
    */
-  private generateBasicStructures(language: string): string[] {
-    const structures: Record<string, string[]> = {
-      javascript: ['Component', 'Service', 'Model', 'Controller', 'Utils'],
-      typescript: ['Interface', 'Service', 'Model', 'Controller', 'Types'],
-      python: ['Class', 'Service', 'Model', 'View', 'Utils'],
-      java: ['Class', 'Service', 'Entity', 'Controller', 'Repository'],
-      go: ['Struct', 'Handler', 'Service', 'Model', 'Repository'],
-      csharp: ['Class', 'Service', 'Model', 'Controller', 'Repository']
-    };
-    
-    return structures[language] || ['Module', 'Service', 'Model', 'Handler', 'Utils'];
+  private async getFileCount(): Promise<number> {
+    try {
+      const files = await vscode.workspace.findFiles(
+        '**/*',
+        '{**/node_modules/**,**/.git/**,**/dist/**,**/build/**}',
+        100
+      );
+      return files.length;
+    } catch (error) {
+      return 0;
+    }
   }
 
   /**
-   * Generate basic functions based on primary language
+   * Fallback analysis if main analysis fails
    */
-  private generateBasicFunctions(language: string): string[] {
-    const functions: Record<string, string[]> = {
-      javascript: ['handleRequest', 'processData', 'validateInput', 'formatResponse'],
-      typescript: ['handleRequest', 'processData', 'validateInput', 'formatResponse'],
-      python: ['handle_request', 'process_data', 'validate_input', 'format_response'],
-      java: ['handleRequest', 'processData', 'validateInput', 'formatResponse'],
-      go: ['HandleRequest', 'ProcessData', 'ValidateInput', 'FormatResponse'],
-      csharp: ['HandleRequest', 'ProcessData', 'ValidateInput', 'FormatResponse']
-    };
-    
-    return functions[language] || ['handleRequest', 'processData', 'validateInput', 'formatResponse'];
-  }
-
-  /**
-   * Create architectural pattern objects from detected patterns
-   */
-  private createArchitecturalPatterns(patterns: string[]): ArchitecturalPattern[] {
-    return patterns.map(pattern => ({
-      name: pattern,
-      description: this.getPatternDescription(pattern),
-      confidence: 8,
-      files: [],
-      examples: []
-    }));
-  }
-
-  /**
-   * Get pattern descriptions for architectural patterns
-   */
-  private getPatternDescription(pattern: string): string {
-    const descriptions: Record<string, string> = {
-      'MVC Architecture': 'Model-View-Controller architectural pattern for separation of concerns',
-      'REST API': 'RESTful API design pattern for web services',
-      'Microservices': 'Microservices architecture for distributed systems',
-      'Clean Architecture': 'Clean Architecture pattern for maintainable, testable code',
-      'Domain-Driven Design': 'DDD approach for complex domain modeling',
-      'CQRS Pattern': 'Command Query Responsibility Segregation pattern',
-      'Handler Pattern': 'Request handler pattern for processing requests',
-      'Service Layer': 'Service layer pattern for business logic encapsulation',
-      'Repository Pattern': 'Data access abstraction pattern',
-      'Controller Pattern': 'Controller pattern for request handling',
-      'Middleware Pattern': 'Middleware pattern for request/response processing',
-      'Authentication': 'Authentication and authorization system',
-      'JWT Authentication': 'JSON Web Token authentication system',
-      'Containerized': 'Docker-based containerization',
-      'Kubernetes Ready': 'Kubernetes orchestration support',
-      'Testing Framework': 'Automated testing infrastructure'
-    };
-    
-    return descriptions[pattern] || `${pattern} implementation`;
-  }
-
-  /**
-   * Create minimal analysis for fallback scenarios
-   */
-  private createMinimalAnalysis(): CodebaseAnalysis {
+  private createFallbackAnalysis(): CodebaseAnalysis {
     return {
       projectPath: this.projectPath,
       totalFiles: 0,
-      packages: ['unknown_project'],
-      structs: ['Component', 'Service', 'Model'],
-      functions: ['handleRequest', 'processData', 'validateInput'],
+      packages: ['unknown'],
+      structs: [],
+      functions: [],
       imports: [],
-      patterns: [{
-        name: 'Standard Architecture',
-        description: 'Standard application architecture pattern',
-        confidence: 5,
-        files: [],
-        examples: []
-      }],
+      patterns: [
+        {
+          name: 'Standard Project',
+          description: 'Standard software project',
+          confidence: 5,
+          files: [],
+          examples: [],
+        },
+      ],
       techStack: [],
       metrics: {
         linesOfCode: 0,
         complexity: 'low',
         technicalDebt: 'low',
-        maintainability: 5
-      }
+        maintainability: 7,
+      },
     };
-  }
-
-  /**
-   * Log helper
-   */
-  private log(message: string): void {
-    this.outputChannel.appendLine(message);
-    console.log(message);
-  }
-
-  /**
-   * Show output channel
-   */
-  showOutput(): void {
-    this.outputChannel.show();
   }
 
   /**
    * Clean up resources
    */
   dispose(): void {
-    this.outputChannel.dispose();
+    this.logger.info('CodebaseAnalyzer disposed');
   }
 }

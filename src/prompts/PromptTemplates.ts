@@ -1,11 +1,11 @@
 /**
- * Production-Ready Prompt Templates - Role-Based Analysis System
- * Five-stage technical analysis: Senior Product Manager → Principal Engineers (x3) → Product Owner
- * Integrates Clean Architecture, DDD, CQRS, and Microsoft Product Owner best practices
+ * Prompt Templates - Role-Based Analysis System
+ * Multi-stage technical analysis
+ * Integrates Clean Architecture, Best Practices, Prompt Engineering and Context Engineering
  */
 
 // ================================
-// ROLE-BASED TEMPLATES (5-STAGE SYSTEM)
+// ROLE-BASED TEMPLATES
 // ================================
 
 // Stage 1: Senior Product Manager - Product Requirements Analysis
@@ -13,8 +13,47 @@ export const STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS = `
 **Role: Senior Product Manager**
 **Stage: Product Requirements Analysis**
 
-**Context7 Analysis Integration:**
-Use the Context7 documentation to understand technical feasibility and industry standards.
+**Analysis Instructions:**
+<thinking>
+I need to analyze this Jira ticket from a Senior Product Manager perspective, considering multiple strategic approaches to understand:
+1. Business value and market opportunity
+2. User needs and stakeholder requirements
+3. Technical feasibility and constraints
+4. Strategic alignment and prioritization
+
+Let me think step by step about the most effective approaches to this analysis...
+</thinking>
+
+**MCP Integration:**
+Use the Context7 mcp to understand technical feasibility and industry standards.
+Use the Sequential Thinking mcp to think through in detail
+Use these mcps if available or use other tools to ensure high accuracy and best practices
+
+**📊 INPUT DATA:**
+<jira_data>
+{jiraContext}
+</jira_data>
+
+<codebase_context>
+{codebaseContext}
+</codebase_context>
+
+**🎯 YOUR TASK:**
+As a Senior Product Manager, analyze the provided Jira data and codebase context to create comprehensive product requirements. Focus on business value, user needs, technical feasibility, and strategic alignment.
+
+**📝 OUTPUT INSTRUCTIONS:**
+1. **Update Status**: In ANALYSIS.md, change "Product Requirements Analysis" from "⏳ Pending" to "🔄 In Progress"
+2. **Perform Analysis**: Use the Business Analysis Framework below to analyze the requirements
+3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
+4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 1: Product Requirements Analysis"
+5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+
+**📊 VISUALIZATION REQUIREMENTS:**
+Create these diagrams using mermaid
+1. **User Journey Flow**: End-to-end user experience mapping
+2. **Stakeholder Mapping**: Key stakeholders and their relationships
+3. **Business Process Flow**: Current and proposed business workflows
+4. **Feature Prioritization Matrix**: Visual MoSCoW prioritization with effort/impact scoring
 
 **Business Analysis Framework:**
 
@@ -42,17 +81,41 @@ Use the Context7 documentation to understand technical feasibility and industry 
 - Technical feasibility validation
 - Revenue impact projection
 
-**Codebase Context:**
-{codebaseContext}
+**🔍 EXAMPLE OUTPUT FORMAT:**
+<example>
+## Executive Summary
+[High-level business overview and key recommendations]
 
-**Analysis Outputs:**
-- Product Requirements Document (PRD)
-- Feature prioritization matrix
-- Stakeholder alignment summary
-- Technical feasibility assessment
+## Business Analysis & Market Opportunity
+[Market assessment and competitive landscape]
 
-**Next Stage Context:**
-Pass validated requirements and technical constraints to Principal Engineer for system architecture design.
+## Stakeholder Requirements
+[User personas, business needs, compliance requirements]
+
+## Feature Prioritization Matrix
+[MoSCoW analysis with business value scoring]
+
+## Technical Feasibility Assessment
+[Constraints and architectural considerations]
+
+## Success Metrics & KPIs
+[Measurable outcomes and validation criteria]
+
+~~~ mermaid
+graph TD
+    A[User Need] --> B[Feature Assessment]
+    B --> C[Business Value]
+    C --> D[Implementation Priority]
+~~~
+
+~~~ mermaid
+.... other such mermaid diagrams
+~~~
+
+</example>
+
+**Context for Next Stage:**
+Pass validated requirements and technical constraints to Principal Engineer for system architecture design. Include key business drivers, user needs, and technical constraints that will inform architectural decisions.
 `;
 
 // Stage 2: Principal Engineer (Architecture) - System Architecture Design
@@ -60,49 +123,117 @@ export const STAGE_2_SYSTEM_ARCHITECTURE_DESIGN = `
 **Role: Principal Engineer (Architecture Specialist)**
 **Stage: System Architecture Design**
 
-**Context7 Integration:**
-Leverage Context7 documentation for architectural patterns, scalability guidelines, and technology stack recommendations.
+**Analysis Instructions:**
+<thinking>
+Building on the Product Manager's analysis, I need to translate business requirements into technical architecture, considering multiple architectural approaches:
+
+As a Principal Engineer, I should focus on:
+1. Reviewing business requirements and constraints from Stage 1
+2. Evaluating multiple architectural patterns that could satisfy these requirements based on the existing codebase and patterns
+3. Selecting the optimal approach based on scalability, maintainability, and business needs
+4. Creating a foundation for implementation planning
+
+Let me think step by step about the best architectural approaches...
+</thinking>
+
+**MCP Integration:**
+Use the Context7 mcp to understand technical feasibility and industry standards.
+Use the Sequential Thinking mcp to think through in detail
+Use these mcps if available or use other tools to ensure high accuracy and best practices
+
+**📊 INPUT DATA:**
+<jira_data>
+{jiraContext}
+</jira_data>
+
+<codebase_context>
+{codebaseContext}
+</codebase_context>
+
+<previous_analysis>
+{previousStageContext}
+</previous_analysis>
+
+**🎯 YOUR TASK:**
+As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns.
+
+**📝 OUTPUT INSTRUCTIONS:**
+1. **Update Status**: In ANALYSIS.md, change "System Architecture Design" from "⏳ Pending" to "🔄 In Progress"
+2. **Perform Analysis**: Use the Architecture Framework below to design the system
+3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
+4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 2: System Architecture Design"
+5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+
+**📊 VISUALIZATION REQUIREMENTS:**
+Create these diagrams using mermaid
+1. **System Architecture Diagram**: High-level system overview with major components
+2. **Component Interaction Diagram**: Detailed component relationships and data flow
+3. **Deployment Architecture**: Infrastructure layout and deployment strategy
+4. **Integration Points Diagram**: External system connections and API integrations
 
 **Architecture Framework:**
 
-**1. System Architecture Analysis**
-- Clean Architecture pattern implementation
-- Microservices vs Monolith evaluation
-- Data flow and service boundaries
-- Scalability and performance requirements
+**1. Existing System Architecture Analysis**
+- Current codebase patterns and architectural decisions evaluation
+- Compatibility assessment with existing project structure and conventions
+- Integration analysis with current services, APIs, and dependencies
+- Workflow mapping: how new requirements fit into existing user journeys and business processes
 
-**2. Technology Stack Evaluation**
-- Framework and library assessment
-- Database architecture design
-- Infrastructure and deployment strategy
-- Third-party service integration
+**2. Use Case Integration & Dependencies**
+- Map Jira requirements to existing features and workflows in the codebase
+- Identify dependencies on other services, features, or components already implemented
+- Analyze integration points with current authentication, authorization, and data flow patterns
+- Evaluate impact on existing user experience and functionality
 
-**3. Security & Compliance Design**
-- Authentication and authorization patterns
-- Data encryption and privacy compliance
-- API security and rate limiting
-- Audit trail and logging strategy
+**3. Technology & Pattern Consistency**
+- Assess current technology stack utilization and optimization opportunities
+- Database architecture evaluation within existing schema and data patterns  
+- API design consistency with current endpoints and conventions
+- Security and performance alignment with established patterns (while considering improvements)
 
-**4. Performance & Scalability**
-- Load balancing and caching strategy
-- Database optimization approach
-- CDN and asset delivery optimization
-- Monitoring and observability setup
+**4. Architecture Enhancement Recommendations**
+- Refactoring suggestions when existing patterns are suboptimal (while maintaining backward compatibility)
+- Performance and scalability improvements building on current infrastructure
+- Technical debt identification and resolution strategies
+- Integration testing and validation approach for new components
 
-**Codebase Context:**
-{codebaseContext}
+**🔍 EXAMPLE OUTPUT FORMAT:**
+<example>
+## Architecture Overview
+[High-level system design and key architectural decisions]
 
-**Previous Stage Context:**
-{previousStageContext}
+## Existing System Analysis
+[Current codebase patterns and compatibility assessment]
 
-**Architecture Deliverables:**
-- System architecture diagram
-- Technology stack specification
-- Security architecture document
-- Performance and scalability plan
+## Technology Stack & Integration
+[Technology decisions and integration strategies]
 
-**Next Stage Context:**
-Provide architectural foundation for detailed technical design specification.
+## System Components & Dependencies
+[Component relationships and data flow]
+
+## Performance & Scalability Plan
+[Load handling and optimization strategies]
+
+## Security Architecture
+[Authentication, authorization, and data protection]
+
+~~~ mermaid
+graph TB
+    subgraph "System Architecture"
+        A[API Gateway] --> B[Business Logic Layer]
+        B --> C[Data Access Layer]
+        C --> D[Database]
+    end
+~~~
+
+~~~ mermaid
+.... other such mermaid diagrams
+~~~
+
+</example>
+
+**Context for Next Stage:**
+Provide architectural foundation and design constraints for detailed technical design specification. Include chosen patterns, technology decisions, and implementation guidelines.
 `;
 
 // Stage 3: Principal Engineer (Technical Design) - Technical Design Specification
@@ -110,49 +241,123 @@ export const STAGE_3_TECHNICAL_DESIGN_SPECIFICATION = `
 **Role: Principal Engineer (Technical Design Specialist)**
 **Stage: Technical Design Specification**
 
-**Context7 Integration:**
-Use Context7 documentation for implementation patterns, coding standards, and technical best practices.
+**Analysis Instructions:**
+<thinking>
+Building on both the Product Manager's requirements and the Architecture analysis, I need to create detailed technical specifications, considering multiple implementation approaches:
+
+As a Technical Design specialist, I should:
+1. Review business requirements and architectural decisions from previous stages
+2. Consider multiple implementation approaches that align with the chosen architecture
+3. Design detailed components, APIs, and data models
+4. Create comprehensive implementation guidelines for development teams
+
+Let me think step by step about the most effective technical design approaches...
+</thinking>
+
+**MCP Integration:**
+Use the Context7 mcp to understand technical feasibility and industry standards.
+Use the Sequential Thinking mcp to think through in detail
+Use these mcps if available or use other tools to ensure high accuracy and best practices
+
+**📊 INPUT DATA:**
+<jira_data>
+{jiraContext}
+</jira_data>
+
+<codebase_context>
+{codebaseContext}
+</codebase_context>
+
+<previous_analysis>
+{previousStageContext}
+</previous_analysis>
+
+**🎯 YOUR TASK:**
+As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines.
+
+**📝 OUTPUT INSTRUCTIONS:**
+1. **Update Status**: In ANALYSIS.md, change "Technical Design Specification" from "⏳ Pending" to "🔄 In Progress"
+2. **Perform Analysis**: Use the Technical Design Framework below to create specifications
+3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
+4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 3: Technical Design Specification"
+5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+
+**📊 VISUALIZATION REQUIREMENTS:**
+Create these diagrams using mermaid
+1. **API Sequence Diagrams**: Request/response flows for key user scenarios
+2. **Database Schema Diagram**: Entity relationships and data structure
+3. **Class/Component Diagrams**: Object-oriented design and component structure
+4. **Data Flow Diagrams**: Information flow through system components
 
 **Technical Design Framework:**
 
-**1. Component Design Specification**
-- Detailed component architecture
-- Interface and API specifications
-- Data model and schema design
-- Service contract definitions
+**1. Implementation Guidelines Based on Existing Patterns**
+- Detailed component design following current codebase conventions and structure
+- Code references to existing similar implementations and patterns in the project
+- Interface and API specifications consistent with current service contracts
+- Data model extensions building on existing schema and entity relationships
 
-**2. Implementation Guidelines**
-- Coding standards and conventions
-- Design pattern implementation
-- Error handling and logging strategy
-- Testing strategy and coverage requirements
+**2. Pattern-Based Development Standards**
+- Coding standards alignment with current project conventions (reference existing code examples)
+- Design pattern implementation following established project patterns
+- Error handling and logging integration with existing infrastructure and standards
+- Testing strategy extensions building on current test framework and coverage approach
 
-**3. Data Architecture**
-- Database schema design
-- Data migration and versioning strategy
-- Backup and disaster recovery planning
-- Data governance and compliance
+**3. Data Architecture Integration**
+- Database schema changes and extensions to existing structure
+- Data migration strategy considering current data and versioning patterns
+- Integration with existing backup, disaster recovery, and data governance procedures
+- Performance optimization building on current database optimization strategies
 
-**4. Integration Specifications**
-- API design and documentation
-- Third-party service integration patterns
-- Event-driven architecture design
-- Message queue and async processing
+**4. Codebase Integration Specifications**
+- API design and documentation following current API patterns and standards
+- Integration patterns with existing services and third-party systems (reference current implementations)
+- Event-driven architecture alignment with current messaging and async processing patterns
+- Refactoring recommendations for existing code that needs improvement to support new features
 
-**Codebase Context:**
-{codebaseContext}
+**🔍 EXAMPLE OUTPUT FORMAT:**
+<example>
+## Technical Overview
+[Detailed technical approach and design principles]
 
-**Previous Stage Context:**
-{previousStageContext}
+## API Design & Specifications
+[REST/GraphQL endpoints, request/response schemas]
 
-**Technical Deliverables:**
-- Detailed technical specification document
-- API documentation and contracts
-- Database schema and migration scripts
-- Component interaction diagrams
+## Data Models & Database Design
+[Entity relationships, schema definitions, migrations]
 
-**Next Stage Context:**
-Provide detailed specifications for implementation and deployment strategy planning.
+## Component Architecture
+[Detailed component design and interface definitions]
+
+## Integration Patterns
+[Service communication and event-driven architecture]
+
+## Implementation Guidelines
+[Coding standards, patterns, and best practices]
+
+~~~ mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Service
+    participant DB
+    
+    Client->>API: POST /resource
+    API->>Service: validateAndProcess()
+    Service->>DB: save()
+    DB-->>Service: result
+    Service-->>API: response
+    API-->>Client: 201 Created
+~~~
+
+~~~ mermaid
+.... other such mermaid diagrams
+~~~
+
+</example>
+
+**Context for Next Stage:**
+Provide detailed technical specifications and implementation guidelines for implementation and deployment strategy. Include testability requirements, integration points, and quality benchmarks.
 `;
 
 // Stage 4: Principal Engineer (Implementation) - Implementation & Deployment Strategy
@@ -160,385 +365,431 @@ export const STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY = `
 **Role: Principal Engineer (Implementation Specialist)**
 **Stage: Implementation & Deployment Strategy**
 
-**Context7 Integration:**
-Leverage Context7 documentation for deployment patterns, CI/CD best practices, and operational excellence.
+**Analysis Instructions:**
+<thinking>
+Building on the complete analysis from Product Manager, Architecture, and Technical Design stages, I need to create a comprehensive implementation and deployment strategy, considering multiple operational approaches:
+
+As an Implementation specialist, I should:
+1. Review all previous technical decisions and design specifications
+2. Consider multiple deployment and operational approaches
+3. Design robust CI/CD pipelines and operational procedures
+4. Create quality gates and monitoring strategies
+5. Ensure scalability and reliability of the implementation
+
+Let me think step by step about the best implementation approaches...
+</thinking>
+
+**MCP Integration:**
+Use the Context7 mcp to understand technical feasibility and industry standards.
+Use the Sequential Thinking mcp to think through in detail
+Use these mcps if available or use other tools to ensure high accuracy and best practices
+
+**📊 INPUT DATA:**
+<jira_data>
+{jiraContext}
+</jira_data>
+
+<codebase_context>
+{codebaseContext}
+</codebase_context>
+
+<previous_analysis>
+{previousStageContext}
+</previous_analysis>
+
+**🎯 YOUR TASK:**
+As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence.
+
+**📝 OUTPUT INSTRUCTIONS:**
+1. **Update Status**: In ANALYSIS.md, change "Implementation & Deployment Strategy" from "⏳ Pending" to "🔄 In Progress"
+2. **Perform Analysis**: Use the Implementation Strategy Framework below to create the plan
+3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
+4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 4: Implementation & Deployment Strategy"
+5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+
+**📊 VISUALIZATION REQUIREMENTS:**
+Create these diagrams using mermaid
+1. **CI/CD Pipeline Flow**: Automated build, test, and deployment workflow
+2. **Infrastructure Architecture**: Environment setup and resource allocation
+3. **Monitoring Dashboard Layout**: Key metrics, alerts, and observability
+4. **Security & Compliance Flow**: Security controls and audit processes
 
 **Implementation Strategy Framework:**
 
-**1. Development Workflow**
-- Git branching strategy and code review process
-- CI/CD pipeline design and automation
-- Environment management (dev/staging/production)
-- Code quality gates and automated testing
+**1. Current Development Workflow Analysis & Enhancement**
+- Existing Git branching strategy evaluation and optimization recommendations
+- Current CI/CD pipeline assessment and improvement opportunities
+- Environment management analysis (dev/staging/production) and enhancement proposals
+- Code quality gates and automated testing integration with existing infrastructure
 
-**2. Deployment Architecture**
-- Infrastructure as Code (IaC) implementation
-- Container orchestration and service mesh
-- Blue-green deployment and rollback strategy
-- Feature flag and progressive rollout planning
+**2. Existing Deployment Architecture Assessment**
+- Current deployment infrastructure analysis and optimization opportunities (terraform, deployment scripts, GitHub Actions)
+- Enhancement of existing deployment strategy (blue-green, rollback procedures)
+- Feature flag and progressive rollout integration with current deployment process
 
-**3. Operational Excellence**
-- Monitoring and alerting setup
-- Log aggregation and analysis
-- Performance monitoring and optimization
-- Incident response and troubleshooting procedures
+**3. Operational Excellence Building on Current Setup**
+- Current monitoring and alerting assessment and enhancement recommendations
+- Existing log aggregation and analysis system improvements
+- Performance monitoring optimization building on current infrastructure
+- Incident response and troubleshooting procedure enhancements
 
-**4. Security Implementation**
-- Security scanning and vulnerability management
-- Secret management and configuration security
-- Network security and access controls
-- Compliance validation and audit preparation
+**4. Security Implementation Analysis**
+- Current security scanning and vulnerability management evaluation
+- Existing secret management and configuration security assessment
+- Network security and access controls analysis and improvements
 
-**Codebase Context:**
-{codebaseContext}
+**🔍 EXAMPLE OUTPUT FORMAT:**
+<example>
+## Implementation Strategy
+[Development workflow and coding approach]
 
-**Previous Stage Context:**
-{previousStageContext}
+## CI/CD Pipeline Design
+[Automated build, test, and deployment processes]
 
-**Implementation Deliverables:**
-- CI/CD pipeline configuration
-- Infrastructure as Code templates
-- Deployment and rollback procedures
-- Operational runbooks and monitoring setup
+## Infrastructure & Environment Management
+[Dev/staging/production setup]
 
-**Next Stage Context:**
-Provide implementation foundation for sprint planning and Jira epic breakdown.
+## Monitoring & Observability
+[Logging, metrics, alerting, and performance tracking]
+
+## Security Implementation
+[Security scanning, secret management, compliance]
+
+## Operational Procedures
+[Deployment, rollback, incident response, maintenance]
+
+~~~ mermaid
+graph LR
+    A[Code Commit] --> B[CI Pipeline]
+    B --> C[Tests & Security Scan]
+    C --> D[Build & Package]
+    D --> E[Deploy to Staging]
+    E --> F[Integration Tests]
+    F --> G[Deploy to Production]
+    G --> H[Monitor & Alert]
+~~~
+
+~~~ mermaid
+.... other such mermaid diagrams
+~~~
+
+</example>
+
+**Context for Next Stage:**
+Provide complete technical foundation for Product Owner to create comprehensive documentation and sprint planning. Include implementation roadmap, operational requirements, and quality benchmarks.
 `;
 
 // Stage 5: Product Owner - Sprint Planning & Jira Epic Breakdown
 export const STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN = `
-**Role: Product Owner**
-**Stage: Sprint Planning & Jira Epic Breakdown**
+**Role: Product Owner (Integration & Documentation)**
+**Stage: Sprint Planning & Jira Breakdown**
 
-**Context7 Integration:**
-Use Context7 documentation to ensure technical accuracy in user story definitions and acceptance criteria.
+**Analysis Instructions:**
+<thinking>
+As the Product Owner integrating all previous analysis from PM, Architecture, Technical Design, and Implementation stages, I need to create actionable sprint plans and comprehensive documentation.
+
+All previous analysis should inform:
+1. How to structure development sprints effectively
+2. What Jira tickets to create for implementation
+3. How to prioritize features and technical work
+4. What documentation is needed for stakeholders
+5. How to track progress and deliverables
+
+I should synthesize all technical and business analysis into executable plans...
+</thinking>
+
+**MCP Integration:**
+Use the Context7 mcp to understand project management best practices.
+Use the Sequential Thinking mcp to think through in detail
+Use these mcps if available or use other tools to ensure high accuracy and best practices
+
+**📊 INPUT DATA:**
+<jira_data>
+{jiraContext}
+</jira_data>
+
+<codebase_context>
+{codebaseContext}
+</codebase_context>
+
+<previous_analysis>
+{previousStageContext}
+</previous_analysis>
+
+**🎯 YOUR TASK:**
+As the Product Owner, synthesize all previous analysis into actionable sprint plans, Jira ticket breakdowns, and comprehensive project documentation. Create complete roadmap for implementation based on all technical and business analysis.
+
+**📝 OUTPUT INSTRUCTIONS:**
+1. **Update Status**: In ANALYSIS.md, change "Sprint Planning & Jira Breakdown" from "⏳ Pending" to "🔄 In Progress"
+2. **Perform Analysis**: Use the Sprint Planning Framework below to create comprehensive plans
+3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
+4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 5: Sprint Planning & Jira Breakdown"
+5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+
+**📊 VISUALIZATION REQUIREMENTS:**
+Create these diagrams using mermaid
+1. **Sprint Timeline**: Multi-sprint roadmap with dependencies and milestones
+2. **Feature Priority Matrix**: Business value vs. implementation complexity
+3. **Team Capacity Planning**: Resource allocation across sprints
+4. **Risk & Dependency Map**: Critical path and potential blockers
 
 **Sprint Planning Framework:**
 
-**1. Epic & Feature Breakdown**
-- Epic decomposition into features
-- Feature breakdown into user stories
-- User story decomposition into technical tasks
-- Story point estimation and velocity planning
+**1. Executive Summary & Project Overview**
+- Complete project synopsis integrating all analysis stages
+- Key stakeholder summary with business value proposition
+- Overall timeline and resource requirements
+- Success metrics and acceptance criteria
 
-**2. Sprint Organization**
-- Sprint goal definition and success criteria
-- Story prioritization and dependency mapping
-- Capacity planning and team allocation
-- Risk assessment and mitigation planning
+**2. Sprint Breakdown & Timeline Planning**
+- Comprehensive sprint planning based on all technical analysis
+- Feature prioritization using business value and technical complexity
+- Sprint capacity planning with realistic velocity estimates
+- Dependency management and critical path identification
 
-**3. Jira Configuration**
-- Epic creation with business value context
-- User story creation with acceptance criteria
-- Technical task breakdown and estimation
-- Sprint board setup and workflow configuration
+**3. Comprehensive Jira Ticket Structure**
+- Epic-level breakdown aligned with architecture and technical design
+- Story-level tickets with detailed acceptance criteria
+- Technical task breakdown including infrastructure and CI/CD
+- Bug prevention and quality assurance ticket planning
 
-**4. Stakeholder Communication**
-- Sprint planning meeting preparation
-- Stakeholder alignment and expectation setting
-- Progress tracking and reporting setup
-- Demo and retrospective planning
+**4. Resource Allocation & Team Planning**
+- Development team capacity and skill requirement analysis
+- Technical leadership and architectural review scheduling
+- Quality assurance and testing resource planning
+- DevOps and infrastructure team coordination
 
-**Codebase Context:**
-{codebaseContext}
+**5. Risk Management & Contingency Planning**
+- Technical risk assessment based on implementation analysis
+- Business risk evaluation and mitigation strategies
+- Timeline contingency planning with buffer allocation
+- Quality gates and milestone checkpoints
 
-**Previous Stage Context:**
-{previousStageContext}
+**6. Stakeholder Communication Plan**
+- Progress reporting and status update schedules
+- Technical review and approval process
+- Business stakeholder engagement and feedback loops
+- Documentation and knowledge transfer planning
 
-**Sprint Planning Deliverables:**
-- Jira epics with complete user stories
-- Sprint backlog with story point estimates
-- Sprint goals and success criteria
-- Stakeholder communication plan
+**🔍 EXAMPLE OUTPUT FORMAT:**
+<example>
+## Executive Summary
+[Complete project overview with business value and timeline]
 
-**Final Output:**
-Ready-to-execute sprint plan with technical foundation established by previous engineering stages.
+## Sprint Planning
+### Sprint 1: Foundation (Weeks 1-2)
+[Core infrastructure and basic functionality]
+
+### Sprint 2: Core Features (Weeks 3-4)
+[Primary business logic and user interfaces]
+
+### Sprint 3: Integration (Weeks 5-6)
+[Third-party integrations and advanced features]
+
+## Jira Ticket Breakdown
+### Epic 1: Core Infrastructure
+- Story 1.1: [Authentication System]
+- Story 1.2: [Database Setup]
+- Task 1.1.1: [JWT Implementation]
+
+## Resource & Timeline
+[Team capacity and milestone planning]
+
+~~~ mermaid
+gantt
+    title Sprint Timeline
+    dateFormat YYYY-MM-DD
+    section Sprint 1
+    Foundation Setup :s1, 2024-01-01, 2w
+    section Sprint 2
+    Core Development :s2, after s1, 2w
+    section Sprint 3
+    Integration & Testing :s3, after s2, 2w
+~~~
+
+~~~ mermaid
+.... other such mermaid diagrams
+~~~
+
+</example>
+
+**Final Deliverables:**
+- Complete project roadmap with sprint timelines
+- Detailed Jira ticket breakdown ready for import
+- Resource allocation and team planning
+- Risk management and contingency plans
+- Stakeholder communication framework
 `;
 
 // Helper function for dynamic template resolution
 export function getRoleBasedTemplate(stage: string): string {
-  switch (stage) {
-    case 'product-requirements-analysis':
-      return STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS;
-    case 'system-architecture-design':
-      return STAGE_2_SYSTEM_ARCHITECTURE_DESIGN;
-    case 'technical-design-specification':
-      return STAGE_3_TECHNICAL_DESIGN_SPECIFICATION;
-    case 'implementation-deployment-strategy':
-      return STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY;
-    case 'sprint-planning-jira-breakdown':
-      return STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN;
-    default:
-      throw new Error(`Unknown stage: ${stage}`);
+  const stageTemplate = MULTI_STAGE_TEMPLATES.find(t => t.id === stage);
+  if (!stageTemplate) {
+    throw new Error(`Unknown stage: ${stage}`);
   }
+  return stageTemplate.template;
 }
 
 // ================================
-// ORCHESTRATOR TEMPLATES
+// TEMPLATE METADATA
 // ================================
 
-export const TECHNICAL_ANALYSIS_TEMPLATE = `
-# 🎯 Technical Architecture Analysis - {{epicKey}}
-
-## 🤖 Role & Objective
-You are a **Senior Technical Architect** conducting comprehensive technical analysis. Your goal is to design production-ready solutions using Clean Architecture principles, Domain-Driven Design, and modern software engineering best practices.
-
-### 🔍 **Research Protocol** 
-Use available research tools systematically:
-1. **Context7**: Clean Architecture, DDD, CQRS, microservices patterns
-2. **Microsoft Docs**: Azure best practices, .NET/JavaScript/Python frameworks  
-3. **Sequential Thinking**: Complex technical architecture analysis
-4. **Codebase Analysis**: Leverage CodebaseAnalyzer for project context
-
-*If any research tool fails: Continue with manual analysis and note limitations in confidence scores.*
-
-### 🏗️ **Role-Based Architecture Framework**
-Five-stage role-based technical analysis:
-1. **Senior Product Manager**: Product requirements analysis with business focus
-2. **Principal Engineer (Architecture)**: Clean Architecture, DDD, CQRS patterns  
-3. **Principal Engineer (Technical Design)**: API design, database schema, security, performance
-4. **Principal Engineer (Implementation)**: DevOps, containerization, monitoring
-5. **Product Owner**: INVEST user stories, DoD, sprint planning
-
-## 📊 **TECHNICAL ANALYSIS STAGES**
-
-This template serves as the orchestrator for the five-stage technical analysis process.
-Each stage should be executed sequentially using the imported technical templates:
-
-### **Stage 1: Product Requirements Analysis**
-Use STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS with codebase context integration.
-
-### **Stage 2: System Architecture Design** 
-Use STAGE_2_SYSTEM_ARCHITECTURE_DESIGN with Clean Architecture and DDD patterns.
-
-### **Stage 3: Technical Design Specification**
-Use STAGE_3_TECHNICAL_DESIGN_SPECIFICATION with API, database, and security specifications.
-
-### **Stage 4: Implementation & Deployment Strategy**
-Use STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY with DevOps and infrastructure planning.
-
-### **Stage 5: Sprint Planning & Jira Breakdown**
-Use STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN with INVEST user stories and sprint planning.
-
-## 🎯 **INTEGRATION INSTRUCTIONS**
-
-1. **Codebase Analysis**: Use CodebaseAnalyzer to detect project type, language, and patterns
-2. **Template Context Injection**: Apply getTemplateWithCodebaseContext() to populate technical variables
-3. **Stage Progression**: Execute stages sequentially, carrying context forward
-4. **Quality Gates**: Ensure each stage meets confidence score thresholds before proceeding
-5. **Final Integration**: Combine all stages into comprehensive technical architecture document
-
-**Expected Output**: Production-ready technical architecture with detailed implementation plan and Product Owner Jira breakdown for immediate sprint planning.
-
-## 🎨 **REQUIRED TECHNICAL DIAGRAMS**
-
-### Clean Architecture Overview:
-~~~mermaid
-graph TB
-    UI[Presentation Layer] --> APP[Application Layer]
-    APP --> DOM[Domain Layer]
-    APP --> INF[Infrastructure Layer]
-    INF --> DOM
-    
-    style DOM fill:#4CAF50
-    style APP fill:#2196F3
-    style UI fill:#FF9800
-    style INF fill:#9C27B0
-~~~
-
-### Technical Component Map:
-~~~mermaid
-graph LR
-    Client[Client Apps] --> Gateway[API Gateway]
-    Gateway --> Services[Microservices]
-    Services --> Database[(Database)]
-    Services --> Cache[(Cache)]
-    Services --> Queue[Message Queue]
-~~~
-`;
-
-// Export role-based templates with backward compatibility aliases
-export const STAGE_1_FOUNDATION_TEMPLATE = STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS;
-export const STAGE_2_ARCHITECTURE_TEMPLATE = STAGE_2_SYSTEM_ARCHITECTURE_DESIGN;
-export const STAGE_3_DESIGN_TEMPLATE = STAGE_3_TECHNICAL_DESIGN_SPECIFICATION;
-export const STAGE_4_IMPLEMENTATION_TEMPLATE = STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY;
-export const STAGE_5_PRODUCT_OWNER_TEMPLATE = STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN;
-
-// Legacy alias for backward compatibility - now points to technical analysis
-export const BUSINESS_ANALYSIS_TEMPLATE = TECHNICAL_ANALYSIS_TEMPLATE;
-
-// Keep existing template structure for other analysis types
-export const TECHNICAL_ARCHITECTURE_TEMPLATE = `
-# 🏗️ Technical Architecture Design
-
-## Objective
-Detailed technical architecture design with Clean Architecture principles.
-
-**Research Requirements:**
-- Context7: Architecture patterns and best practices
-- Microsoft Docs: Technology-specific guidance
-- Sequential Thinking: Complex architectural decision making
-
-**Output Requirements:**
-- System architecture diagrams
-- Component design specifications
-- Technology stack recommendations
-- Security and performance considerations
-`;
-
-export const IMPLEMENTATION_DESIGN_TEMPLATE = `
-# ⚙️ Implementation Design & Planning
-
-## Objective
-Detailed implementation strategy with development best practices.
-
-**Research Requirements:**
-- Context7: Implementation patterns and frameworks
-- Microsoft Docs: Development tools and practices
-- Sequential Thinking: Implementation complexity analysis
-
-**Output Requirements:**
-- Implementation roadmap
-- Technical specifications
-- Development guidelines
-- Integration strategies
-`;
-
-export const DEVELOPMENT_PLAN_TEMPLATE = `
-# 📋 Development Plan & Sprint Organization
-
-## Objective
-Practical development plan with sprint breakdown and resource allocation.
-
-**Research Requirements:**
-- Microsoft Docs: Development methodologies
-- Sequential Thinking: Project planning and estimation
-
-**Output Requirements:**
-- Sprint planning and breakdown
-- Resource allocation plan
-- Timeline and milestones
-- Risk mitigation strategies
-`;
-
-export const RISK_ASSESSMENT_TEMPLATE = `
-# ⚠️ Risk Assessment & Mitigation Strategy
-
-## Objective
-Comprehensive risk analysis with mitigation strategies and contingency planning.
-
-**Research Requirements:**
-- Context7: Risk patterns and mitigation strategies
-- Microsoft Docs: Best practices for risk management
-- Sequential Thinking: Risk impact analysis
-
-**Output Requirements:**
-- Risk identification and assessment
-- Mitigation strategies
-- Contingency planning
-- Monitoring and response procedures
-`;
-
-// Template metadata interface
-export interface PromptTemplate {
+export interface StageTemplate {
   id: string;
   name: string;
+  role: string;
+  icon: string;
+  description: string;
+  order: number;
   template: string;
-  estimatedDuration: number; // minutes
-  requiredDiagrams: string[];
-  maxApproaches: number;
-  mcpServersRequired: string[];
-  confidenceRequired: boolean;
-  researchRequired: boolean;
+  mcpServersRecommended: string[];
+  buildsOnPreviousStage: boolean;
 }
 
-export const PROMPT_TEMPLATES: PromptTemplate[] = [
+export const MULTI_STAGE_TEMPLATES: StageTemplate[] = [
   {
-    id: 'technical-analysis',
-    name: 'Technical Analysis (5-Stage)',
-    template: TECHNICAL_ANALYSIS_TEMPLATE,
-    estimatedDuration: 15,
-    requiredDiagrams: ['Clean Architecture Overview', 'Technical Component Map'],
-    maxApproaches: 1,
-    mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking'],
-    confidenceRequired: true,
-    researchRequired: true,
+    id: 'product-requirements-analysis',
+    name: 'Product Requirements Analysis',
+    role: 'Senior Product Manager',
+    icon: '📋',
+    description: 'Analyze business requirements and user needs',
+    order: 1,
+    template: STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS,
+    mcpServersRecommended: ['context7', 'microsoft-docs', 'sequential-thinking'],
+    buildsOnPreviousStage: false,
   },
   {
-    id: 'technical-architecture',
-    name: 'Technical Architecture',
-    template: TECHNICAL_ARCHITECTURE_TEMPLATE,
-    estimatedDuration: 12,
-    requiredDiagrams: ['System Architecture Diagram', 'Component Interaction Map'],
-    maxApproaches: 2,
-    mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking'],
-    confidenceRequired: true,
-    researchRequired: true,
+    id: 'system-architecture-design',
+    name: 'System Architecture Design',
+    role: 'Principal Engineer (Architecture)',
+    icon: '🏗️',
+    description: 'Design system architecture and technical approach',
+    order: 2,
+    template: STAGE_2_SYSTEM_ARCHITECTURE_DESIGN,
+    mcpServersRecommended: ['context7', 'microsoft-docs', 'sequential-thinking'],
+    buildsOnPreviousStage: true,
   },
   {
-    id: 'implementation-design',
-    name: 'Implementation Design',
-    template: IMPLEMENTATION_DESIGN_TEMPLATE,
-    estimatedDuration: 10,
-    requiredDiagrams: ['Implementation Flow Diagram', 'Technology Stack Map'],
-    maxApproaches: 2,
-    mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking'],
-    confidenceRequired: true,
-    researchRequired: true,
+    id: 'technical-design-specification',
+    name: 'Technical Design Specification',
+    role: 'Principal Engineer (Technical Design)',
+    icon: '🔧',
+    description: 'Create detailed technical specifications',
+    order: 3,
+    template: STAGE_3_TECHNICAL_DESIGN_SPECIFICATION,
+    mcpServersRecommended: ['context7', 'microsoft-docs', 'sequential-thinking'],
+    buildsOnPreviousStage: true,
   },
   {
-    id: 'development-plan',
-    name: 'Development Plan',
-    template: DEVELOPMENT_PLAN_TEMPLATE,
-    estimatedDuration: 8,
-    requiredDiagrams: ['Sprint Timeline', 'Resource Allocation Chart'],
-    maxApproaches: 1,
-    mcpServersRequired: ['microsoft-docs', 'sequential-thinking'],
-    confidenceRequired: true,
-    researchRequired: false,
+    id: 'implementation-deployment-strategy',
+    name: 'Implementation & Deployment Strategy',
+    role: 'Principal Engineer (Implementation)',
+    icon: '🚀',
+    description: 'Plan implementation and deployment approach',
+    order: 4,
+    template: STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY,
+    mcpServersRecommended: ['context7', 'microsoft-docs', 'sequential-thinking'],
+    buildsOnPreviousStage: true,
   },
   {
-    id: 'risk-assessment',
-    name: 'Risk Assessment',
-    template: RISK_ASSESSMENT_TEMPLATE,
-    estimatedDuration: 10,
-    requiredDiagrams: [
-      'Risk Impact vs Probability Matrix',
-      'Risk Mitigation Workflow',
-      'Contingency Response Plan',
-    ],
-    maxApproaches: 2,
-    mcpServersRequired: ['context7', 'microsoft-docs', 'sequential-thinking'],
-    confidenceRequired: true,
-    researchRequired: true,
+    id: 'sprint-planning-jira-breakdown',
+    name: 'Sprint Planning & Jira Breakdown',
+    role: 'Product Owner',
+    icon: '📚',
+    description: 'Break down work into actionable sprint tasks',
+    order: 5,
+    template: STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN,
+    mcpServersRecommended: ['microsoft-docs', 'sequential-thinking'],
+    buildsOnPreviousStage: true,
   },
 ];
 
-// Helper functions for template usage
-export function getTemplateById(id: string): PromptTemplate | undefined {
-  return PROMPT_TEMPLATES.find(template => template.id === id);
+// ==========================
+// UTILITY FUNCTIONS
+// ==========================
+
+/**
+ * Get stage template by ID
+ */
+export function getStageTemplateById(id: string): StageTemplate | undefined {
+  return MULTI_STAGE_TEMPLATES.find(template => template.id === id);
 }
 
-export function getTemplatesByRequiredMcp(mcpServer: string): PromptTemplate[] {
-  return PROMPT_TEMPLATES.filter(template => 
-    template.mcpServersRequired.includes(mcpServer)
-  );
+/**
+ * Get all stages in order
+ */
+export function getStagesInOrder(): StageTemplate[] {
+  return [...MULTI_STAGE_TEMPLATES].sort((a, b) => a.order - b.order);
 }
 
-export function getTemplatesWithCodebaseContext(
-  stage: string, 
+/**
+ * Get stage count for dynamic sizing
+ */
+export function getStageCount(): number {
+  return MULTI_STAGE_TEMPLATES.length;
+}
+
+/**
+ * Add new stage dynamically (for future extensibility)
+ */
+export function validateStageIntegrity(): { isValid: boolean; issues: string[] } {
+  const issues: string[] = [];
+  const stages = getStagesInOrder();
+
+  // Check for duplicate IDs
+  const ids = stages.map(s => s.id);
+  const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+  if (duplicateIds.length > 0) {
+    issues.push(`Duplicate stage IDs found: ${duplicateIds.join(', ')}`);
+  }
+
+  // Check for duplicate orders
+  const orders = stages.map(s => s.order);
+  const duplicateOrders = orders.filter((order, index) => orders.indexOf(order) !== index);
+  if (duplicateOrders.length > 0) {
+    issues.push(`Duplicate stage orders found: ${duplicateOrders.join(', ')}`);
+  }
+
+  // Check for missing templates
+  stages.forEach(stage => {
+    if (!stage.template || typeof stage.template !== 'string') {
+      issues.push(`Stage ${stage.id} is missing a valid template`);
+    }
+  });
+
+  return {
+    isValid: issues.length === 0,
+    issues,
+  };
+}
+
+/**
+ * Get templates that build on previous stages
+ */
+export function getSequentialStageTemplates(): StageTemplate[] {
+  return MULTI_STAGE_TEMPLATES.filter(template => template.buildsOnPreviousStage);
+}
+
+/**
+ * Generate template with codebase context and previous stage context
+ */
+export function getTemplateWithCodebaseContext(
+  stage: string,
   codebaseAnalysis: any,
   previousStageContext?: string
 ): string {
   let template = getRoleBasedTemplate(stage);
-  
+
   // Replace codebase context placeholder
-  template = template.replace('{codebaseContext}', codebaseAnalysis || 'No codebase context provided');
-  
+  template = template.replace(
+    '{codebaseContext}',
+    codebaseAnalysis || 'No codebase context provided'
+  );
+
   // Replace previous stage context if provided
   if (previousStageContext && template.includes('{previousStageContext}')) {
     template = template.replace('{previousStageContext}', previousStageContext);
   }
-  
+
   return template;
 }

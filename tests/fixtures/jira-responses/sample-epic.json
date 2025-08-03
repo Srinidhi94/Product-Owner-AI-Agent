@@ -1,0 +1,51 @@
+{
+  "key": "PROJ-123",
+  "summary": "Sample Epic for Testing",
+  "description": "This is a sample epic used for testing the AI Product Owner Agent functionality. It includes various scenarios and edge cases to ensure comprehensive test coverage.",
+  "status": "In Progress",
+  "created": "2024-01-15T10:00:00.000+0000",
+  "updated": "2024-01-20T15:30:00.000+0000",
+  "assignee": {
+    "accountId": "test-user-123",
+    "displayName": "Test User",
+    "emailAddress": "test.user@example.com"
+  },
+  "reporter": {
+    "accountId": "reporter-456",
+    "displayName": "Product Owner",
+    "emailAddress": "po@example.com"
+  },
+  "stories": [
+    {
+      "key": "PROJ-124",
+      "summary": "User Authentication Feature",
+      "description": "Implement user authentication with OAuth2",
+      "status": "To Do",
+      "storyPoints": 8,
+      "assignee": {
+        "accountId": "dev-789",
+        "displayName": "Developer One"
+      },
+      "labels": ["backend", "security"],
+      "components": ["authentication"],
+      "priority": "High",
+      "issueType": "Story"
+    },
+    {
+      "key": "PROJ-125",
+      "summary": "User Profile Management",
+      "description": "Allow users to manage their profiles",
+      "status": "In Progress",
+      "storyPoints": 5,
+      "assignee": {
+        "accountId": "dev-101",
+        "displayName": "Developer Two"
+      },
+      "labels": ["frontend", "ui"],
+      "components": ["profile"],
+      "priority": "Medium",
+      "issueType": "Story"
+    }
+  ],
+  "totalPoints": 13
+}
