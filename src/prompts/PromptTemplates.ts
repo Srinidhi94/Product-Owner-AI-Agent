@@ -16,10 +16,11 @@ export const STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS = `
 **Analysis Instructions:**
 <thinking>
 I need to analyze this Jira ticket from a Senior Product Manager perspective, considering multiple strategic approaches to understand:
-1. Business value and market opportunity
-2. User needs and stakeholder requirements
-3. Technical feasibility and constraints
-4. Strategic alignment and prioritization
+1. Existing codebase, features and need for the changes requested in Jira
+2. Business value and market opportunity
+3. User needs and stakeholder requirements
+4. Technical feasibility and constraints
+5. Strategic alignment and prioritization
 
 Let me think step by step about the most effective approaches to this analysis...
 </thinking>
@@ -35,11 +36,13 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
+**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+
 {codebaseContext}
 </codebase_context>
 
 **🎯 YOUR TASK:**
-As a Senior Product Manager, analyze the provided Jira data and codebase context to create comprehensive product requirements. Focus on business value, user needs, technical feasibility, and strategic alignment.
+As a Senior Product Manager, analyze the provided Jira data and codebase context to create comprehensive product requirements. Focus on current features, business value, user needs, technical feasibility, and strategic alignment.
 
 **📝 OUTPUT INSTRUCTIONS:**
 1. **Update Status**: In ANALYSIS.md, change "Product Requirements Analysis" from "⏳ Pending" to "🔄 In Progress"
@@ -125,12 +128,12 @@ export const STAGE_2_SYSTEM_ARCHITECTURE_DESIGN = `
 
 **Analysis Instructions:**
 <thinking>
-Building on the Product Manager's analysis, I need to translate business requirements into technical architecture, considering multiple architectural approaches:
+Building on the Product Manager's analysis, I need to translate business requirements into technical architecture, considering multiple architectural approaches but most importantly existing codebase patterns and features:
 
 As a Principal Engineer, I should focus on:
 1. Reviewing business requirements and constraints from Stage 1
 2. Evaluating multiple architectural patterns that could satisfy these requirements based on the existing codebase and patterns
-3. Selecting the optimal approach based on scalability, maintainability, and business needs
+3. Selecting the optimal approach based on existing patterns, scalability, maintainability, and business needs
 4. Creating a foundation for implementation planning
 
 Let me think step by step about the best architectural approaches...
@@ -147,6 +150,8 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
+**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+
 {codebaseContext}
 </codebase_context>
 
@@ -155,7 +160,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns.
+As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
 1. **Update Status**: In ANALYSIS.md, change "System Architecture Design" from "⏳ Pending" to "🔄 In Progress"
@@ -176,7 +181,7 @@ Create these diagrams using mermaid
 **1. Existing System Architecture Analysis**
 - Current codebase patterns and architectural decisions evaluation
 - Compatibility assessment with existing project structure and conventions
-- Integration analysis with current services, APIs, and dependencies
+- Integration analysis with current services, APIs, and dependencies and database models
 - Workflow mapping: how new requirements fit into existing user journeys and business processes
 
 **2. Use Case Integration & Dependencies**
@@ -243,7 +248,7 @@ export const STAGE_3_TECHNICAL_DESIGN_SPECIFICATION = `
 
 **Analysis Instructions:**
 <thinking>
-Building on both the Product Manager's requirements and the Architecture analysis, I need to create detailed technical specifications, considering multiple implementation approaches:
+Building on both the Product Manager's requirements and the Architecture analysis, I need to create detailed technical specifications, considering multiple implementation approaches but most importantly existing codebase patterns and features:
 
 As a Technical Design specialist, I should:
 1. Review business requirements and architectural decisions from previous stages
@@ -265,6 +270,8 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
+**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+
 {codebaseContext}
 </codebase_context>
 
@@ -273,7 +280,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines.
+As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
 1. **Update Status**: In ANALYSIS.md, change "Technical Design Specification" from "⏳ Pending" to "🔄 In Progress"
@@ -367,7 +374,7 @@ export const STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY = `
 
 **Analysis Instructions:**
 <thinking>
-Building on the complete analysis from Product Manager, Architecture, and Technical Design stages, I need to create a comprehensive implementation and deployment strategy, considering multiple operational approaches:
+Building on the complete analysis from Product Manager, Architecture, and Technical Design stages, I need to create a comprehensive implementation and deployment strategy, considering multiple operational approaches  but most importantly existing codebase patterns and features:
 
 As an Implementation specialist, I should:
 1. Review all previous technical decisions and design specifications
@@ -390,6 +397,8 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
+**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+
 {codebaseContext}
 </codebase_context>
 
@@ -398,7 +407,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence.
+As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
 1. **Update Status**: In ANALYSIS.md, change "Implementation & Deployment Strategy" from "⏳ Pending" to "🔄 In Progress"
@@ -509,6 +518,8 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
+**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+
 {codebaseContext}
 </codebase_context>
 
