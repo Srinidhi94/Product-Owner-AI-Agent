@@ -13,6 +13,16 @@ import { Logger, createLogger } from '../utils/Logger';
 import { ConfigurationManager } from '../utils/ConfigurationManager';
 import { getStagesInOrder } from '../prompts/PromptTemplates';
 
+/**
+ * Custom error class for analysis cancellation
+ */
+export class AnalysisCancelledError extends Error {
+  constructor(message: string = 'Analysis was cancelled by user') {
+    super(message);
+    this.name = 'AnalysisCancelledError';
+  }
+}
+
 export interface AnalysisStage {
   id: string;
   name: string;
@@ -75,7 +85,7 @@ export class MultiStageAnalysisEngine {
     if (startChoice?.title !== 'Start Analysis') {
       this.logger.info('Analysis cancelled by user at start');
       console.log(`ℹ️ Analysis cancelled by user for ${epicKey}`);
-      return;
+      throw new AnalysisCancelledError(`Analysis cancelled by user for ${epicKey}`);
     }
 
     // 2. Initialize output structure based on user configuration
@@ -92,7 +102,7 @@ export class MultiStageAnalysisEngine {
       for (let i = 0; i < stages.length; i++) {
         if (this.cancelled) {
           this.logger.info('Analysis cancelled by user');
-          return;
+          throw new AnalysisCancelledError('Analysis cancelled by user during stage execution');
         }
 
         const stage = stages[i];
@@ -124,13 +134,18 @@ export class MultiStageAnalysisEngine {
         });
       } else {
         this.logger.info('Analysis cancelled by user');
+        throw new AnalysisCancelledError('Analysis was cancelled by user');
       }
     } catch (error: any) {
+      // Re-throw AnalysisCancelledError without modification
+      if (error instanceof AnalysisCancelledError) {
+        throw error;
+      }
+      
       // Check if the error is due to cancellation
       if (error.message === 'Analysis cancelled by user') {
         this.logger.info('Analysis cancelled by user');
-        // Don't show error message for user cancellation
-        return;
+        throw new AnalysisCancelledError('Analysis cancelled by user');
       }
       
       this.logger.error(`Analysis failed: ${error.message}`, error);

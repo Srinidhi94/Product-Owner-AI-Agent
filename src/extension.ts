@@ -15,7 +15,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { JiraClient } from './jira/JiraClient';
 import { CodebaseAnalyzer } from './analyzer/CodebaseAnalyzer';
-import { MultiStageAnalysisEngine } from './analysis/MultiStageAnalysisEngine';
+import { MultiStageAnalysisEngine, AnalysisCancelledError } from './analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from './utils/ConfigurationManager';
 import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
 import { WelcomeManager } from './utils/WelcomeManager';
@@ -413,6 +413,15 @@ async function runEpicAnalysisWorkflow(
       await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
     }
   } catch (error) {
+    // Handle cancellation gracefully
+    if (error instanceof AnalysisCancelledError) {
+      // Update state to not analyzing
+      stateManager.updateState({ analyzing: false });
+      console.log(`ℹ️ Analysis workflow cancelled for ${epicKey}`);
+      // Don't show error - the cancellation message was already shown
+      return;
+    }
+    
     // Update state with error
     stateManager.updateState({ analyzing: false });
 
@@ -548,12 +557,19 @@ async function runMultiStageAnalysis(
           }
         });
     } catch (error) {
-      // Check if this was a user cancellation - handle gracefully
+      // Handle cancellation gracefully
+      if (error instanceof AnalysisCancelledError) {
+        console.log(`ℹ️ Analysis cancelled for ${epicKey}`);
+        vscode.window.showInformationMessage(`🛑 Analysis cancelled for ${epicKey}`);
+        throw error; // Re-throw to prevent success messages in parent
+      }
+      
+      // Check if this was a user cancellation by message content - handle gracefully
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       if (errorMessage.includes('cancelled by user') || errorMessage.includes('Analysis cancelled')) {
         console.log(`ℹ️ Analysis cancelled for ${epicKey}`);
-        // Don't throw error for cancellations - let parent handle gracefully
-        throw error;
+        vscode.window.showInformationMessage(`🛑 Analysis cancelled for ${epicKey}`);
+        throw new AnalysisCancelledError(errorMessage);
       }
       // Re-throw other errors
       throw error;

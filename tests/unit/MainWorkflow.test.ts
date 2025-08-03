@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import { MultiStageAnalysisEngine } from '../../src/analysis/MultiStageAnalysisEngine';
+import { MultiStageAnalysisEngine, AnalysisCancelledError } from '../../src/analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from '../../src/utils/ConfigurationManager';
 import { JiraPortfolio, CodebaseAnalysis, JiraUser } from '../../src/types';
 
@@ -142,16 +142,17 @@ describe('Main Workflow Tests', () => {
     test('should handle user cancellation gracefully', async () => {
       mockVSCode.window.showInformationMessage.mockResolvedValueOnce('Cancel');
       
-      // This should not throw an error or show success messages
-      await expect(async () => {
-        try {
-          await engine.executeAnalysis('TEST-123', mockJiraData, mockCodebaseData);
-        } catch (error) {
-          // Cancellation should not be treated as an error
-          const message = error instanceof Error ? error.message : String(error);
-          expect(message.includes('cancelled')).toBe(false);
-        }
-      }).not.toThrow();
+      // Cancellation should now throw AnalysisCancelledError
+      try {
+        await engine.executeAnalysis('TEST-123', mockJiraData, mockCodebaseData);
+        // Should not reach here if cancellation works properly
+        expect(false).toBe(true); // Force failure if no error thrown
+      } catch (error) {
+        // Should throw AnalysisCancelledError with cancellation message
+        const message = error instanceof Error ? error.message : String(error);
+        expect(message.includes('cancelled')).toBe(true);
+        expect(error instanceof AnalysisCancelledError).toBe(true);
+      }
     });
   });
 });
