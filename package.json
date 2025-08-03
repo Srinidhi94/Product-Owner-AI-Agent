@@ -2,15 +2,13 @@
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
   "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
     "Other",
-    "Visualization",
-    "Documentation",
-    "Extension Packs"
+    "Programming Languages"
   ],
   "keywords": [
     "jira",
@@ -53,21 +51,7 @@
         "icon": "$(settings-gear)",
         "description": "Configure Jira and extension settings."
       },
-      {
-        "command": "aiProductOwner.refreshDocumentation",
-        "title": "Refresh Documentation",
-        "category": "AI Product Owner",
-        "icon": "$(refresh)",
-        "enablement": "aiProductOwner.hasResults",
-        "description": "Refresh and display the latest generated documentation."
-      },
-      {
-        "command": "aiProductOwner.copyPrompt",
-        "title": "Copy Prompt to Clipboard",
-        "category": "AI Product Owner",
-        "icon": "$(clippy)",
-        "description": "Copy the generated prompt to your clipboard."
-      },
+
       {
         "command": "aiProductOwner.openWalkthrough",
         "title": "Show Welcome Walkthrough",
@@ -83,25 +67,11 @@
         "description": "Test the connection to your Jira instance."
       },
       {
-        "command": "aiProductOwner.testJiraData",
-        "title": "Test Jira Data Fetch",
-        "category": "AI Product Owner",
-        "icon": "$(database)",
-        "description": "Fetch and display sample Jira data for testing."
-      },
-      {
-        "command": "aiProductOwner.nextStage",
-        "title": "Next Stage (Manual)",
+        "command": "aiProductOwner.completeStage",
+        "title": "Complete Current Stage & Continue",
         "category": "AI Product Owner",
         "icon": "$(arrow-right)",
-        "description": "Manually proceed to the next analysis stage."
-      },
-      {
-        "command": "aiProductOwner.proceedToNextStage",
-        "title": "Proceed to Next Stage",
-        "category": "AI Product Owner",
-        "icon": "$(play)",
-        "description": "Automatically proceed to the next analysis stage."
+        "description": "Mark current analysis stage as complete and proceed to next stage."
       },
       {
         "command": "aiProductOwner.cancelAnalysis",
@@ -109,13 +79,6 @@
         "category": "AI Product Owner",
         "icon": "$(stop)",
         "description": "Cancel the current analysis workflow."
-      },
-      {
-        "command": "aiProductOwner.showAnalysisProgress",
-        "title": "Show Analysis Progress",
-        "category": "AI Product Owner",
-        "icon": "$(progress)",
-        "description": "Show detailed progress of the current analysis workflow."
       }
     ],
     "configuration": {

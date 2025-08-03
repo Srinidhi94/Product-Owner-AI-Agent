@@ -5,8 +5,8 @@
  * - Analyze Epic: Trigger full codebase analysis
  * - Configure Settings: Open extension settings
  * - Test Connection: Verify Jira connectivity
- * - Refresh Documentation: Update analysis results
- * - Copy Prompt: Copy generated prompt to clipboard
+ * - Complete Stage: Manually complete current analysis stage
+ * - Show Welcome: Display getting started guide
  * 
  * @version 1.0.0
  * @author AI Product Owner Team
@@ -108,25 +108,14 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
       ),
       
       new QuickActionItem(
-        'Refresh Documentation',
-        'Update analysis results',
+        'Complete Stage',
+        'Manually complete current analysis stage',
         {
-          command: 'aiProductOwner.refreshDocumentation',
-          title: 'Refresh Documentation',
+          command: 'aiProductOwner.completeStage',
+          title: 'Complete Current Stage',
         },
-        new vscode.ThemeIcon('refresh'),
-        'Refresh and display the latest generated documentation from previous analysis'
-      ),
-      
-      new QuickActionItem(
-        'Copy Prompt',
-        'Copy generated prompt to clipboard',
-        {
-          command: 'aiProductOwner.copyPrompt',
-          title: 'Copy Prompt to Clipboard',
-        },
-        new vscode.ThemeIcon('clippy'),
-        'Copy the generated prompt to your clipboard for use with GitHub Copilot'
+        new vscode.ThemeIcon('check'),
+        'Manually mark the current analysis stage as complete and proceed to the next stage'
       ),
       
       new QuickActionItem(

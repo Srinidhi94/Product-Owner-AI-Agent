@@ -28,6 +28,8 @@ export class MultiStageAnalysisEngine {
   private logger: Logger;
   private cancelled: boolean = false;
   private currentStageInterval: ReturnType<typeof setInterval> | null = null;
+  private currentStageResolver: ((value?: void | PromiseLike<void>) => void) | null = null;
+  private currentStageName: string = '';
 
   constructor() {
     this.logger = createLogger('MultiStageAnalysisEngine');
@@ -66,11 +68,11 @@ export class MultiStageAnalysisEngine {
     const startChoice = await vscode.window.showInformationMessage(
       `🚀 Ready to start multi-stage analysis for ${epicKey}?`,
       { modal: true },
-      'Start Analysis',
-      'Cancel'
+      { title: 'Start Analysis', isCloseAffordance: false },
+      { title: 'Cancel', isCloseAffordance: true }
     );
 
-    if (startChoice !== 'Start Analysis') {
+    if (startChoice?.title !== 'Start Analysis') {
       this.logger.info('Analysis cancelled by user at start');
       console.log(`ℹ️ Analysis cancelled by user for ${epicKey}`);
       return;
@@ -109,16 +111,28 @@ export class MultiStageAnalysisEngine {
         await this.delay(1000);
       }
 
-      this.logger.info('✅ Analysis completed successfully');
-      vscode.window.showInformationMessage(
-        '✅ Multi-stage analysis completed successfully! Check your output directory for results.',
-        'Open Results Folder'
-      ).then(choice => {
-        if (choice === 'Open Results Folder') {
-          vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(outputDir));
-        }
-      });
+      // Only show success message if analysis wasn't cancelled
+      if (!this.cancelled) {
+        this.logger.info('✅ Analysis completed successfully');
+        vscode.window.showInformationMessage(
+          '✅ Multi-stage analysis completed successfully! Check your output directory for results.',
+          'Open Results Folder'
+        ).then(choice => {
+          if (choice === 'Open Results Folder') {
+            vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(outputDir));
+          }
+        });
+      } else {
+        this.logger.info('Analysis cancelled by user');
+      }
     } catch (error: any) {
+      // Check if the error is due to cancellation
+      if (error.message === 'Analysis cancelled by user') {
+        this.logger.info('Analysis cancelled by user');
+        // Don't show error message for user cancellation
+        return;
+      }
+      
       this.logger.error(`Analysis failed: ${error.message}`, error);
       vscode.window.showErrorMessage(`Analysis failed: ${error.message}`);
       throw error;
@@ -183,6 +197,10 @@ export class MultiStageAnalysisEngine {
     return new Promise<void>((resolve, reject) => {
       let intervalCount = 0;
       
+      // Store the resolver for manual completion
+      this.currentStageResolver = resolve;
+      this.currentStageName = stage.name;
+      
       const checkProgress = async () => {
         intervalCount++;
         
@@ -196,30 +214,35 @@ export class MultiStageAnalysisEngine {
         }
 
         const choice = await vscode.window.showInformationMessage(
-          `⏰ ${stage.name} in progress... Is this stage complete?`,
+          `⏰ ${stage.name} in progress... Ready to continue to next stage?`,
           { modal: false },
-          'Stage Complete',
+          'Complete & Continue',
           'Still Working',
-          'Cancel'
+          'Cancel Analysis'
         );
 
-        if (choice === 'Stage Complete') {
+        if (choice === 'Complete & Continue') {
           if (this.currentStageInterval) {
             clearInterval(this.currentStageInterval);
             this.currentStageInterval = null;
           }
+          this.currentStageResolver = null;
+          this.currentStageName = '';
           this.logger.info(`Stage ${stageNumber} (${stage.name}) completed by user`);
           resolve();
-        } else if (choice === 'Cancel') {
+        } else if (choice === 'Cancel Analysis') {
+          // User explicitly chose to cancel
           if (this.currentStageInterval) {
             clearInterval(this.currentStageInterval);
             this.currentStageInterval = null;
           }
+          this.currentStageResolver = null;
+          this.currentStageName = '';
           this.cancelled = true;
           console.log(`ℹ️ Analysis cancelled by user during ${stage.name}`);
           reject(new Error('Analysis cancelled by user'));
         }
-        // If "Still Working" or no choice, continue the interval
+        // If "Still Working" selected or dialog dismissed, continue the interval
       };
 
       // Start the interval - check every 30 seconds
@@ -238,6 +261,41 @@ export class MultiStageAnalysisEngine {
   }
 
   /**
+   * Manually proceed to next stage (for Complete Stage command)
+   */
+  async proceedToNextStage(): Promise<void> {
+    if (this.currentStageResolver) {
+      const stageName = this.currentStageName;
+      this.logger.info(`Manually completing current stage: ${stageName}`);
+      
+      // Clear the interval
+      if (this.currentStageInterval) {
+        clearInterval(this.currentStageInterval);
+        this.currentStageInterval = null;
+      }
+      
+      // Store resolver before clearing state
+      const resolver = this.currentStageResolver;
+      this.currentStageResolver = null;
+      this.currentStageName = '';
+      
+      // Show confirmation message
+      vscode.window.showInformationMessage(`✅ ${stageName || 'Current stage'} marked as complete. Proceeding to next stage...`);
+      
+      resolver();
+    } else {
+      throw new Error('No active stage to complete. Make sure analysis is running.');
+    }
+  }
+
+  /**
+   * Cancel ongoing analysis (wrapper for cancel method to match extension.ts expectations)
+   */
+  cancelAnalysis(): void {
+    this.cancel();
+  }
+
+  /**
    * Cancel ongoing analysis
    */
   cancel(): void {
@@ -246,6 +304,8 @@ export class MultiStageAnalysisEngine {
       clearInterval(this.currentStageInterval);
       this.currentStageInterval = null;
     }
+    this.currentStageResolver = null;
+    this.currentStageName = '';
     this.logger.info('Analysis cancellation requested');
   }
 
@@ -272,6 +332,8 @@ export class MultiStageAnalysisEngine {
       clearInterval(this.currentStageInterval);
       this.currentStageInterval = null;
     }
+    this.currentStageResolver = null;
+    this.currentStageName = '';
     this.outputChannel.dispose();
     this.promptGenerator.dispose();
     this.documentGenerator.dispose();

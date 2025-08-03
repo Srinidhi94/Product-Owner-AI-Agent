@@ -188,28 +188,31 @@ function registerCommands(
     }
   );
 
-  // Refresh documentation command
-  const refreshDocumentationCommand = vscode.commands.registerCommand(
-    'aiProductOwner.refreshDocumentation',
+  // Complete current stage and continue command
+  const completeStageCommand = vscode.commands.registerCommand(
+    'aiProductOwner.completeStage',
     async () => {
       try {
-        await refreshAnalysisDocumentation(stateManager);
+        if (
+          stateManager.activeAnalysisEngine &&
+          typeof stateManager.activeAnalysisEngine.proceedToNextStage === 'function'
+        ) {
+          await stateManager.activeAnalysisEngine.proceedToNextStage();
+        } else {
+          vscode.window
+            .showInformationMessage(
+              'No active analysis workflow. Start an analysis first.',
+              'Start Analysis'
+            )
+            .then(action => {
+              if (action === 'Start Analysis') {
+                vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+              }
+            });
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        vscode.window.showErrorMessage(`Refresh Failed: ${errorMessage}`);
-      }
-    }
-  );
-
-  // Copy prompt command
-  const copyPromptCommand = vscode.commands.registerCommand(
-    'aiProductOwner.copyPrompt',
-    async (prompt: string) => {
-      try {
-        await vscode.env.clipboard.writeText(prompt);
-        vscode.window.showInformationMessage('✅ Prompt copied to clipboard');
-      } catch (error) {
-        vscode.window.showErrorMessage('❌ Failed to copy prompt to clipboard');
+        vscode.window.showErrorMessage(`Failed to progress stage: ${errorMessage}`);
       }
     }
   );
@@ -271,183 +274,11 @@ function registerCommands(
     }
   );
 
-  // Test Jira data fetch command
-  const testJiraDataCommand = vscode.commands.registerCommand(
-    'aiProductOwner.testJiraData',
-    async () => {
-      try {
-        const epicKey = await getEpicKeyFromUser();
-        if (!epicKey) {
-          return;
-        }
 
-        const config = configManager.getJiraConfiguration();
-        const jiraClient = new JiraClient(config);
 
-        await vscode.window.withProgress(
-          {
-            location: vscode.ProgressLocation.Notification,
-            title: 'Fetching Jira Data',
-            cancellable: false,
-          },
-          async progress => {
-            progress.report({ increment: 50, message: `Fetching ${epicKey}...` });
 
-            const jiraData = await jiraClient.fetchPortfolioOrEpic(epicKey);
-            if (!jiraData) {
-              throw new Error(`Epic ${epicKey} not found`);
-            }
 
-            progress.report({ increment: 100, message: 'Data fetched successfully' });
 
-            // Show the data in a new document
-            const dataDisplay = `# Jira Data for ${epicKey}
-
-## Epic Overview
-- **Key**: ${jiraData.key}
-- **Name**: ${jiraData.name}
-- **Type**: ${jiraData.type}
-- **Description**: ${jiraData.description || 'No description'}
-- **Total Story Points**: ${jiraData.totalStoryPoints}
-
-## Epics (${jiraData.epics.length})
-${jiraData.epics
-  .map(
-    (epic, i) => `
-${i + 1}. **${epic.key}**: ${epic.summary}
-   - Status: ${epic.status}
-   - Stories: ${epic.stories.length} (${epic.totalPoints} points)
-   - Description: ${
-     epic.description ? epic.description.substring(0, 100) + '...' : 'No description'
-   }
-`
-  )
-  .join('')}
-
-## Key Stories
-${jiraData.epics
-  .flatMap(epic => epic.stories)
-  .filter(story => story.storyPoints && story.storyPoints > 0)
-  .sort((a, b) => (b.storyPoints || 0) - (a.storyPoints || 0))
-  .slice(0, 5)
-  .map(story => `- **${story.key}** (${story.storyPoints} pts): ${story.summary}`)
-  .join('\n')}
-
----
-✅ **This data SHOULD be included in your analysis prompts!**
-If you don't see this information in the generated prompts, there's a bug.`;
-
-            const doc = await vscode.workspace.openTextDocument({
-              content: dataDisplay,
-              language: 'markdown',
-            });
-            await vscode.window.showTextDocument(doc);
-
-            vscode.window
-              .showInformationMessage(
-                '✅ Jira data fetched successfully! This data should appear in your analysis prompts.',
-                'Continue with Analysis'
-              )
-              .then(action => {
-                if (action === 'Continue with Analysis') {
-                  vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-                }
-              });
-          }
-        );
-      } catch (error) {
-        vscode.window.showErrorMessage(`❌ Failed to fetch Jira data: ${error}`);
-      }
-    }
-  );
-
-  // Manual stage progression command - now provides actual progression options
-  const nextStageCommand = vscode.commands.registerCommand('aiProductOwner.nextStage', async () => {
-    const state = stateManager.getState();
-
-    if (!state.currentEpic) {
-      vscode.window
-        .showInformationMessage(
-          'No active analysis. Start an epic analysis first.',
-          'Start Analysis'
-        )
-        .then(action => {
-          if (action === 'Start Analysis') {
-            vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-          }
-        });
-      return;
-    }
-
-    const action = await vscode.window.showInformationMessage(
-      `🔄 Manual Stage Progression for ${state.currentEpic}\n\nChoose your next action:`,
-      'Open Output Folder',
-      'Restart Analysis',
-      'Skip to Summary'
-    );
-
-    switch (action) {
-      case 'Open Output Folder': {
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-        if (workspaceFolder) {
-          const outputDir = path.join(
-            workspaceFolder.uri.fsPath,
-            'ai-analysis-output',
-            state.currentEpic
-          );
-          if (fs.existsSync(outputDir)) {
-            const uri = vscode.Uri.file(outputDir);
-            await vscode.commands.executeCommand('vscode.openFolder', uri, {
-              forceNewWindow: true,
-            });
-          } else {
-            vscode.window.showWarningMessage(`Output directory not found: ${outputDir}`);
-          }
-        }
-        break;
-      }
-      case 'Restart Analysis':
-        await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-        break;
-      case 'Skip to Summary':
-        vscode.window
-          .showInformationMessage(
-            '📋 To manually create a summary:\n1. Navigate to your output folder\n2. Create SUMMARY.md\n3. Consolidate findings from all stage files',
-            'Open Output Folder'
-          )
-          .then(response => {
-            if (response === 'Open Output Folder') {
-              vscode.commands.executeCommand('aiProductOwner.nextStage');
-            }
-          });
-        break;
-    }
-  });
-
-  // Register proceedToNextStage command for MultiStageAnalysisEngine
-  const proceedToNextStageCommand = vscode.commands.registerCommand(
-    'aiProductOwner.proceedToNextStage',
-    async () => {
-      // Route to the active analysis engine instance
-      if (
-        stateManager.activeAnalysisEngine &&
-        typeof stateManager.activeAnalysisEngine.proceedToNextStage === 'function'
-      ) {
-        await stateManager.activeAnalysisEngine.proceedToNextStage();
-      } else {
-        vscode.window
-          .showInformationMessage(
-            'No active analysis workflow. Start an analysis first.',
-            'Start Analysis'
-          )
-          .then(action => {
-            if (action === 'Start Analysis') {
-              vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
-            }
-          });
-      }
-    }
-  );
 
   // Register cancel analysis command
   const cancelAnalysisCommand = vscode.commands.registerCommand(
@@ -476,29 +307,16 @@ If you don't see this information in the generated prompts, there's a bug.`;
 
 
 
-  // Add progress tracking command
-  const showAnalysisProgressCommand = vscode.commands.registerCommand(
-    'aiProductOwner.showAnalysisProgress',
-    async () => {
-      vscode.window.showInformationMessage(
-        'Analysis progress tracking is available in the output panel.'
-      );
-    }
-  );
+
 
   // Add all commands to subscriptions
   context.subscriptions.push(
     analyzeEpicCommand,
     configureSettingsCommand,
-    refreshDocumentationCommand,
-    copyPromptCommand,
     openWalkthroughCommand,
     testConnectionCommand,
-    testJiraDataCommand,
-    nextStageCommand,
-    proceedToNextStageCommand,
     cancelAnalysisCommand,
-    showAnalysisProgressCommand
+    completeStageCommand
   );
 }
 
