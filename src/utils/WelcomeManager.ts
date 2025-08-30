@@ -271,18 +271,27 @@ The AI Product Owner Agent is a powerful VS Code extension that:
 
 - **Analyzes Jira Epics**: Fetches comprehensive data from your Jira epics and stories
 - **Scans Universal Codebases**: Identifies architectural patterns, tech stack, and code structure across 9 programming languages
-- **Generates Context-Rich Prompts**: Creates detailed prompts for GitHub Copilot/LLMs
-- **Produces Technical Documentation**: Helps create comprehensive analysis documents
+- **Generates Context-Rich Prompts**: Creates detailed prompts with context engineering frames for AI analysis
+- **Produces Technical Documentation**: Creates comprehensive analysis documents with structured context
 
 ## 📋 5-Stage Analysis Process
 
-The extension guides you through a structured 5-stage analysis:
+The extension guides you through a structured role-based analysis workflow:
 
-1. **Requirements Analysis** (5 min) - Analyze Jira requirements and dependencies
-2. **Design Overview** (6 min) - High-level design concept and architecture  
-3. **Technical Design** (15 min) - Detailed DB, API, and business logic design
-4. **Infrastructure & NFRs** (8 min) - Infrastructure and non-functional requirements
-5. **Task Breakdown** (6 min) - Break into implementable Jira tasks
+1. **Product Requirements Analysis** - Senior Product Manager perspective with business value assessment
+2. **System Architecture Design** - Principal Engineer (Architecture) with scalability focus
+3. **Technical Design Specification** - Principal Engineer (Technical) with detailed API/DB design
+4. **Implementation & Deployment Strategy** - Principal Engineer (Implementation) with CI/CD planning
+5. **Sprint Planning & Jira Breakdown** - Product Owner with actionable sprint tasks
+
+## 📁 Generated Files
+
+Each analysis creates these files in your configured output directory:
+
+- **README.md** - Overview and navigation guide for the analysis
+- **PROMPTS.md** - All generated prompts for each analysis stage  
+- **ANALYSIS.md** - Your AI responses and analysis results
+- **CONTEXT.md** - Structured context engineering frame for LLM grounding
 
 ## 🔧 Getting Started
 
@@ -305,18 +314,19 @@ Input: Epic key (e.g., PROJ-123)
 Output: 5 detailed analysis prompts
 \`\`\`
 
-## 🎯 Demo-Ready Features
+## 🎯 Key Features
 
-- **Professional Documentation**: Executive-ready technical analysis
-- **Visual Diagrams**: Mermaid diagrams for architecture and workflows
-- **Comprehensive Coverage**: Business, technical, and implementation aspects
-- **Stakeholder Communication**: Perfect for investor and stakeholder presentations
+- **Context Engineering**: Structured grounding frames to reduce AI hallucinations
+- **Anti-Hallucination Guardrails**: Explicit citation requirements and ROI justification
+- **Visual Diagrams**: Mermaid diagrams for architecture and workflows  
+- **Progressive Context**: Each stage builds on previous analysis results
+- **Enterprise-Ready**: Professional documentation for stakeholder presentations
 
 ## 🛠️ Troubleshooting
 
 ### Common Issues
 - **401/403 Errors**: Check API token validity and permissions
-- **No Source Files**: Extension works with demo data if no codebase found  
+- **No Workspace Found**: Please open a project folder before running analysis
 - **Epic Not Found**: Verify epic key and access permissions
 - **Slow Performance**: Large codebases are automatically optimized
 
@@ -341,9 +351,12 @@ Click the buttons below to start using the extension:
     const steps = [
       'Open Command Palette (Ctrl+Shift+P)',
       'Type "AI Product Owner" to see available commands',
-      'Start with "Configure Settings" to set up Jira',
-      'Use "Test Connection" to verify setup',
-      'Run "Analyze Epic" on your first epic!',
+      'Start with "Configure Settings" to set up Jira credentials',
+      'Use "Test Connection" to verify your Jira setup',
+      'Ensure you have a project folder open in VS Code',
+      'Run "Analyze Epic" with your epic key (e.g., PROJ-123)',
+      'Review generated prompts in PROMPTS.md and copy to your AI',
+      'Use "Open Output Folder" to access all generated files',
     ];
 
     for (let i = 0; i < steps.length; i++) {

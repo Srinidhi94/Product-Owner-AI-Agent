@@ -4,53 +4,152 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-1.74%2B-blue)](https://code.visualstudio.com/)
 
-## Overview
+Turn Jira epics into detailed technical documentation in under an hour. This VS Code extension analyzes your codebase and creates comprehensive project documentation using AI.
 
-The **AI Product Owner Agent** is a VS Code extension that provides technical analysis of Jira epics and codebases across multiple programming languages. It generates comprehensive, implementation-ready technical documentation through a manual copy-paste workflow with GitHub Copilot, significantly improving productivity while ensuring consistent, high-quality output.
+## What It Does
 
-### ✨ Key Features
+**Reduces technical analysis time from days to under an hour** while maintaining principal engineer-level documentation quality.
 
-- **🤖 Manual Copilot Integration**: Streamlined copy-paste workflow with GitHub Copilot
-- **� Clipboard Management**: Automatic prompt copying and response processing
-- **🌐 Multi-Language Analysis**: Supports JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, and Rust
-- **🎯 Jira Integration**: Epic and story analysis with comprehensive data extraction
-- **📊 Multi-Stage Analysis**: Context-rich processing following industry best practices
-- **💾 Documentation Generation**: Structured technical specifications and implementation guides
-- **⚠️ Risk Assessment**: Identification of technical risks and mitigation strategies
-- **📈 Progress Tracking**: Visual progress indicators during analysis
+The extension connects to your Jira epics, analyzes your codebase, and guides you through creating detailed technical documentation using GitHub Copilot.
 
-## 🚀 Quick Start
+## Key Features
 
-1. **Install the Extension**: Download and install the `.vsix` package in VS Code
-2. **Configure Settings**: Set up Jira credentials and output preferences
-3. **Ensure Copilot**: Verify GitHub Copilot extension is installed and active
-4. **Analyze Project**: Use Command Palette → "AI Product Owner: Analyze Epic"
-5. **Manual Workflow**: Copy prompts to Copilot, paste responses back using extension commands
-6. **Review Results**: Access complete technical specifications and implementation guides
+- **Smart Codebase Analysis** - Automatically detects languages, frameworks, and architecture patterns
+- **Secure Jira Integration** - Uses API tokens stored in VS Code's secure storage
+- **Manual AI Integration** - Copy/paste workflow with GitHub Copilot (no API keys needed)
+- **Progress Tracking** - 30-second interval updates with cancellation options
+- **Structured Output** - Organized markdown documentation ready for your team
 
-## 🔧 System Requirements
+## Quick Start
 
-- **VS Code**: Version 1.74.0 or higher
-- **GitHub Copilot**: Extension installed (required for AI-powered analysis)
-- **Jira Access**: Valid API credentials (email + token)
-- **Supported Languages**: Any of the 9 supported programming languages
+1. **Install & Configure**
+   - Install the extension from VS Code Marketplace
+   - Run: `Ctrl/Cmd + Shift + P` → "AI Product Owner: Configure Settings"
+   - Add your Jira URL and API token
 
-## 📚 Documentation
+2. **Analyze Your Epic**
+   - Run: `Ctrl/Cmd + Shift + P` → "AI Product Owner: Analyze Epic"
+   - Enter your Jira epic key (e.g., "PROJ-123")
 
-- **[Installation Guide](INSTALLATION.md)** - Detailed setup instructions
-- **[User Guide](docs/USER_GUIDE.md)** - Complete workflow documentation
-- **[Architecture Overview](docs/ARCHITECTURE.md)** - Technical architecture and design
-- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Development and contribution guidelines
-- **[Product Requirements](docs/PRODUCT_REQUIREMENTS.md)** - Feature specifications and roadmap
+3. **Follow the 5-Stage Workflow**
+   - Copy generated prompts to GitHub Copilot
+   - Paste AI responses back into the extension
+   - Get comprehensive documentation automatically
 
-## 🤝 Contributing
+## How It Works
 
-We welcome contributions from authorized team members. Please review the [Developer Guide](docs/DEVELOPER_GUIDE.md) for coding standards, development setup, and contribution process.
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Jira Epic   │───▶│ Codebase    │───▶│ AI Analysis │
+│ Data Fetch  │    │ Analysis    │    │ Workflow    │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       ▼                   ▼                   ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Requirements│    │ Languages   │    │ 5 Stages of │
+│ & Stories   │    │ Frameworks  │    │ Documentation│
+└─────────────┘    └─────────────┘    └─────────────┘
+```
 
-## 📄 License
+## 5-Stage Analysis Process
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Stage 1: Product Requirements**
+- Business context and user needs
+- Feature requirements from Jira stories
 
----
+**Stage 2: System Architecture** 
+- High-level system design
+- Component relationships
 
-**Note**: This extension is designed for professional development teams and requires proper Jira API access and GitHub Copilot subscription for full functionality.
+**Stage 3: Technical Design**
+- Implementation specifications
+- Technology choices
+
+**Stage 4: Implementation Strategy**
+- Development approach
+- Best practices and patterns
+
+**Stage 5: Sprint Planning**
+- Task breakdown
+- Development timeline
+
+## What You Get
+
+The extension automatically creates 4 documentation files:
+
+```
+your-project/
+├── README.md          # Project overview & setup
+├── PROMPTS.md         # Generated AI prompts
+├── ANALYSIS.md        # AI responses & insights
+└── CONTEXT.md         # Codebase technical details
+```
+
+## Supported Languages
+
+✅ **9+ Programming Languages:**
+- JavaScript & TypeScript
+- Python
+- Java
+- C#
+- Go
+- Rust
+- PHP
+- Ruby
+
+## Installation
+
+### From VS Code Marketplace
+1. Open VS Code Extensions (`Ctrl/Cmd + Shift + X`)
+2. Search "AI Product Owner Agent"
+3. Click Install
+
+### For Developers
+```bash
+git clone <repository-url>
+cd ai-product-owner-agent
+npm install
+npm run compile
+# Press F5 to launch Extension Development Host
+```
+
+## Setup
+
+**Required:**
+- VS Code 1.74.0+
+- GitHub Copilot subscription
+- Jira access with API token
+
+**Get Your Jira API Token:**
+1. Go to https://id.atlassian.com/manage-profile/security/api-tokens
+2. Create new token
+3. Copy token to extension settings
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `AI Product Owner: Analyze Epic` | Start the analysis workflow |
+| `AI Product Owner: Configure Settings` | Setup Jira connection |
+| `AI Product Owner: Test Connection` | Verify Jira access |
+| `AI Product Owner: Complete Stage` | Mark current stage done |
+| `AI Product Owner: Cancel Analysis` | Stop current analysis |
+| `AI Product Owner: Open Output Folder` | View generated docs |
+| `AI Product Owner: Paste Copilot Response` | Add AI response |
+
+## Troubleshooting
+
+**Connection Issues:**
+- Verify Jira URL format: `https://company.atlassian.net`
+- Check API token permissions
+- Use "Test Connection" command
+
+**Epic Not Found:**
+- Ensure epic key format: `PROJECT-123`
+- Verify epic exists and you have access
+- Check project permissions
+
+## License
+
+MIT License
+

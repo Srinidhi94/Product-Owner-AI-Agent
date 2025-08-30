@@ -96,8 +96,13 @@ export class MultiStageAnalysisEngine {
       // Initialize files and folders immediately
       const outputDir = await this.documentGenerator.initializeOutputStructure(epicKey);
       vscode.window.showInformationMessage(`📁 Analysis files created in: ${outputDir}`);
+
+      // Write context grounding
+      await this.documentGenerator.updateContextDocument(epicKey, jiraData, codebaseData);
       
       const stages = this.getDynamicStages();
+
+      let previousContext: string | undefined = undefined;
 
       for (let i = 0; i < stages.length; i++) {
         if (this.cancelled) {
@@ -109,7 +114,7 @@ export class MultiStageAnalysisEngine {
         this.logger.info(`${stage.icon} Stage ${i + 1}/${stages.length}: ${stage.name}`);
 
         // Generate prompt for current stage
-        const prompt = await this.generateStagePrompt(stage, jiraData, codebaseData, i);
+        const prompt: GeneratedPrompt = await this.generateStagePrompt(stage, jiraData, codebaseData, i, previousContext);
 
         // Add prompt to documentation
         await this.documentGenerator.addPromptToDocument(epicKey, stage.id, stage.name, prompt.content);
@@ -119,6 +124,11 @@ export class MultiStageAnalysisEngine {
 
         // Brief pause between stages
         await this.delay(1000);
+
+        // Accumulate previous context for next stage (truncate to keep prompts lean)
+        previousContext = [previousContext || '', `\n\n[Stage ${i + 1} Prompt Summary]\n`, prompt.content.slice(0, 1200)]
+          .join('')
+          .slice(-3000);
       }
 
       // Only show success message if analysis wasn't cancelled
@@ -161,12 +171,13 @@ export class MultiStageAnalysisEngine {
     stage: AnalysisStage,
     jiraData: JiraPortfolio,
     codebaseData: CodebaseAnalysis,
-    stageIndex: number
+    stageIndex: number,
+    previousContext?: string
   ): Promise<GeneratedPrompt> {
     this.logger.info(`Generating prompt for stage: ${stage.name}`);
 
     try {
-      return await this.promptGenerator.generateStagePrompt(stage.id, jiraData, codebaseData);
+      return await this.promptGenerator.generateStagePrompt(stage.id, jiraData, codebaseData, previousContext);
     } catch (error: any) {
       this.logger.error(`Prompt generation failed for ${stage.name}`, error);
       throw new Error(`Failed to generate prompt for ${stage.name}: ${error.message}`);

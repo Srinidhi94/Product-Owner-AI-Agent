@@ -2,7 +2,7 @@
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
   "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -79,6 +79,20 @@
         "category": "AI Product Owner",
         "icon": "$(stop)",
         "description": "Cancel the current analysis workflow."
+      },
+      {
+        "command": "aiProductOwner.openOutputFolder",
+        "title": "Open Output Folder",
+        "category": "AI Product Owner",
+        "icon": "$(folder-opened)",
+        "description": "Open the output folder for the current epic analysis."
+      },
+      {
+        "command": "aiProductOwner.pasteCopilotResponse",
+        "title": "Paste Copilot Response",
+        "category": "AI Product Owner",
+        "icon": "$(clippy)",
+        "description": "Automatically integrate AI response from clipboard into the analysis document."
       }
     ],
     "configuration": {
@@ -163,18 +177,35 @@
           "when": "aiProductOwner.configured"
         },
         {
-          "command": "aiProductOwner.refreshDocumentation",
+          "command": "aiProductOwner.configureSettings"
+        },
+        {
+          "command": "aiProductOwner.testConnection",
+          "when": "aiProductOwner.configured"
+        },
+        {
+          "command": "aiProductOwner.completeStage",
+          "when": "aiProductOwner.analyzing"
+        },
+        {
+          "command": "aiProductOwner.cancelAnalysis",
+          "when": "aiProductOwner.analyzing"
+        },
+        {
+          "command": "aiProductOwner.openOutputFolder",
           "when": "aiProductOwner.hasResults"
+        },
+        {
+          "command": "aiProductOwner.openWalkthrough"
+        },
+        {
+          "command": "aiProductOwner.pasteCopilotResponse",
+          "when": "aiProductOwner.analyzing"
         }
       ],
       "view/title": [
         {
           "command": "aiProductOwner.analyzeEpic",
-          "when": "view == analysisResults",
-          "group": "navigation"
-        },
-        {
-          "command": "aiProductOwner.refreshDocumentation",
           "when": "view == analysisResults",
           "group": "navigation"
         }
@@ -201,7 +232,7 @@
     "lint:check": "eslint src --ext ts",
     "test": "npm run test:unit",
     "test:unit": "jest",
-    "test:integration": "echo 'Integration tests require VS Code environment - run via Extension Host or CI'",
+    "test:integration": "node -e \"console.log('Integration tests skipped in CI - VS Code extension requires host environment'); process.exit(0)\"",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",

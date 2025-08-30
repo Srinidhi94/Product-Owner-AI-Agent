@@ -13,6 +13,12 @@ export const STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS = `
 **Role: Senior Product Manager**
 **Stage: Product Requirements Analysis**
 
+**Safety & Grounding Rules:**
+- Cite real repository files/paths you used under a "What I used" section.
+- If context is insufficient, ask clarifying questions instead of speculating.
+- Align all suggestions with existing architecture, patterns, and constraints.
+- Provide business value, risk, cost, and expected ROI for key recommendations.
+
 **Analysis Instructions:**
 <thinking>
 I need to analyze this Jira ticket from a Senior Product Manager perspective, considering multiple strategic approaches to understand:
@@ -36,7 +42,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
-**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
 
 {codebaseContext}
 </codebase_context>
@@ -45,11 +51,22 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 As a Senior Product Manager, analyze the provided Jira data and codebase context to create comprehensive product requirements. Focus on current features, business value, user needs, technical feasibility, and strategic alignment.
 
 **📝 OUTPUT INSTRUCTIONS:**
-1. **Update Status**: In ANALYSIS.md, change "Product Requirements Analysis" from "⏳ Pending" to "🔄 In Progress"
-2. **Perform Analysis**: Use the Business Analysis Framework below to analyze the requirements
-3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
-4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 1: Product Requirements Analysis"
-5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+After completing your analysis, use the VS Code command "AI Product Owner: Paste Copilot Response" to automatically integrate your response. The command will:
+
+1. **Auto-detect Stage**: Detect this is Stage 1: Product Requirements Analysis
+2. **Update ANALYSIS.md**: 
+   - Change status from "⏳ Pending" to "✅ Complete" in the progress table
+   - Mark completed column as "✅"
+   - Insert your complete analysis under "## Stage 1: Product Requirements Analysis" section
+3. **File Structure**: Your response will be saved in the correct section of ANALYSIS.md
+4. **Manual Alternative**: If command fails, manually update ANALYSIS.md:
+   - Update progress table: \`| Product Requirements Analysis | ✅ Complete | ✅ |\`
+   - Paste your response under "## Stage 1: Product Requirements Analysis"
+
+**Required Content Structure:**
+- Use the Business Analysis Framework below
+- Generate mermaid diagrams with ~~~ formatting 
+- Include "What I used" section with file citations
 
 **📊 VISUALIZATION REQUIREMENTS:**
 Create these diagrams using mermaid
@@ -104,6 +121,9 @@ Create these diagrams using mermaid
 ## Success Metrics & KPIs
 [Measurable outcomes and validation criteria]
 
+## What I used
+- [paths and files referenced]
+
 ~~~ mermaid
 graph TD
     A[User Need] --> B[Feature Assessment]
@@ -125,6 +145,11 @@ Pass validated requirements and technical constraints to Principal Engineer for 
 export const STAGE_2_SYSTEM_ARCHITECTURE_DESIGN = `
 **Role: Principal Engineer (Architecture Specialist)**
 **Stage: System Architecture Design**
+
+**Safety & Grounding Rules:**
+- Cite real repository files/paths you used under a "What I used" section.
+- If a proposed component is not supported by existing patterns, propose the smallest viable extension and justify ROI and risk.
+- Prefer incremental, backward-compatible changes.
 
 **Analysis Instructions:**
 <thinking>
@@ -150,7 +175,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
-**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
 
 {codebaseContext}
 </codebase_context>
@@ -160,14 +185,25 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
+As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
-1. **Update Status**: In ANALYSIS.md, change "System Architecture Design" from "⏳ Pending" to "🔄 In Progress"
-2. **Perform Analysis**: Use the Architecture Framework below to design the system
-3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
-4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 2: System Architecture Design"
-5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+After completing your analysis, use the VS Code command "AI Product Owner: Paste Copilot Response" to automatically integrate your response. The command will:
+
+1. **Auto-detect Stage**: Detect this is Stage 2: System Architecture Design
+2. **Update ANALYSIS.md**: 
+   - Change status from "⏳ Pending" to "✅ Complete" in the progress table
+   - Mark completed column as "✅"
+   - Insert your complete analysis under "## Stage 2: System Architecture Design" section
+3. **File Structure**: Your response will be saved in the correct section of ANALYSIS.md
+4. **Manual Alternative**: If command fails, manually update ANALYSIS.md:
+   - Update progress table: \`| System Architecture Design | ✅ Complete | ✅ |\`
+   - Paste your response under "## Stage 2: System Architecture Design"
+
+**Required Content Structure:**
+- Use the Architecture Framework below
+- Generate mermaid diagrams with ~~~ formatting 
+- Include "What I used" section with file citations
 
 **📊 VISUALIZATION REQUIREMENTS:**
 Create these diagrams using mermaid
@@ -222,6 +258,9 @@ Create these diagrams using mermaid
 ## Security Architecture
 [Authentication, authorization, and data protection]
 
+## What I used
+- [paths and files referenced]
+
 ~~~ mermaid
 graph TB
     subgraph "System Architecture"
@@ -245,6 +284,11 @@ Provide architectural foundation and design constraints for detailed technical d
 export const STAGE_3_TECHNICAL_DESIGN_SPECIFICATION = `
 **Role: Principal Engineer (Technical Design Specialist)**
 **Stage: Technical Design Specification**
+
+**Safety & Grounding Rules:**
+- Follow existing patterns strictly; cite code references for each guideline.
+- Provide testability requirements and link to current test frameworks in repo.
+- Call out assumptions and confidence.
 
 **Analysis Instructions:**
 <thinking>
@@ -270,7 +314,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
-**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
 
 {codebaseContext}
 </codebase_context>
@@ -280,14 +324,25 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
+As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
-1. **Update Status**: In ANALYSIS.md, change "Technical Design Specification" from "⏳ Pending" to "🔄 In Progress"
-2. **Perform Analysis**: Use the Technical Design Framework below to create specifications
-3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
-4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 3: Technical Design Specification"
-5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+After completing your analysis, use the VS Code command "AI Product Owner: Paste Copilot Response" to automatically integrate your response. The command will:
+
+1. **Auto-detect Stage**: Detect this is Stage 3: Technical Design Specification
+2. **Update ANALYSIS.md**: 
+   - Change status from "⏳ Pending" to "✅ Complete" in the progress table
+   - Mark completed column as "✅"
+   - Insert your complete analysis under "## Stage 3: Technical Design Specification" section
+3. **File Structure**: Your response will be saved in the correct section of ANALYSIS.md
+4. **Manual Alternative**: If command fails, manually update ANALYSIS.md:
+   - Update progress table: \`| Technical Design Specification | ✅ Complete | ✅ |\`
+   - Paste your response under "## Stage 3: Technical Design Specification"
+
+**Required Content Structure:**
+- Use the Technical Design Framework below
+- Generate mermaid diagrams with ~~~ formatting 
+- Include "What I used" section with file citations
 
 **📊 VISUALIZATION REQUIREMENTS:**
 Create these diagrams using mermaid
@@ -342,6 +397,9 @@ Create these diagrams using mermaid
 ## Implementation Guidelines
 [Coding standards, patterns, and best practices]
 
+## What I used
+- [paths and files referenced]
+
 ~~~ mermaid
 sequenceDiagram
     participant Client
@@ -372,6 +430,11 @@ export const STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY = `
 **Role: Principal Engineer (Implementation Specialist)**
 **Stage: Implementation & Deployment Strategy**
 
+**Safety & Grounding Rules:**
+- Align with current CI/CD, IaC, and environments. Propose minimal, incremental changes.
+- Provide rollout, rollback, and observability plans with SLOs/SLIs.
+- Cite repository files and pipelines you are building on.
+
 **Analysis Instructions:**
 <thinking>
 Building on the complete analysis from Product Manager, Architecture, and Technical Design stages, I need to create a comprehensive implementation and deployment strategy, considering multiple operational approaches  but most importantly existing codebase patterns and features:
@@ -397,7 +460,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
-**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
 
 {codebaseContext}
 </codebase_context>
@@ -407,14 +470,25 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </previous_analysis>
 
 **🎯 YOUR TASK:**
-As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the cobebase.
+As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
 
 **📝 OUTPUT INSTRUCTIONS:**
-1. **Update Status**: In ANALYSIS.md, change "Implementation & Deployment Strategy" from "⏳ Pending" to "🔄 In Progress"
-2. **Perform Analysis**: Use the Implementation Strategy Framework below to create the plan
-3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
-4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 4: Implementation & Deployment Strategy"
-5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+After completing your analysis, use the VS Code command "AI Product Owner: Paste Copilot Response" to automatically integrate your response. The command will:
+
+1. **Auto-detect Stage**: Detect this is Stage 4: Implementation & Deployment Strategy
+2. **Update ANALYSIS.md**: 
+   - Change status from "⏳ Pending" to "✅ Complete" in the progress table
+   - Mark completed column as "✅"
+   - Insert your complete analysis under "## Stage 4: Implementation & Deployment Strategy" section
+3. **File Structure**: Your response will be saved in the correct section of ANALYSIS.md
+4. **Manual Alternative**: If command fails, manually update ANALYSIS.md:
+   - Update progress table: \`| Implementation & Deployment Strategy | ✅ Complete | ✅ |\`
+   - Paste your response under "## Stage 4: Implementation & Deployment Strategy"
+
+**Required Content Structure:**
+- Use the Implementation Strategy Framework below
+- Generate mermaid diagrams with ~~~ formatting 
+- Include "What I used" section with file citations
 
 **📊 VISUALIZATION REQUIREMENTS:**
 Create these diagrams using mermaid
@@ -467,6 +541,9 @@ Create these diagrams using mermaid
 ## Operational Procedures
 [Deployment, rollback, incident response, maintenance]
 
+## What I used
+- [paths and files referenced]
+
 ~~~ mermaid
 graph LR
     A[Code Commit] --> B[CI Pipeline]
@@ -493,6 +570,11 @@ export const STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN = `
 **Role: Product Owner (Integration & Documentation)**
 **Stage: Sprint Planning & Jira Breakdown**
 
+**Safety & Grounding Rules:**
+- All tickets must reference actual components/files; avoid fictional names.
+- Each story includes acceptance criteria, dependencies, and links to architecture/design sections above.
+- Provide business value and effort; call out risks and mitigations.
+
 **Analysis Instructions:**
 <thinking>
 As the Product Owner integrating all previous analysis from PM, Architecture, Technical Design, and Implementation stages, I need to create actionable sprint plans and comprehensive documentation.
@@ -518,7 +600,7 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 </jira_data>
 
 <codebase_context>
-**This is just a high level anaylsis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
+**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
 
 {codebaseContext}
 </codebase_context>
@@ -531,11 +613,22 @@ Use these mcps if available or use other tools to ensure high accuracy and best 
 As the Product Owner, synthesize all previous analysis into actionable sprint plans, Jira ticket breakdowns, and comprehensive project documentation. Create complete roadmap for implementation based on all technical and business analysis.
 
 **📝 OUTPUT INSTRUCTIONS:**
-1. **Update Status**: In ANALYSIS.md, change "Sprint Planning & Jira Breakdown" from "⏳ Pending" to "🔄 In Progress"
-2. **Perform Analysis**: Use the Sprint Planning Framework below to create comprehensive plans
-3. **Create Visualizations**: Generate all required diagrams using mermaid syntax with ~~~ formatting
-4. **Save Response**: Place your complete analysis in ANALYSIS.md under "## Stage 5: Sprint Planning & Jira Breakdown"
-5. **Mark Complete**: Update status to "✅ Complete" and change Completed column to "✅"
+After completing your analysis, use the VS Code command "AI Product Owner: Paste Copilot Response" to automatically integrate your response. The command will:
+
+1. **Auto-detect Stage**: Detect this is Stage 5: Sprint Planning & Jira Breakdown
+2. **Update ANALYSIS.md**: 
+   - Change status from "⏳ Pending" to "✅ Complete" in the progress table
+   - Mark completed column as "✅"
+   - Insert your complete analysis under "## Stage 5: Sprint Planning & Jira Breakdown" section
+3. **File Structure**: Your response will be saved in the correct section of ANALYSIS.md
+4. **Manual Alternative**: If command fails, manually update ANALYSIS.md:
+   - Update progress table: \`| Sprint Planning & Jira Breakdown | ✅ Complete | ✅ |\`
+   - Paste your response under "## Stage 5: Sprint Planning & Jira Breakdown"
+
+**Required Content Structure:**
+- Use the Sprint Planning Framework below
+- Generate mermaid diagrams with ~~~ formatting 
+- Include "What I used" section with component and path citations
 
 **📊 VISUALIZATION REQUIREMENTS:**
 Create these diagrams using mermaid
@@ -605,6 +698,9 @@ Create these diagrams using mermaid
 
 ## Resource & Timeline
 [Team capacity and milestone planning]
+
+## What I used
+- [paths and files referenced]
 
 ~~~ mermaid
 gantt

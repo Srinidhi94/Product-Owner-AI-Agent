@@ -11,6 +11,8 @@ import * as fs from 'fs/promises';
 import { Logger, createLogger } from '../utils/Logger';
 import { ConfigurationManager } from '../utils/ConfigurationManager';
 import { getStagesInOrder } from '../prompts/PromptTemplates';
+import { buildContextFrame } from '../prompts/ContextEngineering';
+import { JiraPortfolio, CodebaseAnalysis } from '../types';
 
 export class DocumentGenerator {
   private logger: Logger;
@@ -50,6 +52,8 @@ export class DocumentGenerator {
       await this.createReadme(epicKey);
       await this.createPromptsDocument(epicKey);
       await this.createAnalysisDocument(epicKey);
+      // Context placeholder (filled after analysis available)
+      await this.createContextDocument(epicKey, '');
 
       this.logger.info(`✅ Initialized output structure for ${epicKey}`);
       return epicDir;
@@ -87,6 +91,25 @@ export class DocumentGenerator {
   }
 
   /**
+   * Create CONTEXT.md for storing structured grounding context
+   */
+  private async createContextDocument(epicKey: string, content: string): Promise<void> {
+    const contextPath = path.join(this.baseOutputDir, epicKey, 'CONTEXT.md');
+    const header = `# Context Engineering Frame\n\n`;
+    await this.writeFile(contextPath, header + (content || '*Context will be generated during analysis.*\n'));
+  }
+
+  /**
+   * Update CONTEXT.md after Jira and codebase context are available
+   */
+  async updateContextDocument(epicKey: string, jira: JiraPortfolio, codebase: CodebaseAnalysis): Promise<void> {
+    const contextPath = path.join(this.baseOutputDir, epicKey, 'CONTEXT.md');
+    const frame = buildContextFrame(jira, codebase);
+    await this.writeFile(contextPath, `# Context Engineering Frame\n\n\n\n\n${'```'}\n${frame}\n${'```'}\n`);
+    this.logger.info('✅ Updated CONTEXT.md with structured context');
+  }
+
+  /**
    * Add prompt to PROMPTS.md file
    */
   async addPromptToDocument(
@@ -100,9 +123,9 @@ export class DocumentGenerator {
     try {
       let content = await fs.readFile(promptsPath, 'utf-8');
 
-      // Add the new prompt section
-      const promptSection = this.generatePromptSection(stageId, stageName, prompt);
-      content += '\n\n' + promptSection;
+      // Simply append the prompt in a clean format
+      const promptSection = this.generateSimplePromptSection(stageName, prompt);
+      content += '\n' + promptSection;
 
       await this.writeFile(promptsPath, content);
       this.logger.info(`✅ Added ${stageName} prompt to PROMPTS.md`);
@@ -110,6 +133,25 @@ export class DocumentGenerator {
       this.logger.error(`Failed to add prompt to document: ${error.message}`, error);
       throw error;
     }
+  }
+
+  /**
+   * Generate simple prompt section for PROMPTS.md
+   */
+  private generateSimplePromptSection(stageName: string, prompt: string): string {
+    const timestamp = new Date().toLocaleString();
+
+    return `
+## ${stageName}
+
+**Generated:** ${timestamp}
+
+\`\`\`
+${prompt}
+\`\`\`
+
+---
+`;
   }
 
   /**
@@ -136,12 +178,13 @@ This directory contains the AI-assisted analysis for epic **${epicKey}**.
 - **[README.md](./README.md)** - This overview document
 - **[PROMPTS.md](./PROMPTS.md)** - All generated prompts for each analysis stage
 - **[ANALYSIS.md](./ANALYSIS.md)** - Your AI responses and analysis results
+- **[CONTEXT.md](./CONTEXT.md)** - Structured context frame grounding all prompts
 
 ## Workflow
 
 1. **Review Prompts** - Check [PROMPTS.md](./PROMPTS.md) for stage-specific prompts
 2. **Use with AI** - Prompts are automatically copied to clipboard for use with AI assistants
-3. **Auto-Integration** - Use the "Paste Copilot Response" command to automatically integrate responses
+3. **Auto-Integration** - Use the "AI Product Owner: Paste Copilot Response" command to automatically integrate responses
 4. **Iterate** - Refine and improve analysis as needed
 
 ## Getting Started
@@ -151,6 +194,12 @@ This directory contains the AI-assisted analysis for epic **${epicKey}**.
 3. Paste into your AI assistant (ChatGPT, Claude, Copilot, etc.)
 4. Use **Cmd+Shift+P** → "AI Product Owner: Paste Copilot Response" to automatically integrate the response
 5. Proceed to the next prompt
+
+## Commands Available
+
+- **AI Product Owner: Paste Copilot Response** - Automatically integrate AI responses into ANALYSIS.md
+- **AI Product Owner: Complete Current Stage & Continue** - Mark current stage complete and continue
+- **AI Product Owner: Open Output Folder** - Open the analysis output folder
 
 ---
 
@@ -180,19 +229,10 @@ This document contains all generated prompts for the AI analysis workflow.
 1. **Copy** the prompt text below
 2. **Paste** into your AI assistant (ChatGPT, Claude, Copilot, etc.)
 3. **Review** the AI response
-4. **Use** the "Paste Copilot Response" command to automatically integrate the response into [ANALYSIS.md](./ANALYSIS.md)
+4. **Use** the "AI Product Owner: Paste Copilot Response" command (Cmd+Shift+P) to automatically integrate the response into [ANALYSIS.md](./ANALYSIS.md)
 
 ---
 
-## Prompt Navigation
-
-| Stage | Status | Description |
-|-------|--------|-------------|
-| 🔄 | Pending | *Prompts will be added as you progress through the analysis* |
-
----
-
-*Prompts will be automatically added here as you progress through each analysis stage.*
 `;
   }
 
@@ -210,7 +250,7 @@ This document contains all generated prompts for the AI analysis workflow.
     const analysisSections = stages
       .map(
         (stage, index) =>
-          `## Stage ${index + 1}: ${stage.name}\n\n*AI responses will be automatically integrated here using the "Paste Copilot Response" command*\n\n---`
+          `## Stage ${index + 1}: ${stage.name}\n\n*AI responses will be automatically integrated here using the "AI Product Owner: Paste Copilot Response" command (Cmd+Shift+P)*\n\n---`
       )
       .join('\n\n');
 
@@ -231,8 +271,8 @@ This document contains AI-generated analysis results for each stage of the workf
 
 - Copy prompts from [PROMPTS.md](./PROMPTS.md)
 - Use with your preferred AI assistant
-- Use the "Paste Copilot Response" command to automatically integrate responses into the appropriate sections below
-- Update the status indicators as you complete each stage
+- Use the "AI Product Owner: Paste Copilot Response" command (Cmd+Shift+P) to automatically integrate responses into the appropriate sections below
+- The command will automatically update status indicators as you complete each stage
 
 ---
 
@@ -256,35 +296,7 @@ ${analysisSections}
 `;
   }
 
-  /**
-   * Generate prompt section for PROMPTS.md
-   */
-  private generatePromptSection(stageId: string, stageName: string, prompt: string): string {
-    const timestamp = new Date().toLocaleString();
 
-    return `---
-
-## ${stageName}
-
-**Stage ID:** \`${stageId}\`  
-**Generated:** ${timestamp}  
-**Status:** ✅ Ready
-
-### Prompt
-
-\`\`\`
-${prompt}
-\`\`\`
-
-### Instructions
-
-1. **Copy** the prompt text above
-2. **Paste** into your AI assistant
-3. **Review** the response carefully
-4. **Save** the response in [ANALYSIS.md](./ANALYSIS.md) under the "${stageName}" section
-
----`;
-  }
 
   /**
    * Get output directory for an epic

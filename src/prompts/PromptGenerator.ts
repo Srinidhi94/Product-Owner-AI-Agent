@@ -10,6 +10,7 @@ import {
   StageTemplate,
   getTemplateWithCodebaseContext,
 } from './PromptTemplates';
+import { buildContextFrame } from './ContextEngineering';
 
 export interface GeneratedPrompt {
   id: string;
@@ -48,6 +49,9 @@ export class PromptGenerator {
       throw new Error(`Stage template not found: ${stageId}`);
     }
 
+    // Build structured context frame
+    const contextFrame = buildContextFrame(jiraData, codebaseData);
+
     // Prepare context data for substitution
     const contextData = this.prepareContextData(jiraData, codebaseData, previousContext, options);
 
@@ -59,7 +63,18 @@ export class PromptGenerator {
     );
 
     // Substitute template variables
-    const promptContent = this.substituteTemplateVariables(templateContent, contextData);
+    let promptContent = this.substituteTemplateVariables(templateContent, contextData);
+
+    // Prepend context frame and a short reasoning guardrail
+    const deliberateHeader = [
+      'You must strictly ground all analysis in the Context Engineering Frame below.',
+      'If evidence is missing, ask for clarification instead of guessing. Cite actual file paths you used.',
+      '',
+      contextFrame,
+      '',
+    ].join('\n');
+
+    promptContent = deliberateHeader + promptContent;
 
     return {
       id: stageTemplate.id,

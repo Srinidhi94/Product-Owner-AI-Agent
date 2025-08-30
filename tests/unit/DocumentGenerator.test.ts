@@ -76,8 +76,8 @@ describe('DocumentGenerator', () => {
       
       await generator.initializeOutputStructure(epicKey);
       
-      // Should create 3 files: README.md, PROMPTS.md, ANALYSIS.md
-      expect(mockFs.writeFile).toHaveBeenCalledTimes(3);
+      // Should create 4 files: README.md, PROMPTS.md, ANALYSIS.md, CONTEXT.md
+      expect(mockFs.writeFile).toHaveBeenCalledTimes(4);
       expect(mockFs.writeFile).toHaveBeenCalledWith(
         expect.stringContaining('README.md'),
         expect.any(String),
@@ -90,6 +90,11 @@ describe('DocumentGenerator', () => {
       );
       expect(mockFs.writeFile).toHaveBeenCalledWith(
         expect.stringContaining('ANALYSIS.md'),
+        expect.any(String),
+        'utf-8'
+      );
+      expect(mockFs.writeFile).toHaveBeenCalledWith(
+        expect.stringContaining('CONTEXT.md'),
         expect.any(String),
         'utf-8'
       );

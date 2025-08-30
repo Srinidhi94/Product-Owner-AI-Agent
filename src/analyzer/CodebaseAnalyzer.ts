@@ -70,13 +70,16 @@ export class CodebaseAnalyzer {
     try {
       const context = await this.getProjectContext();
 
+      // Deeper lightweight scan for imports/functions
+      const { imports, functions } = await this.scanSymbolsAndImports();
+
       return {
         projectPath: this.projectPath,
         totalFiles: await this.getFileCount(),
         packages: [context.type],
         structs: context.keyDirectories,
-        functions: context.entryPoints,
-        imports: context.framework ? [context.framework] : [],
+        functions,
+        imports,
         patterns: [
           {
             name: context.type,
@@ -334,6 +337,60 @@ export class CodebaseAnalyzer {
     } catch (error) {
       return 0;
     }
+  }
+
+  /**
+   * Scan a sample of files to collect import specifiers and symbol names.
+   */
+  private async scanSymbolsAndImports(): Promise<{ imports: string[]; functions: string[] }> {
+    const importsSet = new Set<string>();
+    const functionsSet = new Set<string>();
+
+    const files = await vscode.workspace.findFiles(
+      '**/*.{ts,tsx,js,jsx}',
+      '{**/node_modules/**,**/dist/**,**/build/**,**/.git/**}',
+      200
+    );
+
+    for (const file of files) {
+      try {
+        const doc = await vscode.workspace.openTextDocument(file);
+        const text = doc.getText();
+
+        // crude import extraction
+        const importRegex = /import\s+(?:[^'"\n]+\s+from\s+)?["']([^"']+)["'];?/g;
+        let m: RegExpExecArray | null;
+        while ((m = importRegex.exec(text)) !== null) {
+          const spec = m[1];
+          if (!spec.startsWith('.')) {
+            importsSet.add(spec.split('/')[0]);
+          }
+        }
+
+        // crude function/class extraction
+        const fnRegex = /(export\s+)?(async\s+)?function\s+([A-Za-z0-9_]+)/g;
+        const arrowRegex = /(export\s+)?const\s+([A-Za-z0-9_]+)\s*=\s*(async\s+)?\(/g;
+        const classRegex = /(export\s+)?class\s+([A-Za-z0-9_]+)/g;
+
+        let fm: RegExpExecArray | null;
+        while ((fm = fnRegex.exec(text)) !== null) {
+          functionsSet.add(fm[3]);
+        }
+        while ((fm = arrowRegex.exec(text)) !== null) {
+          functionsSet.add(fm[2]);
+        }
+        while ((fm = classRegex.exec(text)) !== null) {
+          functionsSet.add(fm[2]);
+        }
+      } catch {
+        // ignore file read errors
+      }
+    }
+
+    return {
+      imports: Array.from(importsSet).slice(0, 50),
+      functions: Array.from(functionsSet).slice(0, 50),
+    };
   }
 
   /**

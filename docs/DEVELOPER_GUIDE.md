@@ -1,62 +1,80 @@
-# AI Product Owner Agent - Developer Guide
+# Developer Guide
+## AI Product Owner Agent
 
-## 📋 Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Development Environment](#development-environment)
-3. [Project Structure](#project-structure)
-4. [Core Components](#core-components)
-5. [Context Engineering](#context-engineering)
-6. [Testing Framework](#testing-framework)
-7. [Debugging Guidelines](#debugging-guidelines)
-8. [Contributing Standards](#contributing-standards)
+**Version**: 1.0 | **Status**: Active
 
-## 🏗️ Architecture Overview
+---
 
-### Current System Architecture
+## Quick Start for Developers
 
-The AI Product Owner Agent implements a configuration-driven, automated UX architecture with comprehensive resource management and 30-second interval-based progress tracking.
+### Prerequisites
+- Node.js 18+ and npm 9+
+- VS Code 1.74.0+
+- TypeScript 4.9.0+
+- Git
 
-```mermaid
-graph TD
-    A[VS Code Extension Host] --> B[MultiStageAnalysisEngine]
-    A --> C[ConfigurationManager]
-    B --> C
-    B --> D[JiraClient]
-    B --> E[CodebaseAnalyzer]
-    B --> F[PromptGenerator]
-    B --> G[DocumentGenerator]
-    B --> H[Logger & ErrorHandler]
-    
-    C --> I[User Configuration]
-    C --> J[Output Directory Management]
-    D --> K[Jira REST API]
-    E --> L[Multi-Language Analysis]
-    F --> M[Context-Rich Prompts]
-    G --> N[Automated File Generation]
-    H --> O[Structured Logging]
-    
-    L --> P[JavaScript/TypeScript]
-    L --> Q[Python]
-    L --> R[Java/C#]
-    L --> S[Go/Rust]
-    L --> T[PHP/Ruby]
+### Setup in 5 Minutes
+
+```bash
+# 1. Clone and install
+git clone https://github.com/Srinidhi94/Product-Owner-AI-Agent.git
+cd Product-Owner-AI-Agent
+npm install
+
+# 2. Build and test
+npm run compile
+npm test
+
+# 3. Start developing
+code .
+# Press F5 to launch Extension Development Host
 ```
 
-### Design Principles
+---
 
-- **Configuration-Driven**: All behavior controlled through centralized configuration management
-- **Automated UX**: Start/cancel dialogs, 30-second progress intervals, automatic file generation
-- **Resource Management**: Proper disposal patterns, interval cleanup, memory management
-- **Error Resilience**: Comprehensive error handling with user-friendly messages
-- **Progressive Analysis**: Each stage builds on previous stage results with full context
-- **Professional Output**: Production-ready technical documentation generation
+## Architecture Overview
 
-## 🚀 Development Environment
+### System Design
+The extension uses a simple, modular architecture:
+
+```
+VS Code Extension
+├── Extension Entry Point (extension.ts)
+│   ├── Command registration
+│   ├── User interface
+│   └── State management
+│
+├── MultiStageAnalysisEngine
+│   ├── 5-stage workflow orchestration
+│   ├── 30-second progress intervals
+│   └── User cancellation handling
+│
+├── Core Components
+│   ├── JiraClient (API integration)
+│   ├── CodebaseAnalyzer (language detection)
+│   ├── DocumentGenerator (file creation)
+│   └── ConfigurationManager (settings)
+│
+└── Support Components
+    ├── PromptGenerator (AI prompts)
+    ├── Logger (debugging)
+    └── ErrorHandler (user-friendly errors)
+```
+
+### Key Design Principles
+- **Simple & Modular** - Each component has one clear responsibility
+- **User-Friendly** - Clear progress updates and error messages
+- **Secure** - Credentials stored safely in VS Code
+- **Extensible** - Easy to add new languages and features
+
+---
+
+## Development Environment
 
 ### System Requirements
 
 ```bash
-# Node.js and npm versions
+# Required versions
 node --version    # v18.0.0 or higher
 npm --version     # v9.0.0 or higher
 
@@ -67,689 +85,294 @@ code --version    # 1.74.0 or higher
 tsc --version     # 4.9.0 or higher
 ```
 
-### Environment Setup
+### Development Commands
 
 ```bash
-# Clone the repository
-git clone https://github.com/Srinidhi94/Product-Owner-AI-Agent.git
-cd Product-Owner-AI-Agent
+# Development workflow
+npm run watch          # Auto-compile TypeScript changes
+npm test              # Run all tests
+npm run lint          # Check code quality
+npm run package       # Create VSIX package
 
-# Install dependencies
-npm install
-
-# Build the extension
-npm run compile
-
-# Launch development environment
-code .
-
-# Start debugging (F5) to launch Extension Development Host
+# Debugging
+# Press F5 in VS Code to launch Extension Development Host
 ```
 
-### Development Workflow
+---
 
-1. **Continuous Compilation**: `npm run watch` for automatic TypeScript compilation
-2. **Extension Testing**: Press `F5` to launch development host with extension loaded
-3. **Unit Testing**: `npm test` for comprehensive test validation
-4. **Code Quality**: `npm run lint` for style and quality checks
-5. **Package Creation**: `npm run package` for distribution-ready builds
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
-├── analysis/              # Multi-stage analysis orchestration
-│   └── MultiStageAnalysisEngine.ts   # 30-second intervals, config integration
-├── analyzer/              # Universal codebase analysis
-│   └── CodebaseAnalyzer.ts           # Multi-language pattern detection
-├── jira/                  # Jira API integration
-│   └── JiraClient.ts                 # Secure API integration
-├── output/                # Automated documentation generation
-│   └── DocumentGenerator.ts          # Config-driven file creation
-├── prompts/               # Context-rich prompt generation
-│   ├── PromptGenerator.ts            # Stage-based prompt creation
-│   └── PromptTemplates.ts            # Role-based templates
-├── types/                 # TypeScript definitions
-│   └── index.ts                      # Core type definitions
-├── utils/                 # Utility components
-│   ├── ConfigurationManager.ts      # Centralized configuration
-│   ├── ErrorHandler.ts              # Comprehensive error handling
-│   ├── Logger.ts                    # Structured logging system
-│   └── WelcomeManager.ts            # User onboarding
-└── extension.ts           # Extension entry point & command registration
+├── analysis/
+│   └── MultiStageAnalysisEngine.ts    # Main workflow orchestrator
+├── analyzer/
+│   └── CodebaseAnalyzer.ts            # Language detection & analysis
+├── jira/
+│   └── JiraClient.ts                  # Jira API integration
+├── output/
+│   └── DocumentGenerator.ts           # Creates output files
+├── types/
+│   └── index.ts                       # TypeScript type definitions
+├── utils/
+│   ├── ConfigurationManager.ts        # Settings management
+│   ├── ErrorHandler.ts                # Error handling
+│   └── Logger.ts                      # Logging system
+└── extension.ts                       # Extension entry point
+
+tests/
+├── unit/                              # Unit tests
+├── integration/                       # Integration tests
+└── fixtures/                          # Test data
 ```
 
-## 🧩 Core Components
+---
+
+## Core Components
 
 ### MultiStageAnalysisEngine
+**What it does**: Manages the 5-stage analysis workflow
 
-**Purpose**: Orchestrates the complete automated analysis workflow with proper UX.
+**Key responsibilities**:
+- Shows progress dialogs every 30 seconds
+- Handles user cancellation
+- Coordinates all other components
+- Manages stage transitions
 
-**Key Features**:
-- **ConfigurationManager Integration**: Uses centralized configuration for all settings
-- **30-Second Progress Tracking**: Promise-based interval checking with proper cleanup
-- **Start/Cancel Dialogs**: User-friendly workflow control
-- **Automatic File Generation**: Creates output structure on analysis start
-- **Resource Management**: Proper disposal of intervals and VS Code resources
+### JiraClient
+**What it does**: Connects to Jira and fetches epic data
 
-**API**:
-```typescript
-class MultiStageAnalysisEngine {
-  constructor();
-  executeAnalysis(epicKey: string, jiraData: JiraPortfolio, codebaseData: CodebaseAnalysis): Promise<void>;
-  cancel(): void;
-  isCancelled(): boolean;
-  getStages(): AnalysisStage[];
-  dispose(): void;
-}
-```
+**Key features**:
+- Secure API token authentication
+- Handles rate limiting and retries
+- Fetches epic and story information
+- Works with Jira Cloud and Server
 
-### ConfigurationManager
+### CodebaseAnalyzer
+**What it does**: Analyzes your project's code structure
 
-**Purpose**: Centralized configuration management for the entire extension.
+**Supported languages**: JavaScript, TypeScript, Python, Java, C#, Go, Rust, PHP, Ruby
 
-**Configuration Categories**:
-- **JIRA Configuration**: API endpoints, authentication, timeouts
-- **Output Configuration**: Directory paths, file naming, template selection
-- **Analysis Configuration**: Stage settings, prompt customization, logging levels
-
-**API**:
-```typescript
-class ConfigurationManager {
-  getJiraConfiguration(): JiraConfig;
-  getOutputConfiguration(): OutputConfig;
-  getAnalysisConfiguration(): AnalysisConfig;
-  validateConfiguration(): boolean;
-  updateConfiguration(key: string, value: any): Promise<void>;
-  dispose(): void;
-}
-```
+**Analysis capabilities**:
+- Detects programming languages and frameworks
+- Identifies architecture patterns
+- Maps project dependencies
+- Analyzes code complexity
 
 ### DocumentGenerator
+**What it does**: Creates the output documentation files
 
-**Purpose**: Automated creation and management of analysis output files.
+**Generated files**:
+- `README.md` - Project overview
+- `PROMPTS.md` - AI prompts used
+- `ANALYSIS.md` - AI responses
+- `CONTEXT.md` - Technical context
 
-**Key Features**:
-- **Configuration-Driven Output**: Uses ConfigurationManager for directory settings
-- **Automatic Structure Creation**: Creates folders and files on analysis start
-- **Template System**: Professional markdown templates with proper formatting
-- **Real-time Updates**: Updates files as analysis progresses
+### ConfigurationManager
+**What it does**: Manages all extension settings
 
-**API**:
+**Configuration areas**:
+- Jira connection settings
+- Output directory preferences
+- Analysis options
+- Security settings
+
+---
+
+## Development Guidelines
+
+### 5-Stage Analysis Process
+The extension follows a structured 5-stage workflow:
+
+```
+Stage 1: Product Requirements
+├── Business context analysis
+├── User story breakdown
+└── Requirements documentation
+
+Stage 2: System Architecture
+├── High-level system design
+├── Component relationships
+└── Technology decisions
+
+Stage 3: Technical Design
+├── API specifications
+├── Data models
+└── Integration details
+
+Stage 4: Implementation Strategy
+├── Development approach
+├── Best practices
+└── Quality assurance
+
+Stage 5: Sprint Planning
+├── Task breakdown
+├── Timeline estimation
+└── Jira epic structuring
+```
+
+### Coding Standards
+
+**TypeScript Best Practices**:
 ```typescript
-class DocumentGenerator {
-  initializeOutputStructure(epicKey: string): Promise<string>;
-  addPromptToDocument(epicKey: string, stageId: string, stageName: string, prompt: string): Promise<void>;
-  addResponseToAnalysis(epicKey: string, stageId: string, response: string): Promise<void>;
-  dispose(): void;
-}
-```
-
-## 🔧 Context Engineering
-
-### Context Engineering Protocol
-
-The AI Product Owner Agent implements sophisticated context engineering to provide GitHub Copilot with comprehensive, role-based prompts for technical analysis.
-
-### Automated Sequential Analysis Architecture
-
-**Key Principle**: Each role receives the complete analysis from previous stages as context, processed through a structured 5-stage workflow.
-
-```mermaid
-graph TB
-    subgraph "🤖 Automated Analysis Pipeline"
-        A[User Triggers Analysis]
-        A --> B[ConfigurationManager]
-        B --> C[Stage 1: Senior Product Manager Analysis]
-        C --> D[Stage 2: Principal Engineer - Design]
-        D --> E[Stage 3: Principal Engineer - Implementation]
-        E --> F[Stage 4: Principal Engineer - QA Strategy]
-        F --> G[Stage 5: Product Owner - Sprint Planning]
-        G --> H[Auto-Save Complete Documentation]
-    end
-    
-    subgraph "🔄 User Experience"
-        I[Start/Cancel Dialogs]
-        J[30-Second Progress Tracking]
-        K[Automatic File Generation]
-        L[Clipboard Integration]
-    end
-    
-    C --> I
-    C --> J
-    C --> K
-    C --> L
-```
-
-### Role-Based Analysis Stages
-
-#### Stage 1: Senior Product Manager
-- **Role**: Business requirements analysis specialist
-- **Focus**: User stories, business value, market requirements
-- **Context**: JIRA epic data, business objectives, user personas
-- **Output**: Comprehensive product requirements document
-
-#### Stage 2: Principal Engineer - System Architecture
-- **Role**: System architecture and design leadership
-- **Focus**: High-level system design, technology decisions, scalability
-- **Context**: Product requirements + codebase analysis + technology constraints
-- **Output**: System architecture design with diagrams
-
-#### Stage 3: Principal Engineer - Technical Design
-- **Role**: Detailed technical specification expert
-- **Focus**: API design, data models, component interactions
-- **Context**: System architecture + detailed codebase patterns + integration requirements
-- **Output**: Comprehensive technical design specification
-
-#### Stage 4: Principal Engineer - Implementation Strategy
-- **Role**: Implementation and deployment strategist
-- **Focus**: Development approach, deployment pipeline, quality assurance
-- **Context**: Technical design + development constraints + operational requirements
-- **Output**: Implementation and deployment strategy
-
-#### Stage 5: Product Owner - Sprint Planning
-- **Role**: Agile delivery and sprint planning expert
-- **Focus**: Task breakdown, sprint organization, JIRA epic structuring
-- **Context**: Complete technical analysis + implementation strategy + team capacity
-- **Output**: Sprint planning and JIRA epic breakdown
-
-### Context Integration Patterns
-
-#### Codebase Context Integration
-```typescript
-interface CodebaseContext {
-  languages: string[];                    // Detected programming languages
-  frameworks: string[];                   // Identified frameworks and libraries
-  patterns: ArchitecturalPattern[];       // Detected architectural patterns
-  complexity: ComplexityMetrics;          // Code complexity analysis
-  dependencies: DependencyMap;            // External and internal dependencies
-  fileStructure: ProjectStructure;        // Organized file and folder structure
-}
-```
-
-#### JIRA Context Integration
-```typescript
-interface JiraContext {
-  epic: EpicDetails;                      // Epic information and requirements
-  stories: UserStory[];                   // Associated user stories
-  acceptance: AcceptanceCriteria[];       // Acceptance criteria and definitions
-  business: BusinessContext;              // Business value and priorities
-  timeline: ProjectTimeline;              // Deadlines and milestones
-}
-```
-
-#### Progressive Context Building
-```typescript
-interface StageContext {
-  previousStages: StageResult[];          // Results from completed stages
-  currentStage: StageConfiguration;       // Current stage configuration
-  codebaseContext: CodebaseContext;       // Full codebase analysis
-  jiraContext: JiraContext;               // JIRA epic and story data
-  userConfiguration: UserPreferences;    // User settings and preferences
-}
-```
-
-### Prompt Engineering Standards
-
-#### Context-Rich Prompt Structure
-```markdown
-# Role: [Specific Role and Expertise Level]
-# Context: [Previous Stage Results + Codebase Analysis + JIRA Data]
-# Objective: [Specific Analysis Objective]
-# Output Requirements: [Exact Output Format and Content Requirements]
-# Quality Standards: [Principal Engineer-level Requirements]
-
-## Previous Analysis Context
-[Complete results from previous stages]
-
-## Codebase Analysis Context
-[Comprehensive codebase analysis results]
-
-## JIRA Epic Context
-[Full epic and user story information]
-
-## Analysis Instructions
-[Detailed, role-specific analysis instructions]
-
-## Output Format Requirements
-[Exact markdown format specifications with required sections]
-```
-
-### Coding Standards and Conventions
-
-#### TypeScript Standards
-```typescript
-// ✅ Explicit return types for all functions
+// Use explicit types
 async function analyzeCodebase(path: string): Promise<CodebaseAnalysis> {
-  // Implementation with proper error handling
+  // Implementation
 }
 
-// ✅ Interface definitions for all data structures
+// Define interfaces for data structures
 interface AnalysisStage {
   id: string;
   name: string;
-  duration: string;
-  icon: string;
   description: string;
-  requiredDiagrams: string[];
 }
 
-// ✅ Proper error handling with typed exceptions
+// Proper error handling
 try {
-  const result = await riskyOperation();
+  const result = await operation();
   return result;
 } catch (error: unknown) {
-  this.errorHandler.handleError(error as Error, context);
+  this.errorHandler.handleError(error as Error);
   throw error;
 }
 ```
 
-#### Resource Management Patterns
+**Resource Management**:
 ```typescript
-export class ComponentClass {
+export class Component {
   private outputChannel: vscode.OutputChannel;
-  private intervalId: ReturnType<typeof setInterval> | null = null;
   
   constructor() {
     this.outputChannel = vscode.window.createOutputChannel('Component');
   }
   
-  // ✅ Proper resource disposal
+  // Always implement dispose
   dispose(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
     this.outputChannel.dispose();
   }
 }
 ```
 
-#### Configuration Pattern
-```typescript
-interface ComponentConfig {
-  timeout: number;
-  retryAttempts: number;
-  enableLogging: boolean;
-}
+### Development Workflow
 
-private getConfiguration(): ComponentConfig {
-  const config = vscode.workspace.getConfiguration('aiProductOwner');
-  return {
-    timeout: config.get<number>('timeout') ?? 30000,
-    retryAttempts: config.get<number>('retryAttempts') ?? 3,
-    enableLogging: config.get<boolean>('enableLogging') ?? true
-  };
-}
+**Before Making Changes**:
+1. Run `npm run compile` to check for errors
+2. Run `npm test` to verify existing functionality
+3. Check if new dependencies are needed
+4. Test configuration changes
+
+**Development Process**:
+1. Make small, focused changes
+2. Write tests for new features
+3. Implement comprehensive error handling
+4. Update documentation
+5. Ensure proper resource cleanup
+
+### Security Guidelines
+- Never log sensitive data (API tokens, credentials)
+- Validate all user inputs
+- Use VS Code's secure storage for sensitive settings
+---
+
+## Testing
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run specific test file
+npm test -- CodebaseAnalyzer.test.ts
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
-### Development Guidelines
-
-#### Before Making Changes
-1. **Check Compilation**: Ensure `npm run compile` passes without warnings
-2. **Run Tests**: Execute `npm test` to verify existing functionality
-3. **Review Dependencies**: Check if new dependencies are necessary and justified
-4. **Validate Configuration**: Test configuration changes with various settings
-
-#### Development Workflow
-1. **Atomic Changes**: Make small, focused changes that can be easily reviewed
-2. **Test-Driven**: Write tests before implementing new features
-3. **Error Handling**: Implement comprehensive error handling for all new code
-4. **Documentation**: Update relevant documentation (README, CHANGELOG, etc.)
-5. **Resource Management**: Ensure proper disposal of all VS Code resources
-
-#### Performance Considerations
-- **Efficient File Operations**: Limit file system operations to necessary files only
-- **Caching Strategy**: Implement caching for expensive operations (codebase analysis, JIRA API calls)
-- **Async Operations**: Use async/await properly to avoid blocking the UI thread
-- **Resource Cleanup**: Dispose of all VS Code resources (output channels, intervals, etc.)
-
-#### Security Guidelines
-- **Data Privacy**: Never log sensitive data (API tokens, user credentials)
-- **Input Validation**: Sanitize all user inputs before processing
-- **Secure Storage**: Use VS Code secrets API for storing sensitive configuration
-- **Data Validation**: Validate all external data (JIRA API responses, file contents)
-
-## 🧪
-│   └── JiraClient.ts
-├── output/                # Documentation generation
-│   └── DocumentGenerator.ts
-├── prompts/               # AI prompt engineering
-│   ├── PromptGenerator.ts
-│   └── PromptTemplates.ts
-├── types/                 # TypeScript type definitions
-│   └── index.ts
-├── utils/                 # Utility modules
-│   ├── ConfigurationManager.ts
-│   ├── ErrorHandler.ts
-│   ├── Logger.ts
-│   ├── PerformanceMonitor.ts
-│   └── WelcomeManager.ts
-├── visualization/         # Diagram generation
-└── extension.ts           # Extension entry point
-```
-
-### File Responsibilities
-
-- **extension.ts**: Extension lifecycle, command registration, and user interface
-- **MultiStageAnalysisEngine.ts**: Orchestrates five-stage analysis workflow
-- **CodebaseAnalyzer.ts**: Universal language analysis supporting 9 programming languages
-- **JiraClient.ts**: Secure Jira API integration with authentication and error handling
-- **PromptGenerator.ts**: Context-rich prompt generation for GitHub Copilot integration
-- **DocumentGenerator.ts**: Technical documentation and artifact generation
-## 🔑 Core Components
-
-### MultiStageAnalysisEngine
-
-**Purpose**: Central orchestrator for the five-stage analysis workflow
-
-**Key Responsibilities**:
-- Progress tracking and user interface management
-- Stage coordination and data flow
-- Error handling and recovery
-- User interaction dialogs
-
-**Extension Points**:
+### Test Structure
 ```typescript
-// Adding new analysis stages
-private stages: AnalysisStage[] = [
-  {
-    id: 'custom-analysis',
-    name: 'Custom Analysis',
-    description: 'Custom analysis description',
-    requiredDiagrams: ['Custom Flow Diagram']
-  }
-];
-```
-
-### Universal CodebaseAnalyzer
-
-**Purpose**: Multi-language codebase analysis engine
-
-**Supported Languages**:
-- JavaScript/TypeScript: React, Node.js, Angular, Vue.js patterns
-- Python: Django, Flask, FastAPI, data science libraries
-- Java: Spring, Maven, Gradle project structures
-- C#: .NET, ASP.NET Core, Entity Framework patterns
-- Go: Gin, Echo, standard library patterns
-- PHP: Laravel, Symfony, Composer dependencies
-- Ruby: Rails, Sinatra, Gem management
-- Rust: Cargo, async patterns, memory management
-
-**Analysis Capabilities**:
-```typescript
-interface LanguageAnalysis {
-  language: string;
-  framework?: string;
-  dependencies: Dependency[];
-  architecture: ArchitecturePattern[];
-  complexity: ComplexityMetrics;
-  testCoverage?: TestMetrics;
-}
-```
-
-### JiraClient
-
-**Purpose**: Secure Jira API integration with comprehensive error handling
-
-**Features**:
-- OAuth 2.0 and API token authentication
-- Rate limiting and retry logic
-- Comprehensive epic and story data extraction
-- Custom field support
-
-**Configuration**:
-```typescript
-interface JiraConfig {
-  baseUrl: string;
-  email: string;
-  token: string;
-  apiVersion?: string;
-  timeout?: number;
-}
-```
-
-### PromptGenerator
-
-**Purpose**: Context-rich prompt generation for GitHub Copilot integration
-
-**Template System**:
-- Variable substitution with validation
-- Stage-specific prompt optimization
-- Context preservation across stages
-- Copilot-optimized formatting
-
-**Template Variables**:
-```typescript
-interface PromptContext {
-  epicKey: string;
-  epicSummary: string;
-  epicStories: JiraStory[];
-  codebaseAnalysis: UniversalAnalysis;
-  previousStageResults?: string;
-}
-```
-
-## 🧪 Testing Framework
-
-### Unit Testing Strategy
-
-**Test Structure**:
-```typescript
-describe('UniversalCodebaseAnalyzer', () => {
+describe('CodebaseAnalyzer', () => {
   let analyzer: CodebaseAnalyzer;
   
   beforeEach(() => {
     analyzer = new CodebaseAnalyzer();
   });
   
-  it('should detect TypeScript React project', async () => {
-    const mockWorkspace = createMockTypeScriptProject();
-    const analysis = await analyzer.analyzeProject(mockWorkspace);
-    
+  it('should detect TypeScript projects', async () => {
+    const analysis = await analyzer.analyzeProject('/path/to/ts-project');
     expect(analysis.language).toBe('typescript');
-    expect(analysis.framework).toBe('react');
-    expect(analysis.dependencies).toContain('react');
-  });
-  
-  it('should handle multi-language projects', async () => {
-    const mockWorkspace = createMockMultiLanguageProject();
-    const analysis = await analyzer.analyzeProject(mockWorkspace);
-    
-    expect(analysis.languages).toHaveLength(3);
-    expect(analysis.primaryLanguage).toBe('typescript');
   });
 });
 ```
 
-### Integration Testing
+---
 
-**Workflow Testing**:
-```typescript
-describe('End-to-End Analysis Workflow', () => {
-  it('should complete five-stage analysis', async () => {
-    const engine = new MultiStageAnalysisEngine();
-    const mockProgress = createMockProgressReporter();
-    
-    await engine.runFullAnalysis('EPIC-123', {
-      jiraData: mockJiraData,
-      workspacePath: mockWorkspacePath
-    }, mockProgress);
-    
-    expect(mockProgress.report).toHaveBeenCalledTimes(5);
-    expect(fs.existsSync('TECHNICAL_ANALYSIS.md')).toBe(true);
-  });
-});
-```
+## Debugging
 
-### Test Data Management
+### VS Code Debug Configuration
+The project includes a debug configuration. Press `F5` to start debugging:
 
-**Mock Data Structure**:
-```typescript
-const mockJiraEpic = {
-  key: 'EPIC-123',
-  summary: 'User Authentication System',
-  description: 'Implement secure user authentication',
-  stories: [
-    {
-      key: 'STORY-456',
-      summary: 'Login API endpoint',
-      acceptanceCriteria: ['Secure password validation', 'JWT token generation']
-    }
-  ]
-};
-```
-
-## 🐞 Debugging Guidelines
-
-### Debug Configuration
-
-**VS Code Launch Configuration**:
 ```json
 {
   "name": "Extension Development",
   "type": "extensionHost",
   "request": "launch",
-  "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-  "outFiles": ["${workspaceFolder}/out/**/*.js"],
-  "preLaunchTask": "npm: compile",
-  "env": {
-    "LOG_LEVEL": "debug"
-  }
+  "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
 }
 ```
 
-### Debugging Techniques
-
-**Logging Strategy**:
+### Logging
 ```typescript
 import { Logger } from './utils/Logger';
 
 const logger = Logger.getInstance();
-
-// Different log levels for debugging
-logger.debug('Detailed debugging information');
+logger.debug('Debug information');
 logger.info('General information');
-logger.warn('Warning conditions');
-logger.error('Error conditions', error);
+logger.error('Error occurred', error);
 ```
 
-**Performance Monitoring**:
-```typescript
-import { PerformanceMonitor } from './utils/PerformanceMonitor';
+### Common Issues
 
-const monitor = PerformanceMonitor.getInstance();
-monitor.startTimer('codebase-analysis');
-// ... analysis logic
-monitor.endTimer('codebase-analysis');
-```
-
-### Common Issues and Solutions
-
-**Authentication Problems**:
-- Validate Jira credentials in VS Code settings
-- Check network connectivity and firewall settings
-- Verify API token permissions and expiration
+**Jira Connection Problems**:
+- Check API token in VS Code settings
+- Verify network connectivity
+- Confirm API token permissions
 
 **Performance Issues**:
-- Monitor large codebase analysis performance
-- Implement caching for repeated operations
-- Use async/await patterns for non-blocking operations
+- Use caching for expensive operations
+- Implement async/await properly
+- Monitor large codebase analysis
 
-**Extension Compatibility**:
-- Test with different VS Code versions
-- Validate against VS Code API changes
-- Handle deprecated API gracefully
+---
 
-## 🤝 Contributing Standards
+## Contributing
 
-### Development Workflow
+### Development Process
+1. Create feature branch: `git checkout -b feature/new-feature`
+2. Make changes with tests
+3. Run quality checks: `npm run lint && npm test`
+4. Submit pull request with clear description
 
-1. **Feature Development**:
-   ```bash
-   git checkout -b feature/universal-language-support
-   npm run watch  # Continuous compilation
-   # Develop and test changes
-   npm test       # Run test suite
-   npm run lint   # Code quality checks
-   ```
+### Code Quality Standards
+- Use TypeScript strict mode
+- Write comprehensive error handling
+- Include unit tests for new features
+- Follow existing architectural patterns
 
-2. **Code Quality Standards**:
-   - TypeScript strict mode enforcement
-   - Comprehensive error handling
-   - JSDoc documentation for public APIs
-   - Unit test coverage for new features
-
-3. **Pull Request Process**:
-   - Clear description of changes and motivation
-   - Include test coverage for new functionality
-   - Update documentation for user-facing changes
-   - Follow existing architectural patterns
-
-### Code Style Guidelines
-
-**TypeScript Standards**:
-```typescript
-// Use explicit types and interfaces
-interface AnalysisConfig {
-  readonly languages: string[];
-  readonly outputPath: string;
-  readonly includeTests: boolean;
-}
-
-// Error handling with custom error types
-class AnalysisError extends Error {
-  constructor(
-    message: string, 
-    public readonly code: string,
-    public readonly stage?: string
-  ) {
-    super(message);
-    this.name = 'AnalysisError';
-  }
-}
-
-// Async/await with proper error handling
-async function analyzeCodebase(config: AnalysisConfig): Promise<AnalysisResult> {
-  try {
-    const result = await performAnalysis(config);
-    return result;
-  } catch (error) {
-    throw new AnalysisError(
-      `Analysis failed: ${error.message}`,
-      'ANALYSIS_FAILED',
-      'codebase-analysis'
-    );
-  }
-}
-```
-
-### Release Management
-
-**Version Strategy**:
-- **Patch** (1.0.x): Bug fixes and minor improvements
-- **Minor** (1.x.0): New features and language support
-- **Major** (x.0.0): Breaking changes and architecture updates
-
-**Release Process**:
+### Release Process
 ```bash
-# Update version and changelog
-npm version minor
-git push --tags
+# Update version
+npm version patch|minor|major
 
-# Build and validate
-npm run compile
-npm test
+# Build and test
+npm run compile && npm test
+
+# Package extension
 npm run package
 
-# Create release notes and publish
+# Publish to marketplace
 vsce publish
 ```
 
 ---
 
-*For user instructions, see [USER_GUIDE.md](USER_GUIDE.md). For system architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).*
-
----
-
-This developer guide provides the technical foundation for maintaining and extending the AI Product Owner Agent. For user documentation, see the [User Guide](USER_GUIDE.md). 
+*For usage instructions, see [USER_GUIDE.md](USER_GUIDE.md). For architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).* 
