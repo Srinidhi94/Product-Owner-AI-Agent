@@ -18,7 +18,7 @@ import {
   STAGE_2_SYSTEM_ARCHITECTURE_DESIGN,
   STAGE_3_TECHNICAL_DESIGN_SPECIFICATION,
   STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY,
-  STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN
+  STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN,
 } from '../../src/prompts/PromptTemplates';
 
 // Test data
@@ -27,13 +27,13 @@ const mockJiraContext = {
   summary: 'Test Epic',
   description: 'Test description',
   status: 'In Progress',
-  stories: []
+  stories: [],
 };
 
 const mockCodebaseContext = {
   files: ['src/test.ts'],
   structure: 'Sample structure',
-  technologies: ['TypeScript', 'Node.js']
+  technologies: ['TypeScript', 'Node.js'],
 };
 
 describe('PromptTemplates', () => {
@@ -121,7 +121,7 @@ describe('PromptTemplates', () => {
     test('should return templates in correct order', () => {
       const stages = getStagesInOrder();
       expect(stages).toHaveLength(5);
-      
+
       for (let i = 0; i < stages.length - 1; i++) {
         expect(stages[i].order).toBeLessThan(stages[i + 1].order);
       }
@@ -148,7 +148,7 @@ describe('PromptTemplates', () => {
     test('should return templates in sequential order', () => {
       const templates = getSequentialStageTemplates();
       expect(templates).toHaveLength(4); // Only templates that build on previous stage
-      
+
       for (let i = 0; i < templates.length - 1; i++) {
         expect(templates[i].order).toBeLessThan(templates[i + 1].order);
       }
@@ -162,7 +162,7 @@ describe('PromptTemplates', () => {
         JSON.stringify(mockCodebaseContext),
         JSON.stringify(mockJiraContext)
       );
-      
+
       expect(result).toContain('src/test.ts');
       expect(result).toContain('Sample structure');
       expect(result).not.toContain('{codebaseContext}');

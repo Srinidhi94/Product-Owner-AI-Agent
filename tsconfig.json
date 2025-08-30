@@ -3,9 +3,7 @@
     "module": "commonjs",
     "target": "ES2020",
     "outDir": "out",
-    "lib": [
-      "ES2020"
-    ],
+    "lib": ["ES2020"],
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
@@ -22,17 +20,10 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    ".vscode-test",
-    "out",
-    "dist"
-  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", ".vscode-test", "out", "dist"],
   "compileOnSave": false,
   "ts-node": {
     "esm": true
   }
-} 
+}

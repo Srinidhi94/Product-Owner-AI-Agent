@@ -13,15 +13,17 @@ export interface UserProfile {
 export class UserService {
   private users: Map<string, UserProfile> = new Map();
 
-  async createUser(userData: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt'>): Promise<UserProfile> {
+  async createUser(
+    userData: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<UserProfile> {
     const id = this.generateId();
     const now = new Date();
-    
+
     const user: UserProfile = {
       id,
       ...userData,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
 
     this.users.set(id, user);
@@ -32,7 +34,10 @@ export class UserService {
     return this.users.get(id) || null;
   }
 
-  async updateUser(id: string, updates: Partial<Omit<UserProfile, 'id' | 'createdAt'>>): Promise<UserProfile | null> {
+  async updateUser(
+    id: string,
+    updates: Partial<Omit<UserProfile, 'id' | 'createdAt'>>
+  ): Promise<UserProfile | null> {
     const existingUser = this.users.get(id);
     if (!existingUser) {
       return null;
@@ -41,7 +46,7 @@ export class UserService {
     const updatedUser: UserProfile = {
       ...existingUser,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.users.set(id, updatedUser);

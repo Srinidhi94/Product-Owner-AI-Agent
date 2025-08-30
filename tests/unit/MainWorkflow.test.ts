@@ -1,5 +1,8 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import { MultiStageAnalysisEngine, AnalysisCancelledError } from '../../src/analysis/MultiStageAnalysisEngine';
+import {
+  MultiStageAnalysisEngine,
+  AnalysisCancelledError,
+} from '../../src/analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from '../../src/utils/ConfigurationManager';
 import { JiraPortfolio, CodebaseAnalysis, JiraUser } from '../../src/types';
 
@@ -23,18 +26,28 @@ describe('Main Workflow Tests', () => {
     name: 'Test Epic',
     description: 'Test Description',
     totalStoryPoints: 25,
-    epics: [{
-      key: 'TEST-123',
-      summary: 'Test Epic',
-      description: 'Test Description',
-      status: 'In Progress',
-      assignee: { accountId: 'acc-123', displayName: 'Test User', emailAddress: 'test@example.com' },
-      reporter: { accountId: 'acc-123', displayName: 'Test User', emailAddress: 'test@example.com' },
-      created: '2025-01-01T00:00:00.000Z',
-      updated: '2025-01-15T00:00:00.000Z',
-      totalPoints: 25,
-      stories: []
-    }]
+    epics: [
+      {
+        key: 'TEST-123',
+        summary: 'Test Epic',
+        description: 'Test Description',
+        status: 'In Progress',
+        assignee: {
+          accountId: 'acc-123',
+          displayName: 'Test User',
+          emailAddress: 'test@example.com',
+        },
+        reporter: {
+          accountId: 'acc-123',
+          displayName: 'Test User',
+          emailAddress: 'test@example.com',
+        },
+        created: '2025-01-01T00:00:00.000Z',
+        updated: '2025-01-15T00:00:00.000Z',
+        totalPoints: 25,
+        stories: [],
+      },
+    ],
   };
 
   const mockCodebaseData: CodebaseAnalysis = {
@@ -51,30 +64,30 @@ describe('Main Workflow Tests', () => {
       maintainability: 8,
       testCoverage: 75,
       linesOfCode: 1000,
-      technicalDebt: 'low'
-    }
+      technicalDebt: 'low',
+    },
   };
 
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Setup basic VS Code mocks
     mockVSCode.window.createOutputChannel.mockReturnValue({
       appendLine: jest.fn(),
       show: jest.fn(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     });
 
     mockVSCode.workspace.getConfiguration.mockReturnValue({
       get: jest.fn().mockImplementation((key: any) => {
         if (key === 'directory') return '/test-output';
         return 'test-value';
-      })
+      }),
     });
 
     mockVSCode.env.clipboard.writeText = jest.fn();
-    
+
     engine = new MultiStageAnalysisEngine();
     configManager = new ConfigurationManager();
   });
@@ -97,7 +110,7 @@ describe('Main Workflow Tests', () => {
       expect(stages).toBeDefined();
       expect(Array.isArray(stages)).toBe(true);
       expect(stages.length).toBeGreaterThan(0);
-      
+
       // Validate stage structure
       stages.forEach(stage => {
         expect(stage).toHaveProperty('id');
@@ -109,7 +122,7 @@ describe('Main Workflow Tests', () => {
 
     test('should handle cancellation properly', () => {
       expect(engine.isCancelled()).toBe(false);
-      
+
       engine.cancel();
       expect(engine.isCancelled()).toBe(true);
     });
@@ -141,7 +154,7 @@ describe('Main Workflow Tests', () => {
   describe('User Cancellation Scenarios', () => {
     test('should handle user cancellation gracefully', async () => {
       mockVSCode.window.showInformationMessage.mockResolvedValueOnce('Cancel');
-      
+
       // Cancellation should now throw AnalysisCancelledError
       try {
         await engine.executeAnalysis('TEST-123', mockJiraData, mockCodebaseData);

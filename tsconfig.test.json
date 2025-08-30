@@ -6,12 +6,6 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node"
   },
-  "include": [
-    "tests/**/*",
-    "src/**/*"
-  ],
-  "exclude": [
-    "out",
-    "node_modules"
-  ]
+  "include": ["tests/**/*", "src/**/*"],
+  "exclude": ["out", "node_modules"]
 }

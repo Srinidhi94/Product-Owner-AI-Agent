@@ -12,7 +12,7 @@ describe('ConfigurationManager', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockVSCode = require('vscode');
     configManager = new ConfigurationManager();
   });
@@ -20,11 +20,12 @@ describe('ConfigurationManager', () => {
   describe('Jira Configuration', () => {
     test('should get Jira configuration with all fields', () => {
       const mockConfig = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockReturnValueOnce('https://test.atlassian.net')
           .mockReturnValueOnce('user@example.com')
           .mockReturnValueOnce('test-token-123')
-          .mockReturnValueOnce(15000)
+          .mockReturnValueOnce(15000),
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 
@@ -35,17 +36,18 @@ describe('ConfigurationManager', () => {
         baseUrl: 'https://test.atlassian.net',
         email: 'user@example.com',
         token: 'test-token-123',
-        timeout: 15000
+        timeout: 15000,
       });
     });
 
     test('should return default values when configuration is missing', () => {
       const mockConfig = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockReturnValueOnce('') // baseUrl
-          .mockReturnValueOnce('') // email  
+          .mockReturnValueOnce('') // email
           .mockReturnValueOnce('') // token
-          .mockReturnValueOnce(10000) // timeout - default value
+          .mockReturnValueOnce(10000), // timeout - default value
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 
@@ -63,7 +65,7 @@ describe('ConfigurationManager', () => {
   describe('Output Configuration', () => {
     test('should get output configuration', () => {
       const mockConfig = {
-        get: jest.fn().mockReturnValue('./custom/output/dir')
+        get: jest.fn().mockReturnValue('./custom/output/dir'),
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 
@@ -71,20 +73,20 @@ describe('ConfigurationManager', () => {
 
       expect(mockVSCode.workspace.getConfiguration).toHaveBeenCalledWith('aiProductOwner.output');
       expect(outputConfig).toEqual({
-        directory: './custom/output/dir'
+        directory: './custom/output/dir',
       });
     });
 
     test('should return default directory when not configured', () => {
       const mockConfig = {
-        get: jest.fn().mockReturnValue('./docs/analysis') // Return default value
+        get: jest.fn().mockReturnValue('./docs/analysis'), // Return default value
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 
       const outputConfig = configManager.getOutputConfiguration();
 
       expect(outputConfig).toEqual({
-        directory: './docs/analysis'  // Default directory
+        directory: './docs/analysis', // Default directory
       });
     });
   });
@@ -92,18 +94,19 @@ describe('ConfigurationManager', () => {
   describe('Extension Configuration', () => {
     test('should get complete extension configuration', () => {
       const mockJiraConfig = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockReturnValueOnce('https://test.atlassian.net')
           .mockReturnValueOnce('user@example.com')
           .mockReturnValueOnce('token-123')
-          .mockReturnValueOnce(12000)
+          .mockReturnValueOnce(12000),
       };
       const mockOutputConfig = {
-        get: jest.fn().mockReturnValue('./test/output')
+        get: jest.fn().mockReturnValue('./test/output'),
       };
 
       mockVSCode.workspace.getConfiguration
-        .mockReturnValueOnce(mockJiraConfig)   // First call for jira config
+        .mockReturnValueOnce(mockJiraConfig) // First call for jira config
         .mockReturnValueOnce(mockOutputConfig); // Second call for output config
 
       const extensionConfig = configManager.getExtensionConfiguration();
@@ -113,11 +116,11 @@ describe('ConfigurationManager', () => {
           baseUrl: 'https://test.atlassian.net',
           email: 'user@example.com',
           token: 'token-123',
-          timeout: 12000
+          timeout: 12000,
         },
         output: {
-          directory: './test/output'
-        }
+          directory: './test/output',
+        },
       });
     });
   });
@@ -125,11 +128,12 @@ describe('ConfigurationManager', () => {
   describe('Configuration Validation', () => {
     test('should validate complete Jira configuration', () => {
       const mockConfig = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockReturnValueOnce('https://test.atlassian.net')
           .mockReturnValueOnce('user@example.com')
           .mockReturnValueOnce('valid-token')
-          .mockReturnValueOnce(10000)
+          .mockReturnValueOnce(10000),
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 
@@ -141,11 +145,12 @@ describe('ConfigurationManager', () => {
 
     test('should detect incomplete Jira configuration', () => {
       const mockConfig = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockReturnValueOnce('https://test.atlassian.net')
-          .mockReturnValueOnce('')  // Missing email
+          .mockReturnValueOnce('') // Missing email
           .mockReturnValueOnce('valid-token')
-          .mockReturnValueOnce(10000)
+          .mockReturnValueOnce(10000),
       };
       mockVSCode.workspace.getConfiguration.mockReturnValue(mockConfig);
 

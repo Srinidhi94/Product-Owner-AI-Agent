@@ -23,11 +23,13 @@ The extension connects to your Jira epics, analyzes your codebase, and guides yo
 ## Quick Start
 
 1. **Install & Configure**
+
    - Install the extension from VS Code Marketplace
    - Run: `Ctrl/Cmd + Shift + P` → "AI Product Owner: Configure Settings"
    - Add your Jira URL and API token
 
 2. **Analyze Your Epic**
+
    - Run: `Ctrl/Cmd + Shift + P` → "AI Product Owner: Analyze Epic"
    - Enter your Jira epic key (e.g., "PROJ-123")
 
@@ -54,22 +56,27 @@ The extension connects to your Jira epics, analyzes your codebase, and guides yo
 ## 5-Stage Analysis Process
 
 **Stage 1: Product Requirements**
+
 - Business context and user needs
 - Feature requirements from Jira stories
 
-**Stage 2: System Architecture** 
+**Stage 2: System Architecture**
+
 - High-level system design
 - Component relationships
 
 **Stage 3: Technical Design**
+
 - Implementation specifications
 - Technology choices
 
 **Stage 4: Implementation Strategy**
+
 - Development approach
 - Best practices and patterns
 
 **Stage 5: Sprint Planning**
+
 - Task breakdown
 - Development timeline
 
@@ -88,6 +95,7 @@ your-project/
 ## Supported Languages
 
 ✅ **9+ Programming Languages:**
+
 - JavaScript & TypeScript
 - Python
 - Java
@@ -100,11 +108,13 @@ your-project/
 ## Installation
 
 ### From VS Code Marketplace
+
 1. Open VS Code Extensions (`Ctrl/Cmd + Shift + X`)
 2. Search "AI Product Owner Agent"
 3. Click Install
 
 ### For Developers
+
 ```bash
 git clone <repository-url>
 cd ai-product-owner-agent
@@ -116,35 +126,39 @@ npm run compile
 ## Setup
 
 **Required:**
+
 - VS Code 1.74.0+
 - GitHub Copilot subscription
 - Jira access with API token
 
 **Get Your Jira API Token:**
+
 1. Go to https://id.atlassian.com/manage-profile/security/api-tokens
 2. Create new token
 3. Copy token to extension settings
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `AI Product Owner: Analyze Epic` | Start the analysis workflow |
-| `AI Product Owner: Configure Settings` | Setup Jira connection |
-| `AI Product Owner: Test Connection` | Verify Jira access |
-| `AI Product Owner: Complete Stage` | Mark current stage done |
-| `AI Product Owner: Cancel Analysis` | Stop current analysis |
-| `AI Product Owner: Open Output Folder` | View generated docs |
-| `AI Product Owner: Paste Copilot Response` | Add AI response |
+| Command                                    | Description                 |
+| ------------------------------------------ | --------------------------- |
+| `AI Product Owner: Analyze Epic`           | Start the analysis workflow |
+| `AI Product Owner: Configure Settings`     | Setup Jira connection       |
+| `AI Product Owner: Test Connection`        | Verify Jira access          |
+| `AI Product Owner: Complete Stage`         | Mark current stage done     |
+| `AI Product Owner: Cancel Analysis`        | Stop current analysis       |
+| `AI Product Owner: Open Output Folder`     | View generated docs         |
+| `AI Product Owner: Paste Copilot Response` | Add AI response             |
 
 ## Troubleshooting
 
 **Connection Issues:**
+
 - Verify Jira URL format: `https://company.atlassian.net`
 - Check API token permissions
 - Use "Test Connection" command
 
 **Epic Not Found:**
+
 - Ensure epic key format: `PROJECT-123`
 - Verify epic exists and you have access
 - Check project permissions
@@ -152,4 +166,3 @@ npm run compile
 ## License
 
 MIT License
-

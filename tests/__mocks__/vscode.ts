@@ -28,11 +28,13 @@ export const workspace = {
     update: jest.fn(() => Promise.resolve()),
     has: jest.fn(() => false),
   })),
-  workspaceFolders: [{
-    uri: { fsPath: '/mock/workspace' },
-    name: 'mock-workspace',
-    index: 0
-  }],
+  workspaceFolders: [
+    {
+      uri: { fsPath: '/mock/workspace' },
+      name: 'mock-workspace',
+      index: 0,
+    },
+  ],
   onDidChangeConfiguration: jest.fn(() => ({ dispose: jest.fn() })),
   findFiles: jest.fn(() => Promise.resolve([])),
 };

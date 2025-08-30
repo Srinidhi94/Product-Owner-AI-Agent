@@ -51,7 +51,6 @@
         "icon": "$(settings-gear)",
         "description": "Configure Jira and extension settings."
       },
-
       {
         "command": "aiProductOwner.openWalkthrough",
         "title": "Show Welcome Walkthrough",
@@ -232,7 +231,7 @@
     "lint:check": "eslint src --ext ts",
     "test": "npm run test:unit",
     "test:unit": "jest",
-    "test:integration": "node -e \"console.log('Integration tests skipped in CI - VS Code extension requires host environment'); process.exit(0)\"",
+    "test:integration": "echo 'Integration tests require VS Code host environment - running validation instead' && npm run compile && mkdir -p test-results && echo '{\"status\":\"skipped\",\"message\":\"Integration tests skipped in CI environment\",\"timestamp\":\"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'\"}' > test-results/integration-results.json && echo '✅ Extension compilation and validation completed'",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
@@ -244,8 +243,8 @@
     "build": "npm run clean && npm run compile",
     "build:prod": "npm run clean && npm run package",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write 'src/**/*.ts'",
-    "format:check": "prettier --check 'src/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts' '*.{js,json,md}' '.github/**/*.{yml,yaml}' '.vscode/**/*.json'",
+    "format:check": "prettier --check 'src/**/*.ts' 'tests/**/*.ts' '*.{js,json,md}' '.github/**/*.{yml,yaml}' '.vscode/**/*.json'",
     "validate": "npm run typecheck && npm run lint:check && npm run format:check",
     "release": "npm run validate && npm run test:coverage && npm run build:prod && npm run vsce-package",
     "release:quick": "npm run test && npm run build:prod && npm run vsce-package",
