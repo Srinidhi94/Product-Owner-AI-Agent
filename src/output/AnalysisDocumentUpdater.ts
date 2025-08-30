@@ -1,6 +1,6 @@
 /**
  * Analysis Document Updater
- * 
+ *
  * Handles automatic integration of AI responses into ANALYSIS.md
  * Updates status indicators and progress tracking
  */
@@ -35,12 +35,14 @@ export class AnalysisDocumentUpdater {
 
       // Get ANALYSIS.md path
       const analysisPath = this.getAnalysisPath(epicKey);
-      
+
       // Check if file exists
       try {
         await fs.access(analysisPath);
       } catch {
-        vscode.window.showErrorMessage(`ANALYSIS.md not found for epic ${epicKey}. Start an analysis first.`);
+        vscode.window.showErrorMessage(
+          `ANALYSIS.md not found for epic ${epicKey}. Start an analysis first.`
+        );
         return;
       }
 
@@ -79,18 +81,20 @@ export class AnalysisDocumentUpdater {
    */
   private async detectOrSelectStage(clipboardContent: string): Promise<StageInfo | undefined> {
     const stages = getStagesInOrder();
-    
+
     // Try to detect stage from content
     let detectedStage: StageInfo | undefined;
-    
+
     for (const stage of stages) {
-      if (clipboardContent.includes(stage.name) || 
-          clipboardContent.includes(`Stage ${stage.order}`) ||
-          clipboardContent.includes(stage.role)) {
+      if (
+        clipboardContent.includes(stage.name) ||
+        clipboardContent.includes(`Stage ${stage.order}`) ||
+        clipboardContent.includes(stage.role)
+      ) {
         detectedStage = {
           id: stage.id,
           name: stage.name,
-          order: stage.order
+          order: stage.order,
         };
         break;
       }
@@ -103,7 +107,7 @@ export class AnalysisDocumentUpdater {
         'Yes, Continue',
         'No, Choose Different Stage'
       );
-      
+
       if (confirm === 'Yes, Continue') {
         return detectedStage;
       }
@@ -117,13 +121,13 @@ export class AnalysisDocumentUpdater {
       stageInfo: {
         id: stage.id,
         name: stage.name,
-        order: stage.order
-      }
+        order: stage.order,
+      },
     }));
 
     const selection = await vscode.window.showQuickPick(quickPickItems, {
       placeHolder: 'Select which analysis stage this response is for',
-      ignoreFocusOut: true
+      ignoreFocusOut: true,
     });
 
     return selection?.stageInfo;
@@ -133,13 +137,13 @@ export class AnalysisDocumentUpdater {
    * Update ANALYSIS.md content with AI response
    */
   private async updateAnalysisContent(
-    content: string, 
-    stageInfo: StageInfo, 
+    content: string,
+    stageInfo: StageInfo,
     aiResponse: string
   ): Promise<string> {
     const sectionHeader = `## Stage ${stageInfo.order}: ${stageInfo.name}`;
     const progressTablePattern = /\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|/g;
-    
+
     // Update progress table - change status to "✅ Complete" and completed to "✅"
     content = content.replace(progressTablePattern, (match, stage, status, completed) => {
       if (stage.trim() === stageInfo.name) {
@@ -161,10 +165,10 @@ export class AnalysisDocumentUpdater {
     // Replace the content between section header and next section
     const beforeSection = content.substring(0, sectionIndex + sectionHeader.length);
     const afterSection = content.substring(sectionEnd);
-    
+
     // Clean up AI response (remove any unwanted prefixes/suffixes)
     const cleanedResponse = this.cleanAiResponse(aiResponse);
-    
+
     const newSectionContent = `
 
 ${cleanedResponse}
@@ -180,13 +184,16 @@ ${cleanedResponse}
   private cleanAiResponse(response: string): string {
     // Remove common AI response prefixes
     let cleaned = response.trim();
-    
+
     // Remove "Here's my analysis:" type prefixes
-    cleaned = cleaned.replace(/^(Here's?\s+(my\s+)?|I'll\s+provide\s+|This\s+is\s+)(analysis|response|assessment|evaluation)[:\s]*/i, '');
-    
+    cleaned = cleaned.replace(
+      /^(Here's?\s+(my\s+)?|I'll\s+provide\s+|This\s+is\s+)(analysis|response|assessment|evaluation)[:\s]*/i,
+      ''
+    );
+
     // Remove "Based on the prompt:" type prefixes
     cleaned = cleaned.replace(/^Based\s+on\s+the\s+prompt[:\s]*/i, '');
-    
+
     return cleaned.trim();
   }
 
@@ -196,7 +203,7 @@ ${cleanedResponse}
   private getAnalysisPath(epicKey: string): string {
     const outputConfig = this.configManager.getOutputConfiguration();
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    
+
     let baseDir: string;
     if (path.isAbsolute(outputConfig.directory)) {
       baseDir = outputConfig.directory;

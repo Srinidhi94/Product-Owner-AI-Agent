@@ -26,7 +26,7 @@ export class DocumentGenerator {
     // Use configuration-based output directory
     const outputConfig = this.configManager.getOutputConfiguration();
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    
+
     if (path.isAbsolute(outputConfig.directory)) {
       this.baseOutputDir = outputConfig.directory;
     } else if (workspaceFolder) {
@@ -96,16 +96,26 @@ export class DocumentGenerator {
   private async createContextDocument(epicKey: string, content: string): Promise<void> {
     const contextPath = path.join(this.baseOutputDir, epicKey, 'CONTEXT.md');
     const header = `# Context Engineering Frame\n\n`;
-    await this.writeFile(contextPath, header + (content || '*Context will be generated during analysis.*\n'));
+    await this.writeFile(
+      contextPath,
+      header + (content || '*Context will be generated during analysis.*\n')
+    );
   }
 
   /**
    * Update CONTEXT.md after Jira and codebase context are available
    */
-  async updateContextDocument(epicKey: string, jira: JiraPortfolio, codebase: CodebaseAnalysis): Promise<void> {
+  async updateContextDocument(
+    epicKey: string,
+    jira: JiraPortfolio,
+    codebase: CodebaseAnalysis
+  ): Promise<void> {
     const contextPath = path.join(this.baseOutputDir, epicKey, 'CONTEXT.md');
     const frame = buildContextFrame(jira, codebase);
-    await this.writeFile(contextPath, `# Context Engineering Frame\n\n\n\n\n${'```'}\n${frame}\n${'```'}\n`);
+    await this.writeFile(
+      contextPath,
+      `# Context Engineering Frame\n\n\n\n\n${'```'}\n${frame}\n${'```'}\n`
+    );
     this.logger.info('✅ Updated CONTEXT.md with structured context');
   }
 
@@ -250,7 +260,9 @@ This document contains all generated prompts for the AI analysis workflow.
     const analysisSections = stages
       .map(
         (stage, index) =>
-          `## Stage ${index + 1}: ${stage.name}\n\n*AI responses will be automatically integrated here using the "AI Product Owner: Paste Copilot Response" command (Cmd+Shift+P)*\n\n---`
+          `## Stage ${index + 1}: ${
+            stage.name
+          }\n\n*AI responses will be automatically integrated here using the "AI Product Owner: Paste Copilot Response" command (Cmd+Shift+P)*\n\n---`
       )
       .join('\n\n');
 
@@ -295,8 +307,6 @@ ${analysisSections}
 *AI responses will be added here as you complete each analysis stage.*
 `;
   }
-
-
 
   /**
    * Get output directory for an epic

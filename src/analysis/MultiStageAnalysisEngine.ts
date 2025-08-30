@@ -91,7 +91,7 @@ export class MultiStageAnalysisEngine {
     // 2. Initialize output structure based on user configuration
     const outputConfig = this.configManager.getOutputConfiguration();
     this.logger.info(`Using output directory: ${outputConfig.directory}`);
-    
+
     try {
       // Initialize files and folders immediately
       const outputDir = await this.documentGenerator.initializeOutputStructure(epicKey);
@@ -99,7 +99,7 @@ export class MultiStageAnalysisEngine {
 
       // Write context grounding
       await this.documentGenerator.updateContextDocument(epicKey, jiraData, codebaseData);
-      
+
       const stages = this.getDynamicStages();
 
       let previousContext: string | undefined = undefined;
@@ -114,10 +114,21 @@ export class MultiStageAnalysisEngine {
         this.logger.info(`${stage.icon} Stage ${i + 1}/${stages.length}: ${stage.name}`);
 
         // Generate prompt for current stage
-        const prompt: GeneratedPrompt = await this.generateStagePrompt(stage, jiraData, codebaseData, i, previousContext);
+        const prompt: GeneratedPrompt = await this.generateStagePrompt(
+          stage,
+          jiraData,
+          codebaseData,
+          i,
+          previousContext
+        );
 
         // Add prompt to documentation
-        await this.documentGenerator.addPromptToDocument(epicKey, stage.id, stage.name, prompt.content);
+        await this.documentGenerator.addPromptToDocument(
+          epicKey,
+          stage.id,
+          stage.name,
+          prompt.content
+        );
 
         // Execute the stage with 30-second interval popups
         await this.executeStageWithProgressTracking(epicKey, stage, prompt, i + 1);
@@ -126,7 +137,11 @@ export class MultiStageAnalysisEngine {
         await this.delay(1000);
 
         // Accumulate previous context for next stage (truncate to keep prompts lean)
-        previousContext = [previousContext || '', `\n\n[Stage ${i + 1} Prompt Summary]\n`, prompt.content.slice(0, 1200)]
+        previousContext = [
+          previousContext || '',
+          `\n\n[Stage ${i + 1} Prompt Summary]\n`,
+          prompt.content.slice(0, 1200),
+        ]
           .join('')
           .slice(-3000);
       }
@@ -134,14 +149,16 @@ export class MultiStageAnalysisEngine {
       // Only show success message if analysis wasn't cancelled
       if (!this.cancelled) {
         this.logger.info('✅ Analysis completed successfully');
-        vscode.window.showInformationMessage(
-          '✅ Multi-stage analysis completed successfully! Check your output directory for results.',
-          'Open Results Folder'
-        ).then(choice => {
-          if (choice === 'Open Results Folder') {
-            vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(outputDir));
-          }
-        });
+        vscode.window
+          .showInformationMessage(
+            '✅ Multi-stage analysis completed successfully! Check your output directory for results.',
+            'Open Results Folder'
+          )
+          .then(choice => {
+            if (choice === 'Open Results Folder') {
+              vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(outputDir));
+            }
+          });
       } else {
         this.logger.info('Analysis cancelled by user');
         throw new AnalysisCancelledError('Analysis was cancelled by user');
@@ -151,13 +168,13 @@ export class MultiStageAnalysisEngine {
       if (error instanceof AnalysisCancelledError) {
         throw error;
       }
-      
+
       // Check if the error is due to cancellation
       if (error.message === 'Analysis cancelled by user') {
         this.logger.info('Analysis cancelled by user');
         throw new AnalysisCancelledError('Analysis cancelled by user');
       }
-      
+
       this.logger.error(`Analysis failed: ${error.message}`, error);
       vscode.window.showErrorMessage(`Analysis failed: ${error.message}`);
       throw error;
@@ -177,7 +194,12 @@ export class MultiStageAnalysisEngine {
     this.logger.info(`Generating prompt for stage: ${stage.name}`);
 
     try {
-      return await this.promptGenerator.generateStagePrompt(stage.id, jiraData, codebaseData, previousContext);
+      return await this.promptGenerator.generateStagePrompt(
+        stage.id,
+        jiraData,
+        codebaseData,
+        previousContext
+      );
     } catch (error: any) {
       this.logger.error(`Prompt generation failed for ${stage.name}`, error);
       throw new Error(`Failed to generate prompt for ${stage.name}: ${error.message}`);
@@ -222,14 +244,14 @@ export class MultiStageAnalysisEngine {
     // Start 30-second interval to ask if stage is complete
     return new Promise<void>((resolve, reject) => {
       let intervalCount = 0;
-      
+
       // Store the resolver for manual completion
       this.currentStageResolver = resolve;
       this.currentStageName = stage.name;
-      
+
       const checkProgress = async () => {
         intervalCount++;
-        
+
         if (this.cancelled) {
           if (this.currentStageInterval) {
             clearInterval(this.currentStageInterval);
@@ -273,7 +295,7 @@ export class MultiStageAnalysisEngine {
 
       // Start the interval - check every 30 seconds
       this.currentStageInterval = setInterval(checkProgress, 30000);
-      
+
       // Also trigger the first check immediately after 5 seconds
       setTimeout(checkProgress, 5000);
     });
@@ -293,21 +315,23 @@ export class MultiStageAnalysisEngine {
     if (this.currentStageResolver) {
       const stageName = this.currentStageName;
       this.logger.info(`Manually completing current stage: ${stageName}`);
-      
+
       // Clear the interval
       if (this.currentStageInterval) {
         clearInterval(this.currentStageInterval);
         this.currentStageInterval = null;
       }
-      
+
       // Store resolver before clearing state
       const resolver = this.currentStageResolver;
       this.currentStageResolver = null;
       this.currentStageName = '';
-      
+
       // Show confirmation message
-      vscode.window.showInformationMessage(`✅ ${stageName || 'Current stage'} marked as complete. Proceeding to next stage...`);
-      
+      vscode.window.showInformationMessage(
+        `✅ ${stageName || 'Current stage'} marked as complete. Proceeding to next stage...`
+      );
+
       resolver();
     } else {
       throw new Error('No active stage to complete. Make sure analysis is running.');

@@ -15,7 +15,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { JiraClient } from './jira/JiraClient';
 import { CodebaseAnalyzer } from './analyzer/CodebaseAnalyzer';
-import { MultiStageAnalysisEngine, AnalysisCancelledError } from './analysis/MultiStageAnalysisEngine';
+import {
+  MultiStageAnalysisEngine,
+  AnalysisCancelledError,
+} from './analysis/MultiStageAnalysisEngine';
 import { ConfigurationManager } from './utils/ConfigurationManager';
 import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
 import { WelcomeManager } from './utils/WelcomeManager';
@@ -309,7 +312,9 @@ function registerCommands(
       }
 
       if (!state.analyzing) {
-        vscode.window.showWarningMessage('No active analysis workflow. The analysis must be in progress to paste responses.');
+        vscode.window.showWarningMessage(
+          'No active analysis workflow. The analysis must be in progress to paste responses.'
+        );
         return;
       }
 
@@ -347,10 +352,6 @@ function registerCommands(
       }
     }
   );
-
-
-
-
 
   // Add all commands to subscriptions
   context.subscriptions.push(
@@ -466,7 +467,7 @@ async function runEpicAnalysisWorkflow(
       // Don't show error - the cancellation message was already shown
       return;
     }
-    
+
     // Update state with error
     stateManager.updateState({ analyzing: false });
 
@@ -608,10 +609,13 @@ async function runMultiStageAnalysis(
         vscode.window.showInformationMessage(`🛑 Analysis cancelled for ${epicKey}`);
         throw error; // Re-throw to prevent success messages in parent
       }
-      
+
       // Check if this was a user cancellation by message content - handle gracefully
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      if (errorMessage.includes('cancelled by user') || errorMessage.includes('Analysis cancelled')) {
+      if (
+        errorMessage.includes('cancelled by user') ||
+        errorMessage.includes('Analysis cancelled')
+      ) {
         console.log(`ℹ️ Analysis cancelled for ${epicKey}`);
         vscode.window.showInformationMessage(`🛑 Analysis cancelled for ${epicKey}`);
         throw new AnalysisCancelledError(errorMessage);

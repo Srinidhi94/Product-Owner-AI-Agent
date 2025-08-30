@@ -42,7 +42,7 @@ export function buildContextFrame(jira: JiraPortfolio, codebase: CodebaseAnalysi
     `- Key Directories: ${keyDirs.join(', ') || 'N/A'}`,
     `- Notable Imports/Frameworks: ${keyImports.join(', ') || 'N/A'}`,
     `- Representative Functions/Classes: ${keyFns.join(', ') || 'N/A'}`,
-    (patterns ? 'Architecture Patterns:\n' + patterns : 'Architecture Patterns: N/A'),
+    patterns ? 'Architecture Patterns:\n' + patterns : 'Architecture Patterns: N/A',
     deps.length ? `- Dependencies (top): ${deps.join(', ')}` : '- Dependencies: N/A',
     '',
     'Constraints',
@@ -65,4 +65,4 @@ export function buildContextFrame(jira: JiraPortfolio, codebase: CodebaseAnalysi
     '- Call out assumptions explicitly. If evidence is weak, mark confidence.',
     '=== End Context Frame ===',
   ].join('\n');
-} 
+}
