@@ -2,14 +2,20 @@ name: Package Extension
 
 on:
   push:
-    tags: ['v*']  # Trigger on version tags (e.g., v1.0.0, v1.1.0)
-  workflow_dispatch:  # Allow manual trigger
+    tags: ['v*'] # Trigger on version tags (e.g., v1.0.0, v1.1.0)
+  workflow_dispatch: # Allow manual trigger
     inputs:
       create_release:
         description: 'Create GitHub Release'
         required: false
         default: true
         type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: read
 
 env:
   NODE_VERSION: '18'
@@ -19,87 +25,83 @@ jobs:
   package:
     name: Package Extension
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write  # Required for creating releases
-      actions: read
-      
+
     outputs:
       extension-file: ${{ steps.package.outputs.extension-file }}
       version: ${{ steps.version.outputs.version }}
-      
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for proper versioning
-          
+          fetch-depth: 0 # Fetch all history for proper versioning
+
       - name: 📋 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: 📦 Install Dependencies
         run: |
           echo "🔧 Installing npm dependencies..."
           npm ci
-          
+
       - name: 🏷️ Extract Version
         id: version
         run: |
           VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📋 Extension Version: $VERSION"
-          
+
           # Validate version format
           if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "❌ Invalid version format: $VERSION"
             exit 1
           fi
-          
+
       - name: 🔍 Validate Package Configuration
         run: |
           echo "🔍 Validating package.json configuration..."
-          
+
           # Check required fields for private distribution
           PUBLISHER=$(grep '"publisher"' package.json | head -1 | cut -d'"' -f4)
           PRIVATE=$(grep '"private"' package.json | head -1 | cut -d':' -f2 | tr -d ' ,')
           LICENSE=$(grep '"license"' package.json | head -1 | cut -d'"' -f4)
-          
+
           echo "📋 Publisher: $PUBLISHER"
           echo "📋 Private: $PRIVATE"
           echo "📋 License: $LICENSE"
-          
+
           # Validate private distribution settings
           if [ "$PUBLISHER" != "your-company-internal" ]; then
             echo "⚠️ Warning: Publisher should be 'your-company-internal' for private distribution"
           fi
-          
+
           if [ "$PRIVATE" != "true" ]; then
             echo "❌ Error: Extension must be marked as private for internal distribution"
             exit 1
           fi
-          
+
           if [ "$LICENSE" != "UNLICENSED" ]; then
             echo "⚠️ Warning: License should be 'UNLICENSED' for private distribution"
           fi
-          
+
           echo "✅ Package configuration validated"
-          
+
       - name: 🔨 Compile TypeScript
         run: |
           echo "🔨 Compiling TypeScript..."
           npm run compile
-          
+
           # Verify compilation output
           if [ ! -f "out/extension.js" ]; then
             echo "❌ Compilation failed: out/extension.js not found"
             exit 1
           fi
-          
+
           echo "✅ TypeScript compilation successful"
-          
+
       - name: 🧪 Run Tests
         run: |
           echo "🧪 Running tests..."
@@ -108,7 +110,7 @@ jobs:
           else
             echo "⚠️ Some tests failed, but continuing with packaging..."
           fi
-          
+
       - name: 🔍 Lint Code
         run: |
           echo "🔍 Running linter..."
@@ -117,110 +119,110 @@ jobs:
           else
             echo "⚠️ Linting issues found, but continuing with packaging..."
           fi
-          
+
       - name: 📦 Package Extension
         id: package
         run: |
           echo "📦 Packaging extension..."
-          
+
           # Install vsce if not available
-          npm install -g vsce
-          
+          npm list -g @vscode/vsce || npm install -g @vscode/vsce
+
           # Package extension
           vsce package --no-dependencies
-          
+
           # Find generated .vsix file
           EXTENSION_FILE=$(ls *.vsix | head -1)
           if [ -z "$EXTENSION_FILE" ]; then
             echo "❌ Failed to create .vsix package"
             exit 1
           fi
-          
+
           # Get file information
           FILE_SIZE=$(ls -lh "$EXTENSION_FILE" | awk '{print $5}')
           echo "extension-file=$EXTENSION_FILE" >> $GITHUB_OUTPUT
-          
+
           echo "✅ Extension packaged successfully"
           echo "📦 Package: $EXTENSION_FILE"
           echo "📏 Size: $FILE_SIZE"
-          
+
       - name: 📄 Generate Installation Guide
         run: |
           echo "📄 Generating installation guide..."
-          
+
           EXTENSION_FILE="${{ steps.package.outputs.extension-file }}"
           VERSION="${{ steps.version.outputs.version }}"
           CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S UTC')
-          
+
           cat > INSTALLATION.md << EOF
           # AI Product Owner Extension - Installation Guide
-          
+
           **Version:** $VERSION  
           **Package:** $EXTENSION_FILE  
           **Build Date:** $CURRENT_DATE  
           **Git Commit:** ${{ github.sha }}
-          
+
           ## 🚨 Important Notice
-          
+
           This extension is for **authorized team members only**. Do not distribute outside your organization.
-          
+
           ## Quick Installation
-          
+
           \`\`\`bash
           # Download and install
           code --install-extension $EXTENSION_FILE
-          
+
           # Restart VS Code
           # Configure Jira connection: Ctrl+Shift+P → "AI Product Owner: Configure Settings"
           \`\`\`
-          
+
           ## Prerequisites
-          
+
           - VS Code 1.74.0 or higher
           - GitHub Copilot extension
           - Jira API access (email + token)
-          
+
           ## Configuration
-          
+
           1. Get Jira API token: https://id.atlassian.com/manage-profile/security/api-tokens
           2. Open Command Palette: \`Ctrl+Shift+P\`
           3. Run: "AI Product Owner: Configure Settings"
           4. Enter your Jira details
           5. Test: "AI Product Owner: Test Jira Connection"
-          
+
           ## First Use
-          
+
           1. Press \`Ctrl+Shift+A\` or use Command Palette
           2. Enter epic key (e.g., PROJ-123)
           3. Follow the 5-stage guided workflow
-          
+
           ## Support
-          
+
           - Internal channel: #ai-product-owner-support
           - Issues: https://github.com/your-company/ai-product-owner-extension/issues
           - Email: dev-tools-support@your-company.com
-          
+
           ---
-          
+
           **Installation Date:** $CURRENT_DATE  
           **Package Version:** $VERSION  
           **Build:** ${{ github.run_number }}
-          
+
           *This extension is for authorized team members only.*
           EOF
-          
+
           echo "✅ Installation guide generated"
-          
+
       - name: 📊 Generate Build Summary
         run: |
           echo "📊 Generating build summary..."
-          
+
           EXTENSION_FILE="${{ steps.package.outputs.extension-file }}"
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           cat > BUILD_SUMMARY.md << EOF
           # Build Summary - AI Product Owner Extension
-          
+
           ## Build Information
           - **Version:** $VERSION
           - **Package:** $EXTENSION_FILE
@@ -228,28 +230,28 @@ jobs:
           - **Git Commit:** ${{ github.sha }}
           - **Build Date:** $(date '+%Y-%m-%d %H:%M:%S UTC')
           - **Triggered By:** ${{ github.event_name }}
-          
+
           ## Package Details
           - **File Size:** $(ls -lh $EXTENSION_FILE | awk '{print $5}')
           - **Node Version:** ${{ env.NODE_VERSION }}
           - **Runner:** ${{ runner.os }}
-          
+
           ## Quality Checks
           - ✅ TypeScript compilation
           - ✅ Package creation
           - ✅ Configuration validation
-          
+
           ## Distribution
           This package is ready for private distribution to authorized team members.
-          
+
           ## Installation Command
           \`\`\`bash
           code --install-extension $EXTENSION_FILE
           \`\`\`
           EOF
-          
+
           cat BUILD_SUMMARY.md
-          
+
       - name: 📤 Upload Extension Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -262,7 +264,7 @@ jobs:
             CHANGELOG.md
           retention-days: 90
           compression-level: 9
-          
+
       - name: 📤 Upload Documentation Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -278,26 +280,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: package
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
-    
-    permissions:
-      contents: write
-      
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: 📥 Download Artifacts
         uses: actions/download-artifact@v4
         with:
           name: extension-package-v${{ needs.package.outputs.version }}
           path: ./artifacts
-          
+
       - name: 📋 Extract Release Information
         id: release_info
         run: |
           VERSION="${{ needs.package.outputs.version }}"
           EXTENSION_FILE="${{ needs.package.outputs.extension-file }}"
-          
+
           # Extract changelog for this version
           if [ -f "CHANGELOG.md" ]; then
             # Extract current version changelog
@@ -315,48 +314,31 @@ jobs:
             echo "" >> RELEASE_NOTES.md
             echo "Private extension release for authorized team members." >> RELEASE_NOTES.md
           fi
-          
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "extension-file=$EXTENSION_FILE" >> $GITHUB_OUTPUT
-          
+
       - name: 🚀 Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name || format('v{0}', needs.package.outputs.version) }}
-          release_name: 'AI Product Owner Agent v${{ needs.package.outputs.version }}'
+          name: 'AI Product Owner Agent v${{ needs.package.outputs.version }}'
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
-          
-      - name: 📎 Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/${{ needs.package.outputs.extension-file }}
-          asset_name: ${{ needs.package.outputs.extension-file }}
-          asset_content_type: application/zip
-          
-      - name: 📎 Upload Installation Guide
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/INSTALLATION.md
-          asset_name: INSTALLATION.md
-          asset_content_type: text/markdown
+          files: |
+            ./artifacts/${{ needs.package.outputs.extension-file }}
+            ./artifacts/INSTALLATION.md
 
   notify:
     name: Notify Team
     runs-on: ubuntu-latest
     needs: [package, release]
     if: always() && needs.package.result == 'success'
-    
+
     steps:
       - name: 📢 Prepare Notification
         id: notification
@@ -364,7 +346,7 @@ jobs:
           VERSION="${{ needs.package.outputs.version }}"
           EXTENSION_FILE="${{ needs.package.outputs.extension-file }}"
           STATUS="${{ needs.release.result }}"
-          
+
           if [ "$STATUS" = "success" ]; then
             RELEASE_STATUS="✅ Release created successfully"
             RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/v$VERSION"
@@ -372,34 +354,34 @@ jobs:
             RELEASE_STATUS="⚠️ Package created, but release was skipped"
             RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
-          
+
           cat > notification.md << EOF
           ## 🚀 AI Product Owner Extension v$VERSION Ready
-          
+
           **Package:** \`$EXTENSION_FILE\`  
           **Build:** #${{ github.run_number }}  
           **Status:** $RELEASE_STATUS
-          
+
           ### Installation
           \`\`\`bash
           code --install-extension $EXTENSION_FILE
           \`\`\`
-          
+
           ### Download
           - 📦 [Extension Package]($RELEASE_URL)
           - 📄 [Installation Guide]($RELEASE_URL)
-          
+
           ### Next Steps
           1. Download the .vsix file from the release
           2. Share with authorized team members
           3. Include INSTALLATION.md with distribution
           4. Update internal documentation
-          
+
           **Note:** This is a private extension for authorized team members only.
           EOF
-          
+
           cat notification.md
-          
+
       - name: 📝 Create Team Notification Issue
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/github-script@v7
@@ -407,11 +389,11 @@ jobs:
           script: |
             const fs = require('fs');
             const notification = fs.readFileSync('notification.md', 'utf8');
-            
+
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `🚀 AI Product Owner Extension v${{ needs.package.outputs.version }} Available`,
               body: notification,
               labels: ['release', 'internal-distribution']
-            }); 
+            });

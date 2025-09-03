@@ -15,20 +15,20 @@ export class JiraClient {
 
   constructor(config: JiraConfiguration) {
     this.config = config;
-    
+
     // Normalize Jira URL format
     this.baseUrl = config.baseUrl.replace(/\/$/, ''); // Remove trailing slash
     if (!this.baseUrl.startsWith('https://')) {
       this.baseUrl = `https://${this.baseUrl}`;
     }
-    
+
     // Basic Auth with API token
     const credentials = Buffer.from(`${config.email}:${config.token}`).toString('base64');
     this.authHeader = `Basic ${credentials}`;
-    
+
     // VS Code output channel for logging
     this.outputChannel = vscode.window.createOutputChannel('AI Product Owner - Jira');
-    
+
     this.log(`🔑 Using API token authentication for: ${config.email}`);
     this.log(`🌐 Jira URL: ${this.baseUrl}`);
     this.log(`🔐 Auth header (first 20 chars): Basic ${credentials.substring(0, 20)}...`);
@@ -42,20 +42,20 @@ export class JiraClient {
       // Test with the same type of endpoint that works in curl
       const testUrl = `${this.baseUrl}/rest/api/3/myself`;
       this.log(`🔗 Testing connection to: ${testUrl}`);
-      
+
       // Use minimal headers like curl - remove Content-Type for GET requests
       const testHeaders = {
-        'Authorization': this.authHeader,
-        'Accept': 'application/json'
+        Authorization: this.authHeader,
+        Accept: 'application/json',
       };
-      
-      const response = await axios.get(testUrl, { 
-        headers: testHeaders, 
-        timeout: 10000 
+
+      const response = await axios.get(testUrl, {
+        headers: testHeaders,
+        timeout: 10000,
       });
-      
+
       this.log(`📡 Response status: ${response.status}`);
-      
+
       if (response.status === 200) {
         const userData = response.data;
         this.log(`✅ Connected to Jira as: ${userData.displayName || 'Unknown'}`);
@@ -64,12 +64,11 @@ export class JiraClient {
       } else {
         this.log(`❌ Jira connection failed: ${response.status}`);
         this.log(`📄 Response: ${JSON.stringify(response.data)}`);
-        
+
         // Try alternative test - use issue endpoint like the working curl
         this.log('🔄 Trying alternative test with issue endpoint...');
         return await this.testWithIssueEndpoint();
       }
-      
     } catch (error: any) {
       this.log(`❌ Jira connection error: ${error.message}`);
       return false;
@@ -82,36 +81,35 @@ export class JiraClient {
   private async testWithIssueEndpoint(): Promise<boolean> {
     try {
       this.log('🔄 Testing with issue search endpoint...');
-      
+
       const testUrl = `${this.baseUrl}/rest/api/3/search`;
       const testHeaders = {
-        'Authorization': this.authHeader,
-        'Accept': 'application/json'
+        Authorization: this.authHeader,
+        Accept: 'application/json',
       };
-      
+
       // Simple JQL query to test access
       const params = { jql: 'project is not EMPTY', maxResults: 1 };
-      
-      const response = await axios.get(testUrl, { 
-        headers: testHeaders, 
-        params: params, 
-        timeout: 10000 
+
+      const response = await axios.get(testUrl, {
+        headers: testHeaders,
+        params: params,
+        timeout: 10000,
       });
-      
+
       this.log(`📡 Alternative test status: ${response.status}`);
-      
+
       if (response.status === 200) {
         this.log('✅ Connection successful with issue search endpoint');
         return true;
       } else {
         this.log(`❌ Alternative test failed: ${response.status}`);
         this.log(`📄 Response: ${JSON.stringify(response.data)}`);
-        
+
         // Provide helpful error messages
         this.logConnectionHints(response.status);
         return false;
       }
-      
     } catch (error: any) {
       this.log(`❌ Alternative test error: ${error.message}`);
       this.logConnectionError(error);
@@ -125,24 +123,24 @@ export class JiraClient {
   async debugCurlEquivalent(issueKey: string): Promise<boolean> {
     try {
       this.log(`🧪 Testing exact curl equivalent for issue: ${issueKey}`);
-      
+
       // Replicate exact curl command
       const testUrl = `${this.baseUrl}/rest/api/3/issue/${issueKey}`;
       const testHeaders = {
-        'Authorization': this.authHeader,
-        'Accept': 'application/json'
+        Authorization: this.authHeader,
+        Accept: 'application/json',
       };
-      
+
       this.log(`🔗 URL: ${testUrl}`);
       this.log(`📋 Headers: ${JSON.stringify(testHeaders)}`);
-      
-      const response = await axios.get(testUrl, { 
-        headers: testHeaders, 
-        timeout: 10000 
+
+      const response = await axios.get(testUrl, {
+        headers: testHeaders,
+        timeout: 10000,
       });
-      
+
       this.log(`📡 Response status: ${response.status}`);
-      
+
       if (response.status === 200) {
         const issueData = response.data;
         this.log(`✅ SUCCESS! Issue found: ${issueData.fields.summary}`);
@@ -152,7 +150,6 @@ export class JiraClient {
         this.log(`📄 Response: ${JSON.stringify(response.data)}`);
         return false;
       }
-      
     } catch (error: any) {
       this.log(`❌ Debug test error: ${error.message}`);
       return false;
@@ -165,7 +162,7 @@ export class JiraClient {
   async fetchPortfolioOrEpic(key: string): Promise<JiraPortfolio | null> {
     try {
       this.log(`🔍 Attempting to fetch: ${key}`);
-      
+
       // Try as Epic first
       this.log('📋 Trying as Epic...');
       const epicData = await this.fetchEpicWithStories(key);
@@ -177,10 +174,10 @@ export class JiraClient {
           name: epicData.summary,
           description: epicData.description,
           epics: [epicData],
-          totalStoryPoints: epicData.totalPoints
+          totalStoryPoints: epicData.totalPoints,
         };
       }
-      
+
       // Try as Project (Portfolio-like)
       this.log('📂 Trying as Project...');
       const projectData = await this.fetchProjectEpics(key);
@@ -188,11 +185,10 @@ export class JiraClient {
         this.log(`✅ Successfully fetched as Project with ${projectData.epics.length} epics`);
         return projectData;
       }
-      
+
       this.log(`❌ Could not find portfolio/epic: ${key}`);
       this.log('💡 Make sure the key exists and you have permission to access it');
       return null;
-      
     } catch (error: any) {
       this.log(`❌ Error fetching Jira data: ${error.message}`);
       this.log('🔍 Check your Jira URL and token');
@@ -207,35 +203,35 @@ export class JiraClient {
     try {
       // Fetch epic details
       const epicUrl = `${this.baseUrl}/rest/api/3/issue/${epicKey}`;
-      
+
       // Use minimal headers for GET requests (like curl)
       const issueHeaders = {
-        'Authorization': this.authHeader,
-        'Accept': 'application/json'
+        Authorization: this.authHeader,
+        Accept: 'application/json',
       };
-      
-      const response = await axios.get(epicUrl, { 
-        headers: issueHeaders, 
-        timeout: 10000 
+
+      const response = await axios.get(epicUrl, {
+        headers: issueHeaders,
+        timeout: 10000,
       });
-      
+
       if (response.status !== 200) {
         this.log(`⚠️ Epic not found or no access: ${epicKey}`);
         return null;
       }
-      
+
       const epicData = response.data;
-      
+
       // Get stories in this epic - try multiple Epic Link field variations
       let stories: JiraStory[] = [];
-      
+
       const epicLinkQueries = [
         `"Epic Link" = ${epicKey}`,
         `parent = ${epicKey}`,
         `"Parent Link" = ${epicKey}`,
-        `"Epic Name" = "${epicKey}"`
+        `"Epic Name" = "${epicKey}"`,
       ];
-      
+
       for (const jql of epicLinkQueries) {
         this.log(`🔍 Trying Epic Link query: ${jql}`);
         stories = await this.searchIssues(jql);
@@ -244,14 +240,14 @@ export class JiraClient {
           break;
         }
       }
-      
+
       if (stories.length === 0) {
         this.log(`⚠️ No stories found for epic ${epicKey} with any Epic Link variation`);
       }
-      
+
       // Calculate total story points
       const totalPoints = stories.reduce((sum, story) => sum + (story.storyPoints || 0), 0);
-      
+
       return {
         key: epicKey,
         summary: epicData.fields.summary,
@@ -261,18 +257,21 @@ export class JiraClient {
         totalPoints: totalPoints,
         created: epicData.fields.created,
         updated: epicData.fields.updated,
-        assignee: epicData.fields.assignee ? {
-          accountId: epicData.fields.assignee.accountId,
-          displayName: epicData.fields.assignee.displayName,
-          emailAddress: epicData.fields.assignee.emailAddress
-        } : undefined,
-        reporter: epicData.fields.reporter ? {
-          accountId: epicData.fields.reporter.accountId,
-          displayName: epicData.fields.reporter.displayName,
-          emailAddress: epicData.fields.reporter.emailAddress
-        } : undefined
+        assignee: epicData.fields.assignee
+          ? {
+              accountId: epicData.fields.assignee.accountId,
+              displayName: epicData.fields.assignee.displayName,
+              emailAddress: epicData.fields.assignee.emailAddress,
+            }
+          : undefined,
+        reporter: epicData.fields.reporter
+          ? {
+              accountId: epicData.fields.reporter.accountId,
+              displayName: epicData.fields.reporter.displayName,
+              emailAddress: epicData.fields.reporter.emailAddress,
+            }
+          : undefined,
       };
-      
     } catch (error: any) {
       this.log(`❌ Error fetching epic ${epicKey}: ${error.message}`);
       return null;
@@ -287,15 +286,15 @@ export class JiraClient {
       // Search for epics in this project
       const epicsJql = `project = ${projectKey} AND issuetype = Epic`;
       const epicIssues = await this.searchIssues(epicsJql);
-      
+
       if (!epicIssues || epicIssues.length === 0) {
         return null;
       }
-      
+
       // Convert issues to epics and fetch their stories
       const epics: JiraEpic[] = [];
       let totalStoryPoints = 0;
-      
+
       for (const epicIssue of epicIssues) {
         const epicData = await this.fetchEpicWithStories(epicIssue.key);
         if (epicData) {
@@ -303,16 +302,15 @@ export class JiraClient {
           totalStoryPoints += epicData.totalPoints;
         }
       }
-      
+
       return {
         type: 'project',
         key: projectKey,
         name: `Project ${projectKey}`,
         description: `Portfolio containing ${epics.length} epics`,
         epics: epics,
-        totalStoryPoints: totalStoryPoints
+        totalStoryPoints: totalStoryPoints,
       };
-      
     } catch (error: any) {
       this.log(`❌ Error fetching project ${projectKey}: ${error.message}`);
       return null;
@@ -325,35 +323,36 @@ export class JiraClient {
   private async searchIssues(jql: string): Promise<JiraStory[]> {
     try {
       this.log(`🔍 Searching issues: ${jql}`);
-      
+
       const searchUrl = `${this.baseUrl}/rest/api/3/search`;
       const params = {
         jql: jql,
         maxResults: 100,
-        fields: 'summary,description,status,customfield_10016,assignee,priority,issuetype,labels,components'
+        fields:
+          'summary,description,status,customfield_10016,assignee,priority,issuetype,labels,components',
       };
-      
+
       // Use minimal headers for GET requests (like curl)
       const searchHeaders = {
-        'Authorization': this.authHeader,
-        'Accept': 'application/json'
+        Authorization: this.authHeader,
+        Accept: 'application/json',
       };
-      
-      const response = await axios.get(searchUrl, { 
-        headers: searchHeaders, 
-        params: params, 
-        timeout: 10000 
+
+      const response = await axios.get(searchUrl, {
+        headers: searchHeaders,
+        params: params,
+        timeout: 10000,
       });
-      
+
       if (response.status !== 200) {
         this.log(`⚠️ Search failed: ${response.status} - ${JSON.stringify(response.data)}`);
         return [];
       }
-      
+
       const data = response.data;
       const issues = data.issues || [];
       this.log(`📊 Found ${issues.length} issues`);
-      
+
       return issues.map((issue: any) => ({
         key: issue.key,
         summary: issue.fields.summary,
@@ -364,13 +363,14 @@ export class JiraClient {
         components: (issue.fields.components || []).map((c: any) => c.name),
         priority: issue.fields.priority?.name || 'Unknown',
         issueType: issue.fields.issuetype.name,
-        assignee: issue.fields.assignee ? {
-          accountId: issue.fields.assignee.accountId,
-          displayName: issue.fields.assignee.displayName,
-          emailAddress: issue.fields.assignee.emailAddress
-        } : undefined
+        assignee: issue.fields.assignee
+          ? {
+              accountId: issue.fields.assignee.accountId,
+              displayName: issue.fields.assignee.displayName,
+              emailAddress: issue.fields.assignee.emailAddress,
+            }
+          : undefined,
       }));
-      
     } catch (error: any) {
       this.log(`❌ Error searching issues: ${error.message}`);
       return [];
@@ -384,7 +384,7 @@ export class JiraClient {
     switch (status) {
       case 401:
         this.log('💡 Authentication failed. Check your token and credentials.');
-        this.log('💡 Verify your API token is valid and hasn\'t expired.');
+        this.log("💡 Verify your API token is valid and hasn't expired.");
         break;
       case 403:
         this.log('💡 Access forbidden. Check your token permissions and scopes.');
@@ -420,7 +420,7 @@ export class JiraClient {
     return {
       baseUrl: this.config.baseUrl,
       email: this.config.email,
-      timeout: this.config.timeout
+      timeout: this.config.timeout,
       // Note: token is not included for security
     };
   }
@@ -430,10 +430,10 @@ export class JiraClient {
    */
   private log(message: string): void {
     this.outputChannel.appendLine(message);
-    
+
     // Also log to console for development
     console.log(message);
-    
+
     // Show important messages as notifications
     if (message.includes('✅ Connected') || message.includes('❌ Error')) {
       if (message.includes('✅')) {
@@ -465,12 +465,12 @@ export class JiraClient {
     if (!description) {
       return '';
     }
-    
+
     // If it's already a string, return it
     if (typeof description === 'string') {
       return description;
     }
-    
+
     // If it's an Atlassian Document Format object, extract text
     if (description && typeof description === 'object') {
       try {
@@ -478,10 +478,10 @@ export class JiraClient {
         if (description.content && Array.isArray(description.content)) {
           return this.extractTextFromADF(description.content);
         }
-        
+
         // Log the structure for debugging
         this.log(`📄 Description structure: ${JSON.stringify(description, null, 2)}`);
-        
+
         // Fallback: stringify the object
         return JSON.stringify(description);
       } catch (error) {
@@ -489,7 +489,7 @@ export class JiraClient {
         return '[Description parsing error]';
       }
     }
-    
+
     return String(description);
   }
 
@@ -498,7 +498,7 @@ export class JiraClient {
    */
   private extractTextFromADF(content: any[]): string {
     let text = '';
-    
+
     for (const node of content) {
       if (node.type === 'paragraph' && node.content) {
         for (const textNode of node.content) {
@@ -524,7 +524,7 @@ export class JiraClient {
         text += this.extractTextFromADF(node.content);
       }
     }
-    
+
     return text.trim();
   }
 
@@ -534,4 +534,4 @@ export class JiraClient {
   dispose(): void {
     this.outputChannel.dispose();
   }
-} 
+}

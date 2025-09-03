@@ -1,6 +1,6 @@
 /**
- * TypeScript interfaces for AI Product Owner Agent VS Code Extension
- * Based on the proven Python PoC implementation and enhanced requirements
+ * Core TypeScript interfaces for AI Product Owner Agent VS Code Extension
+ * Streamlined to include only actively used types
  */
 
 // ================================
@@ -50,31 +50,6 @@ export interface JiraPortfolio {
 }
 
 // ================================
-// Cross-Team Dependencies
-// ================================
-
-export interface CrossTeamDependency {
-  id: string;
-  type: 'frontend' | 'backend' | 'infrastructure' | 'external-api' | 'database';
-  description: string;
-  team: string;
-  estimatedEffort: string;
-  risk: 'low' | 'medium' | 'high';
-  blocking: boolean;
-  mitigationStrategy?: string;
-}
-
-export interface ExternalIntegration {
-  name: string;
-  type: 'api' | 'database' | 'service' | 'webhook';
-  endpoint?: string;
-  authentication: string;
-  dependencies: string[];
-  documentation?: string;
-  owner: string;
-}
-
-// ================================
 // Codebase Analysis Types
 // ================================
 
@@ -114,73 +89,6 @@ export interface CodebaseMetrics {
 }
 
 // ================================
-// Technical Solution Types
-// ================================
-
-export interface TechnicalSolution {
-  id: string;
-  name: string;
-  description: string;
-  approach: ImplementationApproach;
-  architecture: SystemArchitecture;
-  implementation: ImplementationDetails;
-  risks: RiskAssessment[];
-  effort: EffortEstimate;
-  pros: string[];
-  cons: string[];
-  recommended: boolean;
-}
-
-export interface ImplementationApproach {
-  strategy: 'incremental' | 'big-bang' | 'parallel' | 'phased';
-  technologies: TechStackComponent[];
-  patterns: string[];
-  integrations: ExternalIntegration[];
-}
-
-export interface SystemArchitecture {
-  components: SystemComponent[];
-  relationships: ComponentRelationship[];
-  dataFlow: DataFlowStep[];
-  deploymentModel: 'monolith' | 'microservices' | 'hybrid';
-}
-
-export interface SystemComponent {
-  id: string;
-  name: string;
-  type: 'service' | 'database' | 'gateway' | 'frontend' | 'middleware';
-  description: string;
-  responsibilities: string[];
-  interfaces: ComponentInterface[];
-  dependencies: string[];
-}
-
-export interface ComponentInterface {
-  name: string;
-  type: 'rest-api' | 'graphql' | 'grpc' | 'message-queue' | 'database';
-  endpoint?: string;
-  methods: string[];
-  dataContract: Record<string, any>;
-}
-
-export interface ComponentRelationship {
-  from: string;
-  to: string;
-  type: 'uses' | 'depends-on' | 'publishes-to' | 'subscribes-to';
-  protocol: string;
-  description: string;
-}
-
-export interface DataFlowStep {
-  step: number;
-  description: string;
-  from: string;
-  to: string;
-  data: string;
-  transformation?: string;
-}
-
-// ================================
 // Analysis Stages and Prompts
 // ================================
 
@@ -208,7 +116,6 @@ export interface PromptContext {
   jiraData?: JiraPortfolio;
   codebaseData?: CodebaseAnalysis;
   previousAnalysis?: AnalysisOutput[];
-  context7Docs?: Context7Documentation[];
 }
 
 export interface VisualizationRequirement {
@@ -344,84 +251,6 @@ export interface TaskDependency {
 }
 
 // ================================
-// User Journey and Business Types
-// ================================
-
-export interface UserJourney {
-  id: string;
-  name: string;
-  description: string;
-  persona: UserPersona;
-  steps: JourneyStep[];
-  touchpoints: Touchpoint[];
-  painPoints: string[];
-  opportunities: string[];
-}
-
-export interface UserPersona {
-  name: string;
-  role: string;
-  goals: string[];
-  frustrations: string[];
-  techSavvy: 'low' | 'medium' | 'high';
-}
-
-export interface JourneyStep {
-  step: number;
-  action: string;
-  thought: string;
-  emotion: 'frustrated' | 'neutral' | 'satisfied' | 'delighted';
-  touchpoint: string;
-  issues: string[];
-}
-
-export interface Touchpoint {
-  name: string;
-  type: 'web' | 'mobile' | 'api' | 'email' | 'system';
-  description: string;
-  currentExperience: 'poor' | 'fair' | 'good' | 'excellent';
-  targetExperience: 'poor' | 'fair' | 'good' | 'excellent';
-}
-
-// ================================
-// Context7 Integration Types
-// ================================
-
-export interface Context7Documentation {
-  library: string;
-  version?: string;
-  sections: DocumentationSection[];
-  patterns: CodePattern[];
-  examples: CodeExample[];
-  lastUpdated: string;
-}
-
-export interface DocumentationSection {
-  title: string;
-  content: string;
-  type: 'overview' | 'api' | 'pattern' | 'example' | 'migration';
-  relevance: number; // 1-10 scale
-}
-
-export interface CodePattern {
-  name: string;
-  description: string;
-  category: string;
-  code: string;
-  language: string;
-  bestPractices: string[];
-}
-
-export interface CodeExample {
-  title: string;
-  description: string;
-  code: string;
-  language: string;
-  tags: string[];
-  complexity: 'basic' | 'intermediate' | 'advanced';
-}
-
-// ================================
 // Extension State and Configuration
 // ================================
 
@@ -437,8 +266,6 @@ export interface ExtensionState {
 export interface ExtensionConfiguration {
   jira: JiraConfiguration;
   output: OutputConfiguration;
-  analysis: AnalysisConfiguration;
-  codebase: CodebaseConfiguration;
 }
 
 export interface JiraConfiguration {
@@ -450,23 +277,6 @@ export interface JiraConfiguration {
 
 export interface OutputConfiguration {
   directory: string;
-  generateDiagrams: boolean;
-  format: 'markdown' | 'html' | 'pdf';
-  includeRawData: boolean;
-}
-
-export interface AnalysisConfiguration {
-  maxSolutions: number;
-  includeContext7: boolean;
-  stageTimeout: number; // minutes
-  autoOpenResults: boolean;
-}
-
-export interface CodebaseConfiguration {
-  includeTests: boolean;
-  excludePatterns: string[];
-  maxFileSize: number; // MB
-  analysisDepth: 'basic' | 'detailed' | 'comprehensive';
 }
 
 // ================================
@@ -534,5 +344,3 @@ export interface ProcessingStatus {
   endTime?: string;
   error?: string;
 }
-
- 

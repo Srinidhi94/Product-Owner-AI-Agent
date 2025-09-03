@@ -36,25 +36,25 @@ export class ErrorHandler {
   static async handleJiraError(error: any, context: ErrorContext): Promise<boolean> {
     const errorCode = error.status || error.code;
     const errorMessage = error.message || 'Unknown Jira error';
-    
+
     this.logError('Jira Error', error, context);
 
     switch (errorCode) {
       case 401:
       case 403:
         return await this.handleAuthenticationError(error, context);
-        
+
       case 404:
         return await this.handleNotFoundError(error, context);
-        
+
       case 429:
         return await this.handleRateLimitError(error, context);
-        
+
       case 'ENOTFOUND':
       case 'ECONNREFUSED':
       case 'ETIMEDOUT':
         return await this.handleNetworkError(error, context);
-        
+
       default:
         return await this.handleGenericJiraError(error, context);
     }
@@ -63,7 +63,10 @@ export class ErrorHandler {
   /**
    * Handle authentication errors (401/403)
    */
-  private static async handleAuthenticationError(error: any, context: ErrorContext): Promise<boolean> {
+  private static async handleAuthenticationError(
+    error: any,
+    context: ErrorContext
+  ): Promise<boolean> {
     const action = await vscode.window.showInformationMessage(
       `🔐 Jira configuration is incomplete or invalid.\n\nPlease configure your Jira settings in the extension settings.`,
       'Open Settings'
@@ -72,7 +75,7 @@ export class ErrorHandler {
     if (action === 'Open Settings') {
       await vscode.commands.executeCommand('aiProductOwner.configureSettings');
     }
-    
+
     return false;
   }
 
@@ -81,7 +84,7 @@ export class ErrorHandler {
    */
   private static async handleNotFoundError(error: any, context: ErrorContext): Promise<boolean> {
     const epicKey = context.epicKey || 'the requested epic';
-    
+
     const action = await vscode.window.showErrorMessage(
       `🔍 Epic "${epicKey}" not found during ${context.operation}.\n\nPossible causes:\n• Epic key is incorrect\n• You don't have permission to view this epic\n• Epic is in a different Jira project`,
       { modal: true },
@@ -97,30 +100,36 @@ export class ErrorHandler {
           prompt: 'Enter the correct epic key',
           value: epicKey === 'the requested epic' ? '' : epicKey,
           placeHolder: 'e.g., PROJ-123',
-          validateInput: (value) => {
-            if (!value) {return 'Epic key is required';}
-            if (!/^[A-Z]+-\d+$/i.test(value)) {return 'Epic key format: PROJECT-NUMBER';}
+          validateInput: value => {
+            if (!value) {
+              return 'Epic key is required';
+            }
+            if (!/^[A-Z]+-\d+$/i.test(value)) {
+              return 'Epic key format: PROJECT-NUMBER';
+            }
             return null;
-          }
+          },
         });
         return !!newEpicKey;
       }
-        
+
       case 'Check Permissions':
-        await vscode.window.showInformationMessage(
-          '🔒 Permission Troubleshooting:\n\n• Ensure you have "Browse Projects" permission\n• Check if the epic is in a restricted project\n• Verify you can access the epic in Jira web interface',
-          'Open Jira'
-        ).then(result => {
-          if (result === 'Open Jira') {
-            this.openJiraInBrowser();
-          }
-        });
+        await vscode.window
+          .showInformationMessage(
+            '🔒 Permission Troubleshooting:\n\n• Ensure you have "Browse Projects" permission\n• Check if the epic is in a restricted project\n• Verify you can access the epic in Jira web interface',
+            'Open Jira'
+          )
+          .then(result => {
+            if (result === 'Open Jira') {
+              this.openJiraInBrowser();
+            }
+          });
         return false;
-        
+
       case 'Try Another Epic':
         await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
         return true;
-        
+
       default:
         return false;
     }
@@ -132,7 +141,7 @@ export class ErrorHandler {
   private static async handleRateLimitError(error: any, context: ErrorContext): Promise<boolean> {
     const retryAfter = this.extractRetryAfter(error);
     const waitTime = retryAfter || 60; // Default to 60 seconds
-    
+
     const action = await vscode.window.showWarningMessage(
       `⏳ Jira API rate limit exceeded during ${context.operation}.\n\nPlease wait ${waitTime} seconds before retrying.`,
       { modal: true },
@@ -143,7 +152,7 @@ export class ErrorHandler {
     if (action === 'Wait and Retry') {
       return await this.waitAndRetry(waitTime, context.operation);
     }
-    
+
     return false;
   }
 
@@ -155,7 +164,7 @@ export class ErrorHandler {
       `🌐 Network error during ${context.operation}.\n\nPlease check your internet connection and ensure you can access your Jira instance.`,
       'OK'
     );
-    
+
     return false;
   }
 
@@ -167,7 +176,7 @@ export class ErrorHandler {
       `❌ Jira error during ${context.operation}.\n\nPlease check your Jira configuration and ensure the service is accessible.`,
       'OK'
     );
-    
+
     return false;
   }
 
@@ -180,11 +189,11 @@ export class ErrorHandler {
     if (error.message?.includes('No Go files found')) {
       return await this.handleNoGoFilesError(context);
     }
-    
+
     if (error.message?.includes('timeout') || error.message?.includes('too many files')) {
       return await this.handleLargeCodebaseError(context);
     }
-    
+
     if (error.code === 'EACCES' || error.code === 'EPERM') {
       return await this.handleFilePermissionError(error, context);
     }
@@ -197,7 +206,7 @@ export class ErrorHandler {
    */
   private static async handleNoGoFilesError(context: ErrorContext): Promise<boolean> {
     const action = await vscode.window.showWarningMessage(
-      `📁 No Go files found in the current workspace.\n\n• Ensure you have a Go project open\n• Check that .go files exist in the workspace\n• Verify the correct folder is opened in VS Code`,
+      `📁 No source files found in the current workspace.\n\n• Ensure you have a project open\n• Check that source files exist in the workspace\n• Verify the correct folder is opened in VS Code\n• Supported languages: JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, Rust`,
       { modal: true },
       'Open Folder',
       'Check Workspace',
@@ -209,15 +218,17 @@ export class ErrorHandler {
       case 'Open Folder':
         await vscode.commands.executeCommand('vscode.openFolder');
         return false;
-        
+
       case 'Check Workspace':
         await this.showWorkspaceInfo();
         return false;
-        
+
       case 'Continue Anyway':
-        vscode.window.showInformationMessage('⚠️ Continuing without codebase analysis. Analysis will be limited to Jira data only.');
+        vscode.window.showInformationMessage(
+          '⚠️ Continuing without codebase analysis. Analysis will be limited to Jira data only.'
+        );
         return true;
-        
+
       default:
         return false;
     }
@@ -240,15 +251,15 @@ export class ErrorHandler {
       case 'Limit Scope':
         await this.configureScopeLimit();
         return true;
-        
+
       case 'Exclude Dependencies':
         await this.configureExclusions();
         return true;
-        
+
       case 'Partial Analysis':
         vscode.window.showInformationMessage('⚠️ Continuing with partial codebase analysis.');
         return true;
-        
+
       default:
         return false;
     }
@@ -257,7 +268,10 @@ export class ErrorHandler {
   /**
    * Handle file permission errors
    */
-  private static async handleFilePermissionError(error: any, context: ErrorContext): Promise<boolean> {
+  private static async handleFilePermissionError(
+    error: any,
+    context: ErrorContext
+  ): Promise<boolean> {
     const action = await vscode.window.showErrorMessage(
       `🔒 File permission error during codebase analysis.\n\nError: ${error.message}\n\n• Check file/folder permissions\n• Run VS Code with appropriate privileges\n• Exclude problematic directories`,
       { modal: true },
@@ -271,14 +285,14 @@ export class ErrorHandler {
       case 'Check Permissions':
         await this.showPermissionHelp();
         return false;
-        
+
       case 'Exclude Directory':
         await this.configureExclusions();
         return true;
-        
+
       case 'Continue':
         return true;
-        
+
       default:
         return false;
     }
@@ -287,7 +301,10 @@ export class ErrorHandler {
   /**
    * Handle generic codebase errors
    */
-  private static async handleGenericCodebaseError(error: any, context: ErrorContext): Promise<boolean> {
+  private static async handleGenericCodebaseError(
+    error: any,
+    context: ErrorContext
+  ): Promise<boolean> {
     const action = await vscode.window.showErrorMessage(
       `❌ Codebase analysis failed during ${context.operation}.\n\nError: ${error.message}`,
       { modal: true },
@@ -300,15 +317,17 @@ export class ErrorHandler {
     switch (action) {
       case 'Retry':
         return true;
-        
+
       case 'Skip Codebase':
-        vscode.window.showInformationMessage('⚠️ Skipping codebase analysis. Analysis will use Jira data only.');
+        vscode.window.showInformationMessage(
+          '⚠️ Skipping codebase analysis. Analysis will use Jira data only.'
+        );
         return true;
-        
+
       case 'Show Details':
         this.showErrorDetails(error, context);
         return false;
-        
+
       default:
         return false;
     }
@@ -319,7 +338,7 @@ export class ErrorHandler {
    */
   static async handleCopilotError(error: any, context: ErrorContext): Promise<boolean> {
     this.logError('Copilot Integration Error', error, context);
-    
+
     const action = await vscode.window.showWarningMessage(
       `🤖 GitHub Copilot integration issue during ${context.operation}.\n\n• Copilot extension might not be installed\n• Copilot might not be activated\n• Chat window might not be available`,
       { modal: true },
@@ -336,15 +355,15 @@ export class ErrorHandler {
           'Continue'
         );
         return true;
-        
+
       case 'Install Copilot':
         await vscode.commands.executeCommand('workbench.extensions.search', 'GitHub.copilot');
         return false;
-        
+
       case 'Check Status':
         await this.checkCopilotStatus();
         return false;
-        
+
       default:
         return false;
     }
@@ -377,9 +396,11 @@ Context: ${JSON.stringify(context, null, 2)}
     config: RetryConfig
   ): Promise<boolean> {
     const retryCount = context.retryCount || 0;
-    
+
     if (retryCount >= config.maxRetries) {
-      vscode.window.showErrorMessage(`❌ Maximum retry attempts (${config.maxRetries}) exceeded for ${context.operation}.`);
+      vscode.window.showErrorMessage(
+        `❌ Maximum retry attempts (${config.maxRetries}) exceeded for ${context.operation}.`
+      );
       return false;
     }
 
@@ -389,7 +410,9 @@ Context: ${JSON.stringify(context, null, 2)}
     );
 
     const shouldRetry = await vscode.window.showInformationMessage(
-      `⏳ Retrying ${context.operation} in ${delay / 1000} seconds... (Attempt ${retryCount + 1}/${config.maxRetries})`,
+      `⏳ Retrying ${context.operation} in ${delay / 1000} seconds... (Attempt ${retryCount + 1}/${
+        config.maxRetries
+      })`,
       'Cancel Retry'
     );
 
@@ -405,16 +428,16 @@ Context: ${JSON.stringify(context, null, 2)}
    * Wait and retry after rate limit
    */
   private static async waitAndRetry(waitTimeSeconds: number, operation: string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       let remainingTime = waitTimeSeconds;
-      
+
       const countdownInterval = setInterval(() => {
         if (remainingTime <= 0) {
           clearInterval(countdownInterval);
           resolve(true);
           return;
         }
-        
+
         remainingTime--;
       }, 1000);
     });
@@ -457,12 +480,14 @@ Context: ${JSON.stringify(context, null, 2)}
 - Code: ${error.status || error.code || 'Unknown'}
 - Timestamp: ${context.timestamp.toISOString()}`;
 
-    vscode.workspace.openTextDocument({
-      content: details,
-      language: 'plaintext'
-    }).then(doc => {
-      vscode.window.showTextDocument(doc);
-    });
+    vscode.workspace
+      .openTextDocument({
+        content: details,
+        language: 'plaintext',
+      })
+      .then(doc => {
+        vscode.window.showTextDocument(doc);
+      });
   }
 
   private static async reportIssue(error: any, context: ErrorContext): Promise<void> {
@@ -472,8 +497,10 @@ Context: ${JSON.stringify(context, null, 2)}
 
   private static async showWorkspaceInfo(): Promise<void> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    const info = workspaceFolders?.map(folder => `- ${folder.name}: ${folder.uri.fsPath}`).join('\n') || 'No workspace folders';
-    
+    const info =
+      workspaceFolders?.map(folder => `- ${folder.name}: ${folder.uri.fsPath}`).join('\n') ||
+      'No workspace folders';
+
     const content = `Workspace Information:
 ${info}
 
@@ -484,7 +511,7 @@ Troubleshooting:
 
     const doc = await vscode.workspace.openTextDocument({
       content,
-      language: 'plaintext'
+      language: 'plaintext',
     });
     await vscode.window.showTextDocument(doc);
   }
@@ -515,20 +542,22 @@ Troubleshooting:
 
     const doc = await vscode.workspace.openTextDocument({
       content: helpContent,
-      language: 'plaintext'
+      language: 'plaintext',
     });
     await vscode.window.showTextDocument(doc);
   }
 
   private static async checkNetworkConnectivity(): Promise<void> {
-    vscode.window.showInformationMessage('🌐 Network connectivity check:\n• Verify internet connection\n• Check corporate firewall settings\n• Try accessing Jira in browser');
+    vscode.window.showInformationMessage(
+      '🌐 Network connectivity check:\n• Verify internet connection\n• Check corporate firewall settings\n• Try accessing Jira in browser'
+    );
   }
 
   private static async checkCopilotStatus(): Promise<void> {
     try {
       const extensions = vscode.extensions.all;
       const copilotExt = extensions.find(ext => ext.id === 'GitHub.copilot');
-      
+
       if (!copilotExt) {
         vscode.window.showWarningMessage('GitHub Copilot extension is not installed.');
       } else if (!copilotExt.isActive) {
@@ -546,7 +575,7 @@ Troubleshooting:
    */
   static async showWelcomeWalkthrough(context: vscode.ExtensionContext): Promise<void> {
     const hasShownWelcome = context.globalState.get('hasShownWelcome', false);
-    
+
     if (!hasShownWelcome) {
       const action = await vscode.window.showInformationMessage(
         '🚀 Welcome to AI Product Owner Agent!\n\nWould you like a quick walkthrough to get started?',
@@ -571,17 +600,21 @@ Troubleshooting:
       'Open a Go workspace',
       'Run epic analysis',
       'Use interactive prompts',
-      'Review generated documentation'
+      'Review generated documentation',
     ];
 
-    vscode.window.showInformationMessage(
-      `📋 AI Product Owner Walkthrough:\n\n${steps.map((step, i) => `${i + 1}. ${step}`).join('\n')}\n\nReady to start?`,
-      'Configure Jira'
-    ).then(action => {
-      if (action === 'Configure Jira') {
-        vscode.commands.executeCommand('aiProductOwner.configureSettings');
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        `📋 AI Product Owner Walkthrough:\n\n${steps
+          .map((step, i) => `${i + 1}. ${step}`)
+          .join('\n')}\n\nReady to start?`,
+        'Configure Jira'
+      )
+      .then(action => {
+        if (action === 'Configure Jira') {
+          vscode.commands.executeCommand('aiProductOwner.configureSettings');
+        }
+      });
   }
 
   /**
@@ -594,22 +627,37 @@ Troubleshooting:
   /**
    * Show progress with cancellation support
    */
-  static async showProgressWithCancellation<T>(title: string, task: (progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => Promise<T>): Promise<T> {
-    return await vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title,
-      cancellable: true
-    }, (progress, token) => Promise.resolve(task(progress, token)));
+  static async showProgressWithCancellation<T>(
+    title: string,
+    task: (
+      progress: vscode.Progress<{ message?: string; increment?: number }>,
+      token: vscode.CancellationToken
+    ) => Promise<T>
+  ): Promise<T> {
+    return await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title,
+        cancellable: true,
+      },
+      (progress, token) => Promise.resolve(task(progress, token))
+    );
   }
 
   /**
    * Show progress with steps (no cancellation)
    */
-  static async showProgressWithSteps<T>(title: string, task: (progress: vscode.Progress<{ message?: string; increment?: number }>) => Promise<T>): Promise<T> {
-    return await vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title,
-      cancellable: false
-    }, (progress) => Promise.resolve(task(progress)));
+  static async showProgressWithSteps<T>(
+    title: string,
+    task: (progress: vscode.Progress<{ message?: string; increment?: number }>) => Promise<T>
+  ): Promise<T> {
+    return await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title,
+        cancellable: false,
+      },
+      progress => Promise.resolve(task(progress))
+    );
   }
 }

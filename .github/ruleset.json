@@ -1,0 +1,78 @@
+{
+  "name": "Main Branch Protection",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "SrinidHi94/Product-Owner-AI-Agent",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": ["refs/heads/main"]
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [
+          {
+            "context": "CI/CD Pipeline / quality-gates",
+            "integration_id": null
+          },
+          {
+            "context": "CI/CD Pipeline / unit-tests",
+            "integration_id": null
+          },
+          {
+            "context": "CI/CD Pipeline / build-verification",
+            "integration_id": null
+          },
+          {
+            "context": "CI/CD Pipeline / integration-tests",
+            "integration_id": null
+          },
+          {
+            "context": "CI/CD Pipeline / pr-status-check",
+            "integration_id": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "non_fast_forward",
+      "parameters": {}
+    },
+    {
+      "type": "deletion",
+      "parameters": {}
+    },
+    {
+      "type": "required_signatures",
+      "parameters": {}
+    },
+    {
+      "type": "max_file_size",
+      "parameters": {
+        "max_file_size": 100
+      }
+    }
+  ],
+  "bypass_actors": [
+    {
+      "actor_id": 1,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "always"
+    }
+  ]
+}

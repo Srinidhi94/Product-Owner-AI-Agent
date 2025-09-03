@@ -5,9 +5,7 @@
     "es6": true,
     "node": true
   },
-  "extends": [
-    "eslint:recommended"
-  ],
+  "extends": ["eslint:recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -21,11 +19,11 @@
   },
   "ignorePatterns": [
     "out",
-    "dist", 
+    "dist",
     "node_modules",
     "**/*.d.ts",
     "*.vsix",
     ".vscode",
     "webpack.config.js"
   ]
-} 
+}

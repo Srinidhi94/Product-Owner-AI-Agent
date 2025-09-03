@@ -1,236 +1,378 @@
-# AI Product Owner Agent - Developer Guide
+# Developer Guide
+## AI Product Owner Agent
+
+**Version**: 1.0 | **Status**: Active
 
 ---
 
-## 📋 Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Development Setup](#development-setup)
-3. [Code Structure](#code-structure)
-4. [Key Components](#key-components)
-5. [Extension Points](#extension-points)
-6. [Testing Strategy](#testing-strategy)
-7. [Debugging](#debugging)
-8. [Contributing](#contributing)
-
----
-
-## 🏗️ Architecture Overview
-
-### System Design
-The AI Product Owner Agent follows a modular, extensible architecture with clear separation of concerns:
-
-```mermaid
-graph TD
-    A[VS Code Extension/CLI] --> B[MultiStageAnalysisEngine]
-    B --> C[JiraClient]
-    B --> D[GoCodebaseAnalyzer]
-    B --> E[PromptGenerator]
-    B --> F[DocumentGenerator]
-    E --> G[Copilot/LLM]
-    F --> H[Output Files]
-```
-
-### Core Components
-- **extension.ts**: Entry point, command registration, and user interaction
-- **MultiStageAnalysisEngine**: Orchestrates the workflow, manages progress, coordinates all components
-- **JiraClient**: API integration with authentication
-- **GoCodebaseAnalyzer**: Static code analysis
-- **PromptGenerator**: AI prompt creation (Context7/Anthropic style)
-- **DocumentGenerator**: Output file management
-- **ErrorHandler**: Comprehensive error management
-
----
-
-## 🚀 Development Setup
+## Quick Start for Developers
 
 ### Prerequisites
-```bash
-node --version    # v16+ required
-npm --version     # v8+ required
-code --version    # VS Code 1.74+ required
-```
+- Node.js 18+ and npm 9+
+- VS Code 1.74.0+
+- TypeScript 4.9.0+
+- Git
 
-### Initial Setup
-```bash
-# Clone repository
-git clone https://github.com/your-company/ai-product-owner-agent.git
-cd ai-product-owner-agent
+### Setup in 5 Minutes
 
-# Install dependencies
+```bash
+# 1. Clone and install
+git clone https://github.com/Srinidhi94/Product-Owner-AI-Agent.git
+cd Product-Owner-AI-Agent
 npm install
 
-# Build extension
+# 2. Build and test
 npm run compile
+npm test
 
-# Start debugging
+# 3. Start developing
 code .
 # Press F5 to launch Extension Development Host
 ```
 
-### Development Workflow
-1. **Watch Mode**: `npm run watch` for automatic compilation
-2. **Debug Extension**: Press F5 to test in development host
-3. **Run Tests**: `npm test` for validation
-4. **Package**: `vsce package` for distribution
+---
+
+## Architecture Overview
+
+### System Design
+The extension uses a simple, modular architecture:
+
+```
+VS Code Extension
+├── Extension Entry Point (extension.ts)
+│   ├── Command registration
+│   ├── User interface
+│   └── State management
+│
+├── MultiStageAnalysisEngine
+│   ├── 5-stage workflow orchestration
+│   ├── 30-second progress intervals
+│   └── User cancellation handling
+│
+├── Core Components
+│   ├── JiraClient (API integration)
+│   ├── CodebaseAnalyzer (language detection)
+│   ├── DocumentGenerator (file creation)
+│   └── ConfigurationManager (settings)
+│
+└── Support Components
+    ├── PromptGenerator (AI prompts)
+    ├── Logger (debugging)
+    └── ErrorHandler (user-friendly errors)
+```
+
+### Key Design Principles
+- **Simple & Modular** - Each component has one clear responsibility
+- **User-Friendly** - Clear progress updates and error messages
+- **Secure** - Credentials stored safely in VS Code
+- **Extensible** - Easy to add new languages and features
 
 ---
 
-## 📁 Code Structure
+## Development Environment
+
+### System Requirements
+
+```bash
+# Required versions
+node --version    # v18.0.0 or higher
+npm --version     # v9.0.0 or higher
+
+# VS Code development
+code --version    # 1.74.0 or higher
+
+# TypeScript tooling
+tsc --version     # 4.9.0 or higher
+```
+
+### Development Commands
+
+```bash
+# Development workflow
+npm run watch          # Auto-compile TypeScript changes
+npm test              # Run all tests
+npm run lint          # Check code quality
+npm run package       # Create VSIX package
+
+# Debugging
+# Press F5 in VS Code to launch Extension Development Host
+```
+
+---
+
+## Project Structure
 
 ```
 src/
-├── analysis/           # Multi-stage analysis engine
-├── analyzer/           # Go codebase analysis
-├── jira/               # Jira API integration
-├── prompts/            # AI prompt generation
-├── types/              # TypeScript definitions
-├── utils/              # Utility modules
-└── extension.ts        # Main entry point
-```
+├── analysis/
+│   └── MultiStageAnalysisEngine.ts    # Main workflow orchestrator
+├── analyzer/
+│   └── CodebaseAnalyzer.ts            # Language detection & analysis
+├── jira/
+│   └── JiraClient.ts                  # Jira API integration
+├── output/
+│   └── DocumentGenerator.ts           # Creates output files
+├── types/
+│   └── index.ts                       # TypeScript type definitions
+├── utils/
+│   ├── ConfigurationManager.ts        # Settings management
+│   ├── ErrorHandler.ts                # Error handling
+│   └── Logger.ts                      # Logging system
+└── extension.ts                       # Extension entry point
 
-### Key Files
-- `extension.ts` - Extension activation and command registration
-- `jira/JiraClient.ts` - Jira API integration with authentication
-- `analyzer/GoCodebaseAnalyzer.ts` - Go source code analysis
-- `analysis/MultiStageAnalysisEngine.ts` - 5-stage analysis workflow
-- `prompts/PromptGenerator.ts` - AI prompt generation
-- `output/DocumentGenerator.ts` - Output file management
-- `utils/ErrorHandler.ts` - Error management and user guidance
-
----
-
-## 🔑 Extension Points
-
-### Adding New Analysis Stages
-To add a new analysis stage:
-1. **Update Stage Definition** in `MultiStageAnalysisEngine.ts`:
-```typescript
-private stages: AnalysisStage[] = [
-  // ... existing stages
-  {
-    id: 'custom-analysis',
-    name: 'Custom Analysis',
-    description: 'Custom analysis description',
-    requiredDiagrams: ['Custom Diagram']
-  }
-];
-```
-2. **Create Prompt Template** in `PromptGenerator.ts`:
-```typescript
-export const CUSTOM_ANALYSIS_TEMPLATE = `
-You are a Custom Analysis Expert...
-
-## Context
-Epic: {{epicKey}} - {{epicSummary}}
-
-## Requirements
-Analyze and provide:
-1. Custom analysis point 1
-2. Custom analysis point 2
-
-## Required Diagrams
-Generate Mermaid diagram for custom flow.
-`;
-```
-3. **Update Output Logic** in `DocumentGenerator.ts` as needed.
-
-### Customizing Prompt Templates
-Templates support variable substitution:
-- `{{epicKey}}` - Epic identifier
-- `{{epicSummary}}` - Epic title
-- `{{epicStories}}` - Array of stories
-- `{{codebaseData.*}}` - Codebase analysis results
-
----
-
-## 🧪 Testing Strategy
-
-### Unit Tests
-```typescript
-describe('PromptGenerator', () => {
-  let generator: PromptGenerator;
-  beforeEach(() => {
-    generator = new PromptGenerator();
-  });
-  it('should generate business analysis prompt', async () => {
-    const prompt = await generator.generatePrompt(
-      'business-analysis',
-      mockJiraPortfolio,
-      mockCodebaseAnalysis
-    );
-    expect(prompt.content).toContain('business requirements');
-    expect(prompt.metadata.stage).toBe('business-analysis');
-  });
-});
-```
-
-### Integration Tests
-```typescript
-describe('Epic Analysis Workflow', () => {
-  it('should complete full analysis', async () => {
-    const engine = new MultiStageAnalysisEngine();
-    await engine.runFullAnalysis('TEST-123', mockData, mockProgress);
-    expect(mockProgress.report).toHaveBeenCalledTimes(5);
-  });
-});
+tests/
+├── unit/                              # Unit tests
+├── integration/                       # Integration tests
+└── fixtures/                          # Test data
 ```
 
 ---
 
-## 🐞 Debugging
+## Core Components
 
-### Debug Configuration
-```json
-{
-  "name": "Extension",
-  "type": "extensionHost",
-  "request": "launch",
-  "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-  "outFiles": ["${workspaceFolder}/out/**/*.js"]
+### MultiStageAnalysisEngine
+**What it does**: Manages the 5-stage analysis workflow
+
+**Key responsibilities**:
+- Shows progress dialogs every 30 seconds
+- Handles user cancellation
+- Coordinates all other components
+- Manages stage transitions
+
+### JiraClient
+**What it does**: Connects to Jira and fetches epic data
+
+**Key features**:
+- Secure API token authentication
+- Handles rate limiting and retries
+- Fetches epic and story information
+- Works with Jira Cloud and Server
+
+### CodebaseAnalyzer
+**What it does**: Analyzes your project's code structure
+
+**Supported languages**: JavaScript, TypeScript, Python, Java, C#, Go, Rust, PHP, Ruby
+
+**Analysis capabilities**:
+- Detects programming languages and frameworks
+- Identifies architecture patterns
+- Maps project dependencies
+- Analyzes code complexity
+
+### DocumentGenerator
+**What it does**: Creates the output documentation files
+
+**Generated files**:
+- `README.md` - Project overview
+- `PROMPTS.md` - AI prompts used
+- `ANALYSIS.md` - AI responses
+- `CONTEXT.md` - Technical context
+
+### ConfigurationManager
+**What it does**: Manages all extension settings
+
+**Configuration areas**:
+- Jira connection settings
+- Output directory preferences
+- Analysis options
+- Security settings
+
+---
+
+## Development Guidelines
+
+### 5-Stage Analysis Process
+The extension follows a structured 5-stage workflow:
+
+```
+Stage 1: Product Requirements
+├── Business context analysis
+├── User story breakdown
+└── Requirements documentation
+
+Stage 2: System Architecture
+├── High-level system design
+├── Component relationships
+└── Technology decisions
+
+Stage 3: Technical Design
+├── API specifications
+├── Data models
+└── Integration details
+
+Stage 4: Implementation Strategy
+├── Development approach
+├── Best practices
+└── Quality assurance
+
+Stage 5: Sprint Planning
+├── Task breakdown
+├── Timeline estimation
+└── Jira epic structuring
+```
+
+### Coding Standards
+
+**TypeScript Best Practices**:
+```typescript
+// Use explicit types
+async function analyzeCodebase(path: string): Promise<CodebaseAnalysis> {
+  // Implementation
+}
+
+// Define interfaces for data structures
+interface AnalysisStage {
+  id: string;
+  name: string;
+  description: string;
+}
+
+// Proper error handling
+try {
+  const result = await operation();
+  return result;
+} catch (error: unknown) {
+  this.errorHandler.handleError(error as Error);
+  throw error;
 }
 ```
 
-### Debug Techniques
-1. **Console Logging**: Use `console.log` for debugging
-2. **Breakpoints**: Set breakpoints in TypeScript source
-3. **Output Panel**: Check "AI Product Owner" output channel
-4. **Developer Tools**: Use Help → Toggle Developer Tools
+**Resource Management**:
+```typescript
+export class Component {
+  private outputChannel: vscode.OutputChannel;
+  
+  constructor() {
+    this.outputChannel = vscode.window.createOutputChannel('Component');
+  }
+  
+  // Always implement dispose
+  dispose(): void {
+    this.outputChannel.dispose();
+  }
+}
+```
+
+### Development Workflow
+
+**Before Making Changes**:
+1. Run `npm run compile` to check for errors
+2. Run `npm test` to verify existing functionality
+3. Check if new dependencies are needed
+4. Test configuration changes
+
+**Development Process**:
+1. Make small, focused changes
+2. Write tests for new features
+3. Implement comprehensive error handling
+4. Update documentation
+5. Ensure proper resource cleanup
+
+### Security Guidelines
+- Never log sensitive data (API tokens, credentials)
+- Validate all user inputs
+- Use VS Code's secure storage for sensitive settings
+---
+
+## Testing
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run specific test file
+npm test -- CodebaseAnalyzer.test.ts
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+### Test Structure
+```typescript
+describe('CodebaseAnalyzer', () => {
+  let analyzer: CodebaseAnalyzer;
+  
+  beforeEach(() => {
+    analyzer = new CodebaseAnalyzer();
+  });
+  
+  it('should detect TypeScript projects', async () => {
+    const analysis = await analyzer.analyzeProject('/path/to/ts-project');
+    expect(analysis.language).toBe('typescript');
+  });
+});
+```
+
+---
+
+## Debugging
+
+### VS Code Debug Configuration
+The project includes a debug configuration. Press `F5` to start debugging:
+
+```json
+{
+  "name": "Extension Development",
+  "type": "extensionHost",
+  "request": "launch",
+  "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
+}
+```
+
+### Logging
+```typescript
+import { Logger } from './utils/Logger';
+
+const logger = Logger.getInstance();
+logger.debug('Debug information');
+logger.info('General information');
+logger.error('Error occurred', error);
+```
 
 ### Common Issues
-- **Authentication Errors**: Check Jira credentials and permissions
-- **Timeout Issues**: Adjust network timeout settings
-- **Parse Errors**: Validate JSON responses from Jira API
+
+**Jira Connection Problems**:
+- Check API token in VS Code settings
+- Verify network connectivity
+- Confirm API token permissions
+
+**Performance Issues**:
+- Use caching for expensive operations
+- Implement async/await properly
+- Monitor large codebase analysis
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Process
-1. Fork repository and create feature branch
-2. Make changes following coding standards
-3. Add tests for new functionality
-4. Submit pull request with description
+1. Create feature branch: `git checkout -b feature/new-feature`
+2. Make changes with tests
+3. Run quality checks: `npm run lint && npm test`
+4. Submit pull request with clear description
 
-### Coding Standards
+### Code Quality Standards
 - Use TypeScript strict mode
-- Follow ESLint rules
-- Add JSDoc comments for public APIs
-- Use ErrorHandler for user-facing errors
-- Write tests for new features
-
-### Pull Request Guidelines
-- Clear description of changes
-- Include test coverage
-- Update documentation if needed
-- Follow existing code patterns
+- Write comprehensive error handling
+- Include unit tests for new features
+- Follow existing architectural patterns
 
 ### Release Process
-1. Update version: `npm version [patch|minor|major]`
-2. Update changelog
-3. Create Git tag
-4. Build package: `vsce package`
-5. Publish: `vsce publish`
+```bash
+# Update version
+npm version patch|minor|major
+
+# Build and test
+npm run compile && npm test
+
+# Package extension
+npm run package
+
+# Publish to marketplace
+vsce publish
+```
 
 ---
 
-This developer guide provides the technical foundation for maintaining and extending the AI Product Owner Agent. For user documentation, see the [User Guide](USER_GUIDE.md). 
+*For usage instructions, see [USER_GUIDE.md](USER_GUIDE.md). For architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).* 

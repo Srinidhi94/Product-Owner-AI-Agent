@@ -91,6 +91,7 @@ coverage/
 *.lcov
 test/out/
 .nyc_output
+test-results/
 
 # VS Code Settings (personal)
 .vscode/settings.json
