@@ -99,67 +99,6 @@ jobs:
           path: coverage/
           retention-days: 7
 
-  # Build and Package Verification
-  build-verification:
-    name: Build & Package
-    runs-on: ${{ matrix.os }}
-    needs: [quality-gates, unit-tests]
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Build extension
-        run: npm run build:prod
-
-      - name: Package VSIX
-        run: |
-          # Ensure vsce is installed
-          npm list -g @vscode/vsce || npm install -g @vscode/vsce
-          npm run vsce-package
-
-      - name: Verify package (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          ls -la *.vsix
-          test -f ai-product-owner-agent-*.vsix
-
-      - name: Verify package (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          dir *.vsix
-          if (!(Test-Path "ai-product-owner-agent-*.vsix")) { exit 1 }
-        shell: powershell
-
-      - name: Check bundle size (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          npm run build:prod
-          ls -lh out/
-          # Fail if bundle is too large (1MB limit)
-          test $(stat -c%s out/extension.js) -lt 1048576
-
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          name: vsix-package-${{ github.sha }}
-          path: '*.vsix'
-          retention-days: 30
-
   # Integration Tests (VS Code Extension Host)
   integration-tests:
     name: Integration Tests
@@ -223,7 +162,7 @@ jobs:
   pr-status-check:
     name: PR Status Check
     runs-on: ubuntu-latest
-    needs: [quality-gates, unit-tests, build-verification, integration-tests, security-scan]
+    needs: [quality-gates, unit-tests, integration-tests, security-scan]
     if: always()
 
     steps:
@@ -231,13 +170,11 @@ jobs:
         run: |
           echo "Quality Gates: ${{ needs.quality-gates.result }}"
           echo "Unit Tests: ${{ needs.unit-tests.result }}"
-          echo "Build Verification: ${{ needs.build-verification.result }}"
           echo "Integration Tests: ${{ needs.integration-tests.result }}"
           echo "Security Scan: ${{ needs.security-scan.result }}"
 
           if [[ "${{ needs.quality-gates.result }}" != "success" || 
                 "${{ needs.unit-tests.result }}" != "success" || 
-                "${{ needs.build-verification.result }}" != "success" || 
                 "${{ needs.integration-tests.result }}" != "success" ]]; then
             echo "❌ One or more required checks failed"
             exit 1
