@@ -56,7 +56,7 @@ VS Code Extension
 │   └── ConfigurationManager (settings)
 │
 └── Support Components
-    ├── PromptGenerator (AI prompts)
+    ├── PromptGenerator (context file architecture)
     ├── Logger (debugging)
     └── ErrorHandler (user-friendly errors)
 ```
@@ -139,6 +139,20 @@ tests/
 - Coordinates all other components
 - Manages stage transitions
 
+### PromptGenerator
+**What it does**: Generates AI prompts using context file architecture
+
+**Context File Approach**:
+- References context files instead of embedding large contexts
+- Streamlined prompts focused on instructions
+- Epic-specific folder structure for organized context
+- Eliminated variable substitution patterns
+
+**Template system**:
+- Role-based templates for each stage
+- Context file references for better token efficiency
+- Anti-hallucination protocol through explicit context grounding
+
 ### JiraClient
 **What it does**: Connects to Jira and fetches epic data
 
@@ -164,9 +178,11 @@ tests/
 
 **Generated files**:
 - `README.md` - Project overview
+- `CONTEXT.md` - Project context and constraints
+- `JIRA.md` - Epic and story details
+- `CODEBASE.md` - Technical patterns and architecture
 - `PROMPTS.md` - AI prompts used
 - `ANALYSIS.md` - AI responses
-- `CONTEXT.md` - Technical context
 
 ### ConfigurationManager
 **What it does**: Manages all extension settings
