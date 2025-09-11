@@ -11,7 +11,6 @@ import {
   getStageCount,
   validateStageIntegrity,
   getSequentialStageTemplates,
-  getTemplateWithCodebaseContext,
   StageTemplate,
   MULTI_STAGE_TEMPLATES,
   STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS,
@@ -52,16 +51,13 @@ describe('PromptTemplates', () => {
       expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('Principal Engineer');
     });
 
-    test('should contain placeholder for jira context', () => {
-      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).toContain('{jiraContext}');
-      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('{jiraContext}');
-      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('{jiraContext}');
-    });
-
-    test('should contain placeholder for codebase context', () => {
-      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).toContain('{codebaseContext}');
-      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('{codebaseContext}');
-      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('{codebaseContext}');
+    test('should not contain obsolete variable substitution patterns', () => {
+      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).not.toContain('{jiraContext}');
+      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).not.toContain('{codebaseContext}');
+      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).not.toContain('{jiraContext}');
+      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).not.toContain('{codebaseContext}');
+      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).not.toContain('{jiraContext}');
+      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).not.toContain('{codebaseContext}');
     });
   });
 
@@ -155,23 +151,21 @@ describe('PromptTemplates', () => {
     });
   });
 
-  describe('getTemplateWithCodebaseContext', () => {
-    test('should replace context placeholders', () => {
-      const result = getTemplateWithCodebaseContext(
-        'product-requirements-analysis',
-        JSON.stringify(mockCodebaseContext),
-        JSON.stringify(mockJiraContext)
-      );
-
-      expect(result).toContain('src/test.ts');
-      expect(result).toContain('Sample structure');
-      expect(result).not.toContain('{codebaseContext}');
+  describe('Context File Architecture', () => {
+    test('should not contain obsolete variable substitution patterns', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).not.toContain('{jiraContext}');
+        expect(template.template).not.toContain('{codebaseContext}');
+        expect(template.template).not.toContain('{previousStageContext}');
+      });
     });
 
-    test('should handle empty contexts', () => {
-      const result = getTemplateWithCodebaseContext('product-requirements-analysis', '', '');
-      expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+    test('should reference context files in templates', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        // Templates should focus on instructions and reference context files
+        expect(template.template).toContain('🎯 YOUR TASK:');
+        expect(template.template).toContain('OUTPUT INSTRUCTIONS');
+      });
     });
   });
 });

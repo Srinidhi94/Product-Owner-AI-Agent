@@ -36,17 +36,6 @@ Use the Context7 mcp to understand technical feasibility and industry standards.
 Use the Sequential Thinking mcp to think through in detail
 Use these mcps if available or use other tools to ensure high accuracy and best practices
 
-**📊 INPUT DATA:**
-<jira_data>
-{jiraContext}
-</jira_data>
-
-<codebase_context>
-**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
-
-{codebaseContext}
-</codebase_context>
-
 **🎯 YOUR TASK:**
 As a Senior Product Manager, analyze the provided Jira data and codebase context to create comprehensive product requirements. Focus on current features, business value, user needs, technical feasibility, and strategic alignment.
 
@@ -168,21 +157,6 @@ Let me think step by step about the best architectural approaches...
 Use the Context7 mcp to understand technical feasibility and industry standards.
 Use the Sequential Thinking mcp to think through in detail
 Use these mcps if available or use other tools to ensure high accuracy and best practices
-
-**📊 INPUT DATA:**
-<jira_data>
-{jiraContext}
-</jira_data>
-
-<codebase_context>
-**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
-
-{codebaseContext}
-</codebase_context>
-
-<previous_analysis>
-{previousStageContext}
-</previous_analysis>
 
 **🎯 YOUR TASK:**
 As a Principal Engineer specializing in Architecture, translate the business requirements from Stage 1 into a comprehensive system architecture. Focus on scalability, maintainability, and alignment with existing codebase patterns. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
@@ -307,21 +281,6 @@ Let me think step by step about the most effective technical design approaches..
 Use the Context7 mcp to understand technical feasibility and industry standards.
 Use the Sequential Thinking mcp to think through in detail
 Use these mcps if available or use other tools to ensure high accuracy and best practices
-
-**📊 INPUT DATA:**
-<jira_data>
-{jiraContext}
-</jira_data>
-
-<codebase_context>
-**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
-
-{codebaseContext}
-</codebase_context>
-
-<previous_analysis>
-{previousStageContext}
-</previous_analysis>
 
 **🎯 YOUR TASK:**
 As a Principal Engineer specializing in Technical Design, create detailed technical specifications based on the architectural foundation from Stage 2. Focus on APIs, data models, component design, and implementation guidelines. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
@@ -454,21 +413,6 @@ Use the Context7 mcp to understand technical feasibility and industry standards.
 Use the Sequential Thinking mcp to think through in detail
 Use these mcps if available or use other tools to ensure high accuracy and best practices
 
-**📊 INPUT DATA:**
-<jira_data>
-{jiraContext}
-</jira_data>
-
-<codebase_context>
-**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
-
-{codebaseContext}
-</codebase_context>
-
-<previous_analysis>
-{previousStageContext}
-</previous_analysis>
-
 **🎯 YOUR TASK:**
 As a Principal Engineer specializing in Implementation, create a comprehensive implementation and deployment strategy based on all previous technical analysis. Focus on CI/CD, infrastructure, monitoring, and operational excellence. Ensure to incorporate existing modules and components into any diagrams or code references. Do not hallucinate or go off the rails with assumptions and suggestions which do not have a strong foundation to things you can find in the codebase.
 
@@ -593,21 +537,6 @@ I should synthesize all technical and business analysis into executable plans...
 Use the Context7 mcp to understand project management best practices.
 Use the Sequential Thinking mcp to think through in detail
 Use these mcps if available or use other tools to ensure high accuracy and best practices
-
-**📊 INPUT DATA:**
-<jira_data>
-{jiraContext}
-</jira_data>
-
-<codebase_context>
-**This is just a high level analysis. Go through the codebase in detail and build your own context on the project/codebase and design patterns and existing architecture and structure and features,**
-
-{codebaseContext}
-</codebase_context>
-
-<previous_analysis>
-{previousStageContext}
-</previous_analysis>
 
 **🎯 YOUR TASK:**
 As the Product Owner, synthesize all previous analysis into actionable sprint plans, Jira ticket breakdowns, and comprehensive project documentation. Create complete roadmap for implementation based on all technical and business analysis.
@@ -877,26 +806,3 @@ export function getSequentialStageTemplates(): StageTemplate[] {
   return MULTI_STAGE_TEMPLATES.filter(template => template.buildsOnPreviousStage);
 }
 
-/**
- * Generate template with codebase context and previous stage context
- */
-export function getTemplateWithCodebaseContext(
-  stage: string,
-  codebaseAnalysis: any,
-  previousStageContext?: string
-): string {
-  let template = getRoleBasedTemplate(stage);
-
-  // Replace codebase context placeholder
-  template = template.replace(
-    '{codebaseContext}',
-    codebaseAnalysis || 'No codebase context provided'
-  );
-
-  // Replace previous stage context if provided
-  if (previousStageContext && template.includes('{previousStageContext}')) {
-    template = template.replace('{previousStageContext}', previousStageContext);
-  }
-
-  return template;
-}

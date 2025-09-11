@@ -6,9 +6,19 @@
 import * as vscode from 'vscode';
 import { JiraPortfolio, CodebaseAnalysis } from '../types';
 import {
-  MULTI_STAGE_TEMPLATES,
+  getRoleBasedTemplate,
+  getStageTemplateById,
+  getStagesInOrder,
+  getStageCount,
+  validateStageIntegrity,
+  getSequentialStageTemplates,
   StageTemplate,
-  getTemplateWithCodebaseContext,
+  MULTI_STAGE_TEMPLATES,
+  STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS,
+  STAGE_2_SYSTEM_ARCHITECTURE_DESIGN,
+  STAGE_3_TECHNICAL_DESIGN_SPECIFICATION,
+  STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY,
+  STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN,
 } from './PromptTemplates';
 import { buildContextFrame } from './ContextEngineering';
 
@@ -55,15 +65,8 @@ export class PromptGenerator {
     // Prepare context data for substitution
     const contextData = this.prepareContextData(jiraData, codebaseData, previousContext, options);
 
-    // Get the template content with codebase and previous stage context
-    const templateContent = getTemplateWithCodebaseContext(
-      stageId,
-      this.formatCodebaseContext(codebaseData),
-      previousContext
-    );
-
-    // Substitute template variables
-    let promptContent = this.substituteTemplateVariables(templateContent, contextData);
+    // Get the template content (now context-file focused)
+    const templateContent = stageTemplate.template;
 
     // Prepend context frame and a short reasoning guardrail
     const deliberateHeader = [
@@ -74,7 +77,7 @@ export class PromptGenerator {
       '',
     ].join('\n');
 
-    promptContent = deliberateHeader + promptContent;
+    const promptContent = deliberateHeader + templateContent;
 
     return {
       id: stageTemplate.id,
