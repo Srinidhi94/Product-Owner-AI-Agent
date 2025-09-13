@@ -164,7 +164,7 @@ describe('PromptTemplates', () => {
       MULTI_STAGE_TEMPLATES.forEach(template => {
         // Templates should focus on instructions and reference context files
         expect(template.template).toContain('🎯 YOUR TASK:');
-        expect(template.template).toContain('OUTPUT INSTRUCTIONS');
+        expect(template.template).toContain('OUTPUT FORMAT');
       });
     });
   });

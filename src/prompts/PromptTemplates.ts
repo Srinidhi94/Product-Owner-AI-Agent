@@ -31,16 +31,21 @@ Create mermaid diagrams for:
 1. **User Journey Flow** - End-to-end experience mapping
 2. **Feature Priority Matrix** - MoSCoW with effort/impact scoring
 
-**✅ OUTPUT REQUIREMENTS:**
-- **Evidence-Based Analysis:** Cite specific Jira keys and file paths
-- **Confidence Scoring:** Rate confidence (1-10) for major business recommendations
-- **Context File References:** Link back to specific sections in context files
+**✅ ACTION-ORIENTED OUTPUT:**
+
+**STEP 1: UPDATE ANALYSIS.md**
+Add your findings under "## Stage 1: Product Requirements Analysis" section, including:
+- Evidence-based analysis with specific Jira keys and file paths
+- Confidence scoring (1-10) for major business recommendations
+- Context file references linking to specific sections
 - **Business Metrics:** Include measurable success criteria and KPIs
 
 **🔧 MCP TOOLS & ANALYSIS:**
 Ensure to use your MCP servers and tools to think through this in detail, plan comprehensively while keeping it focused on the requirements and guidelines and do the necessary analysis accurately without any hallucinations. Available tools may include filesystem, sequential-thinking, memory, and others depending on your setup.
 
-**🔍 OUTPUT FORMAT:**
+**🎯 YOUR ACTION:**
+UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 1: Product Requirements Analysis" section. Build your analysis using the following structure:
+
 ## Executive Summary
 [Business overview with confidence scores and Jira key references]
 
@@ -59,16 +64,10 @@ Ensure to use your MCP servers and tools to think through this in detail, plan c
 ## Success Metrics & KPIs
 [Measurable outcomes linked to Jira acceptance criteria]
 
-## MCP Tools Used
-[Document which tools were used and findings]
-
-## Context File References
-[Specific sections referenced from CONTEXT.md, JIRA.md, CODEBASE.md]
-
 [Include required mermaid diagrams]
 
 **Next Stage Context:**
-Provide validated requirements and technical constraints for Principal Engineer architecture design, including key business drivers and technical feasibility insights.
+Your analysis will provide validated requirements and technical constraints for the Principal Engineer architecture design stage.
 `;
 
 // Stage 2: Principal Engineer (Architecture) - System Architecture Design
@@ -99,13 +98,18 @@ Create mermaid diagrams for:
 1. **System Architecture Overview** - High-level component relationships
 2. **Data Flow Architecture** - Information flow through system components
 
-**✅ OUTPUT REQUIREMENTS:**
-- **Evidence-Based Design:** Cite specific files and existing patterns
-- **Confidence Scoring:** Rate confidence (1-10) for architectural decisions
-- **Backward Compatibility:** Ensure all changes respect existing patterns
+**✅ ACTION-ORIENTED OUTPUT:**
+
+**STEP 1: UPDATE ANALYSIS.md**
+Add your findings under "## Stage 2: System Architecture Analysis" section, including:
+- Evidence-based design citing specific files and existing patterns
+- Confidence scoring (1-10) for architectural decisions
+- Backward compatibility analysis ensuring changes respect existing patterns
 - **Technical Debt Assessment:** Identify and plan resolution strategies
 
-**🔍 OUTPUT FORMAT:**
+**🎯 YOUR ACTION:**
+UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 2: System Architecture Design" section, building on the Stage 1 analysis. Use the following structure:
+
 ## Architecture Overview
 [System design with confidence scores and file references]
 
@@ -124,16 +128,10 @@ Create mermaid diagrams for:
 ## Security Architecture
 [Security design aligned with existing practices]
 
-## MCP Tools Used
-[Document tools used and architectural insights discovered]
-
-## Context File References
-[Specific sections referenced from context files]
-
 [Include required mermaid diagrams]
 
 **Next Stage Context:**
-Provide architectural foundation and design constraints for technical design specification, including chosen patterns and implementation guidelines.
+Your architectural analysis will provide the foundation for the technical design specification stage.
 `;
 
 // Stage 3: Principal Engineer (Technical Design) - Technical Design Specification
@@ -164,10 +162,13 @@ Create mermaid diagrams for:
 1. **API Sequence Flows** - Request/response patterns for key scenarios
 2. **Data Model Relationships** - Entity relationships and schema design
 
-**✅ OUTPUT REQUIREMENTS:**
-- **Pattern Consistency:** Follow existing code patterns and conventions
-- **Evidence-Based Design:** Cite specific files and implementation examples
-- **Confidence Scoring:** Rate confidence (1-10) for technical design decisions
+**✅ ACTION-ORIENTED OUTPUT:**
+
+**STEP 1: UPDATE ANALYSIS.md**
+Add your findings under "## Stage 3: Technical Design & Implementation" section, including:
+- Pattern consistency following existing code patterns and conventions
+- Evidence-based design citing specific files and implementation examples
+- Confidence scoring (1-10) for technical design decisions
 - **Testing Strategy:** Plan testing based on existing test infrastructure
 - **Implementation Guidance:** Provide clear, actionable implementation steps
 
@@ -197,7 +198,9 @@ Create mermaid diagrams for:
 - Event-driven architecture alignment with current messaging and async processing patterns
 - Refactoring recommendations for existing code that needs improvement to support new features
 
-**🔍 OUTPUT FORMAT:**
+**🎯 YOUR ACTION:**
+UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 3: Technical Design Specification" section, building on Stages 1-2 analysis. Use the following structure:
+
 ## Technical Overview
 [Design approach with confidence scores and pattern references]
 
@@ -216,16 +219,10 @@ Create mermaid diagrams for:
 ## Implementation Guidelines
 [Coding standards based on existing project conventions]
 
-## MCP Tools Used
-[Document tools used and technical insights discovered]
-
-## Context File References
-[Specific sections referenced from context files]
-
 [Include required mermaid diagrams]
 
 **Next Stage Context:**
-Provide technical specifications and implementation guidelines for deployment strategy, including testability requirements and quality benchmarks.
+Your technical specifications will guide the implementation and deployment strategy stage.
 `;
 
 // Stage 4: Principal Engineer (Implementation) - Implementation & Deployment Strategy
@@ -275,10 +272,13 @@ Create mermaid diagrams for:
 1. **CI/CD Pipeline Flow** - Build, test, and deployment automation
 2. **Infrastructure Architecture** - Environment setup and resource allocation
 
-**✅ OUTPUT REQUIREMENTS:**
-- **Infrastructure Consistency:** Follow existing CI/CD and deployment patterns
-- **Evidence-Based Strategy:** Cite specific configuration files and pipeline examples
-- **Confidence Scoring:** Rate confidence (1-10) for implementation decisions
+**✅ ACTION-ORIENTED OUTPUT:**
+
+**STEP 1: UPDATE ANALYSIS.md**
+Add your findings under "## Stage 4: Implementation Strategy & Technical Design" section, including:
+- Infrastructure consistency following existing CI/CD and deployment patterns
+- Evidence-based strategy citing specific configuration files and pipeline examples
+- Confidence scoring (1-10) for implementation decisions
 - **Operational Excellence:** Plan monitoring based on existing observability infrastructure
 - **Risk Management:** Provide rollback and disaster recovery procedures
 
@@ -306,7 +306,9 @@ Create mermaid diagrams for:
 - Existing secret management and configuration security assessment
 - Network security and access controls analysis and improvements
 
-**🔍 OUTPUT FORMAT:**
+**🎯 YOUR ACTION:**
+UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 4: Implementation & Deployment Strategy" section, building on Stages 1-3 analysis. Use the following structure:
+
 ## Implementation Strategy
 [Development workflow with confidence scores and infrastructure references]
 
@@ -325,16 +327,13 @@ Create mermaid diagrams for:
 ## Operational Procedures
 [Procedures aligned with existing operational patterns]
 
-## MCP Tools Used
-[Document tools used and implementation insights discovered]
-
-## Context File References
-[Specific sections referenced from context files]
+**CRITICAL: UPDATE ANALYSIS.md FILE**
+After completing your analysis, you MUST update the ANALYSIS.md file by adding your findings under the "## Stage 4: Implementation Strategy & Technical Design" section. Build upon the previous stages' content sequentially.
 
 [Include required mermaid diagrams]
 
 **Next Stage Context:**
-Provide complete technical foundation for Product Owner sprint planning, including implementation roadmap and operational requirements.
+Your implementation strategy will inform the final sprint planning and Jira breakdown stage.
 `;
 
 // Stage 5: Product Owner - Sprint Planning & Jira Epic Breakdown
@@ -365,10 +364,13 @@ Create mermaid diagrams for:
 1. **Sprint Timeline & Roadmap** - Multi-sprint plan with dependencies and milestones
 2. **Feature Priority Matrix** - Business value vs. technical complexity analysis
 
-**✅ OUTPUT REQUIREMENTS:**
-- **Actionable Planning:** Create specific, implementable sprint plans and tickets
-- **Evidence-Based Prioritization:** Ground priorities in business value and technical analysis
-- **Realistic Estimation:** Size stories based on technical complexity assessment
+**✅ ACTION-ORIENTED OUTPUT:**
+
+**STEP 1: UPDATE ANALYSIS.md**
+Add your findings under "## Stage 5: Sprint Planning & Jira Breakdown" section, including:
+- Actionable planning with specific, implementable sprint plans and tickets
+- Evidence-based prioritization grounded in business value and technical analysis
+- Realistic estimation sizing stories based on technical complexity assessment
 - **Risk Mitigation:** Identify and plan for technical and business risks
 - **Stakeholder Alignment:** Ensure plans align with business requirements and constraints
 
@@ -410,30 +412,22 @@ Create mermaid diagrams for:
 - Business stakeholder engagement and feedback loops
 - Documentation and knowledge transfer planning
 
-**🔍 OUTPUT FORMAT:**
-## Executive Summary
-[Project overview with business value, timeline, and confidence scores]
+**🔍 ACTION-ORIENTED OUTPUT:**
 
-## Sprint Planning & Roadmap
-[Multi-sprint plan based on technical complexity and business priorities]
+**STEP 1: UPDATE ANALYSIS.md**
+Add the following sections under "## Stage 5: Sprint Planning & Jira Breakdown":
+- Executive Summary with project overview and business value
+- Sprint Planning & Roadmap with multi-sprint timeline
+- Jira Epic & Story Breakdown with detailed tickets
+- Resource Allocation & Timeline with capacity planning
+- Risk Management & Quality Gates with mitigation strategies
+- Stakeholder Communication Plan with reporting processes
 
-## Jira Epic & Story Breakdown
-[Detailed tickets with acceptance criteria and dependencies]
+**STEP 2: CREATE IMPLEMENTATION ARTIFACTS**
+Generate actionable deliverables that can be immediately used by development teams
 
-## Resource Allocation & Timeline
-[Team capacity planning with realistic estimates]
-
-## Risk Management & Quality Gates
-[Risk mitigation strategies and milestone checkpoints]
-
-## Stakeholder Communication Plan
-[Progress reporting and review processes]
-
-## MCP Tools Used
-[Document tools used and planning insights discovered]
-
-## Context File References
-[Specific sections referenced from context files]
+**CRITICAL: UPDATE ANALYSIS.md FILE**
+After completing your analysis, you MUST update the ANALYSIS.md file by adding your findings under the "## Stage 5: Sprint Planning & Jira Breakdown" section. This is the final stage - ensure your content builds upon and synthesizes all previous stages' analysis.
 
 [Include required mermaid diagrams]
 

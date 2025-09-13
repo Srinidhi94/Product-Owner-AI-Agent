@@ -2,7 +2,7 @@
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
   "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
-  "version": "1.0.5",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
