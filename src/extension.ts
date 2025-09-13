@@ -300,7 +300,6 @@ function registerCommands(
     }
   );
 
-
   // Register cancel analysis command
   const cancelAnalysisCommand = vscode.commands.registerCommand(
     'aiProductOwner.cancelAnalysis',

@@ -96,12 +96,14 @@ ai-analysis/
 ```
 
 ### Context File Architecture Benefits
+
 - **60-70% Token Reduction**: Streamlined prompts reference context files instead of embedding large contexts
 - **Enhanced AI Grounding**: Context files provide explicit grounding for better analysis accuracy
 - **Better Maintainability**: Context written once, referenced by all analysis stages
 - **Anti-Hallucination Protocol**: Explicit context file references prevent AI from making unfounded assumptions
 
 ### Key Features
+
 - **Epic-Specific Organization**: Each Jira epic gets its own analysis folder with dedicated context files
 - **Comprehensive Coverage**: From business requirements to implementation strategy
 - **GitHub Copilot Integration**: Seamless AI-powered analysis workflow with optimized prompts

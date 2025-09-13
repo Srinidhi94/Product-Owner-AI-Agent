@@ -10,12 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Major Prompt Engineering Optimization
 
 - **Simplified Prompt Templates**: Complete refactoring of all 5 stage prompt templates for improved flexibility
+
   - Removed specific MCP server dependencies (mcp4_read_text_file, mcp6_create_entities, etc.) to support diverse user setups
   - Replaced prescriptive workflow instructions with flexible analysis frameworks
   - Added generic MCP tools usage statements allowing adaptation to any available MCP server configuration
   - Reduced visualization requirements from 4+ to 1-3 per stage, focusing on essential diagrams only
 
 - **Enhanced Context File Architecture**: Improved document generation workflow
+
   - Added automatic JIRA.md and CODEBASE.md generation during analysis initialization
   - Ensured all context files (CONTEXT.md, JIRA.md, CODEBASE.md, ANALYSIS.md) are created before stage execution
   - Maintained separation of large context data from prompt templates to reduce token usage
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🔧 Technical Improvements
 
 - **Prompt Template Flexibility**: Templates now work with any MCP server configuration
+
   - No assumptions about specific tools being available
   - Graceful adaptation to different user environments
   - Maintained comprehensive analysis quality while improving compatibility

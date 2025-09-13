@@ -166,7 +166,11 @@ type: context-frame
 - **Analysis Timestamp:** ${timestamp}
 
 ### Architectural Constraints
-- **Existing Patterns:** ${codebase.patterns.length > 0 ? codebase.patterns.map(p => p.name).join(', ') : 'None identified'}
+- **Existing Patterns:** ${
+      codebase.patterns.length > 0
+        ? codebase.patterns.map(p => p.name).join(', ')
+        : 'None identified'
+    }
 - **Technical Debt Score:** ${codebase.metrics.technicalDebt}/10
 - **Complexity Score:** ${codebase.metrics.complexity}/10
 - **Maintainability Score:** ${codebase.metrics.maintainability}/10
@@ -608,7 +612,9 @@ ${analysisSections}
     const timestamp = new Date().toISOString();
 
     // Generate technology stack details
-    const techStackDetails = codebase.techStack.map(tech => `
+    const techStackDetails = codebase.techStack
+      .map(
+        tech => `
 ### ${tech.name} ${tech.version ? `(${tech.version})` : ''}
 
 **Type:** ${tech.type}
@@ -616,13 +622,25 @@ ${analysisSections}
 **Usage Context:** ${(tech as any).usage || 'Not specified'}
 
 ${(tech as any).description ? `**Description:** ${(tech as any).description}` : ''}
-${(tech as any).configFiles && (tech as any).configFiles.length > 0 ? `**Config Files:** ${(tech as any).configFiles.join(', ')}` : ''}
-${(tech as any).dependencies && (tech as any).dependencies.length > 0 ? `**Dependencies:** ${(tech as any).dependencies.join(', ')}` : ''}
+${
+  (tech as any).configFiles && (tech as any).configFiles.length > 0
+    ? `**Config Files:** ${(tech as any).configFiles.join(', ')}`
+    : ''
+}
+${
+  (tech as any).dependencies && (tech as any).dependencies.length > 0
+    ? `**Dependencies:** ${(tech as any).dependencies.join(', ')}`
+    : ''
+}
 
----`).join('\n');
+---`
+      )
+      .join('\n');
 
     // Generate architectural patterns
-    const patternsDetails = codebase.patterns.map(pattern => `
+    const patternsDetails = codebase.patterns
+      .map(
+        pattern => `
 ### ${pattern.name}
 
 **Type:** ${(pattern as any).type || 'Unknown'}
@@ -630,47 +648,68 @@ ${(tech as any).dependencies && (tech as any).dependencies.length > 0 ? `**Depen
 **Files:** ${pattern.files.length} files implementing this pattern
 
 **Key Files:**
-${pattern.files.slice(0, 5).map(file => `- \`${file}\``).join('\n')}
+${pattern.files
+  .slice(0, 5)
+  .map(file => `- \`${file}\``)
+  .join('\n')}
 ${pattern.files.length > 5 ? `- ... and ${pattern.files.length - 5} more files` : ''}
 
 **Description:** ${pattern.description || 'Pattern description not available'}
 
----`).join('\n');
+---`
+      )
+      .join('\n');
 
     // Generate entry points analysis
-    const entryPointsDetails = (codebase as any).entryPoints?.map((entry: any) => `
+    const entryPointsDetails =
+      (codebase as any).entryPoints
+        ?.map(
+          (entry: any) => `
 ### ${entry.file}
 
 **Type:** ${entry.type}
 **Purpose:** ${entry.purpose || 'Entry point purpose not specified'}
 **Dependencies:** ${entry.dependencies?.length || 0} direct dependencies
 
-${entry.dependencies && entry.dependencies.length > 0 ? `
+${
+  entry.dependencies && entry.dependencies.length > 0
+    ? `
 **Key Dependencies:**
-${entry.dependencies.slice(0, 10).map((dep: any) => `- ${dep}`).join('\n')}
-${entry.dependencies.length > 10 ? `- ... and ${entry.dependencies.length - 10} more dependencies` : ''}
-` : ''}
+${entry.dependencies
+  .slice(0, 10)
+  .map((dep: any) => `- ${dep}`)
+  .join('\n')}
+${
+  entry.dependencies.length > 10
+    ? `- ... and ${entry.dependencies.length - 10} more dependencies`
+    : ''
+}
+`
+    : ''
+}
 
----`).join('\n') || 'No entry points identified';
+---`
+        )
+        .join('\n') || 'No entry points identified';
 
     // Generate file structure analysis
     const generateFileStructure = (structure: any, depth = 0): string => {
       const indent = '  '.repeat(depth);
       let result = '';
-      
+
       if (structure.files) {
         structure.files.forEach((file: string) => {
           result += `${indent}- 📄 ${file}\n`;
         });
       }
-      
+
       if (structure.directories) {
         Object.entries(structure.directories).forEach(([dirName, dirContent]) => {
           result += `${indent}- 📁 ${dirName}/\n`;
           result += generateFileStructure(dirContent, depth + 1);
         });
       }
-      
+
       return result;
     };
 
@@ -708,12 +747,18 @@ ${entryPointsDetails || 'No entry points identified'}
 - **Technical Debt Score:** ${codebase.metrics.technicalDebt}/10
 - **Complexity Score:** ${codebase.metrics.complexity}/10
 - **Maintainability Score:** ${codebase.metrics.maintainability}/10
-- **Test Coverage:** ${codebase.metrics.testCoverage ? `${codebase.metrics.testCoverage}%` : 'Not available'}
+- **Test Coverage:** ${
+      codebase.metrics.testCoverage ? `${codebase.metrics.testCoverage}%` : 'Not available'
+    }
 
 ### Code Organization
 - **Cyclomatic Complexity:** ${(codebase.metrics as any).cyclomaticComplexity || 'Not calculated'}
 - **Lines of Code:** ${(codebase.metrics as any).linesOfCode || 'Not counted'}
-- **Code Duplication:** ${(codebase.metrics as any).duplication ? `${(codebase.metrics as any).duplication}%` : 'Not analyzed'}
+- **Code Duplication:** ${
+      (codebase.metrics as any).duplication
+        ? `${(codebase.metrics as any).duplication}%`
+        : 'Not analyzed'
+    }
 
 ## File Structure Overview
 
@@ -725,21 +770,39 @@ ${generateFileStructure((codebase as any).structure || {})}
 ## Dependencies Analysis
 
 ### Production Dependencies
-${(codebase as any).dependencies?.production?.length > 0 ? 
-  (codebase as any).dependencies.production.map((dep: any) => `- **${dep.name}** (${dep.version}) - ${dep.description || 'No description'}`).join('\n') :
-  'No production dependencies identified'
+${
+  (codebase as any).dependencies?.production?.length > 0
+    ? (codebase as any).dependencies.production
+        .map(
+          (dep: any) =>
+            `- **${dep.name}** (${dep.version}) - ${dep.description || 'No description'}`
+        )
+        .join('\n')
+    : 'No production dependencies identified'
 }
 
 ### Development Dependencies
-${(codebase as any).dependencies?.development?.length > 0 ? 
-  (codebase as any).dependencies.development.map((dep: any) => `- **${dep.name}** (${dep.version}) - ${dep.description || 'No description'}`).join('\n') :
-  'No development dependencies identified'
+${
+  (codebase as any).dependencies?.development?.length > 0
+    ? (codebase as any).dependencies.development
+        .map(
+          (dep: any) =>
+            `- **${dep.name}** (${dep.version}) - ${dep.description || 'No description'}`
+        )
+        .join('\n')
+    : 'No development dependencies identified'
 }
 
 ### Security Vulnerabilities
-${(codebase as any).dependencies?.vulnerabilities?.length > 0 ? 
-  (codebase as any).dependencies.vulnerabilities.map((vuln: any) => `- **${vuln.severity}**: ${vuln.title} in ${vuln.package} (${vuln.version})`).join('\n') :
-  'No known security vulnerabilities detected'
+${
+  (codebase as any).dependencies?.vulnerabilities?.length > 0
+    ? (codebase as any).dependencies.vulnerabilities
+        .map(
+          (vuln: any) =>
+            `- **${vuln.severity}**: ${vuln.title} in ${vuln.package} (${vuln.version})`
+        )
+        .join('\n')
+    : 'No known security vulnerabilities detected'
 }
 
 ## Testing Infrastructure
@@ -753,29 +816,35 @@ ${(codebase as any).testing?.framework || 'Test framework not identified'}
 - **E2E Tests:** ${(codebase as any).testing?.e2eTests || 'Not analyzed'}
 
 ### Test Files Location
-${(codebase as any).testing?.testFiles?.length > 0 ? 
-  (codebase as any).testing.testFiles.map((file: any) => `- \`${file}\``).join('\n') :
-  'No test files identified'
+${
+  (codebase as any).testing?.testFiles?.length > 0
+    ? (codebase as any).testing.testFiles.map((file: any) => `- \`${file}\``).join('\n')
+    : 'No test files identified'
 }
 
 ## Build and Deployment
 
 ### Build Configuration
-${(codebase as any).build?.configFiles?.length > 0 ? 
-  (codebase as any).build.configFiles.map((file: any) => `- \`${file}\``).join('\n') :
-  'No build configuration files identified'
+${
+  (codebase as any).build?.configFiles?.length > 0
+    ? (codebase as any).build.configFiles.map((file: any) => `- \`${file}\``).join('\n')
+    : 'No build configuration files identified'
 }
 
 ### Deployment Scripts
-${(codebase as any).deployment?.scripts?.length > 0 ? 
-  (codebase as any).deployment.scripts.map((script: any) => `- \`${script}\``).join('\n') :
-  'No deployment scripts identified'
+${
+  (codebase as any).deployment?.scripts?.length > 0
+    ? (codebase as any).deployment.scripts.map((script: any) => `- \`${script}\``).join('\n')
+    : 'No deployment scripts identified'
 }
 
 ### Environment Configuration
-${(codebase as any).deployment?.environments?.length > 0 ? 
-  (codebase as any).deployment.environments.map((env: any) => `- **${env.name}**: ${env.description || 'No description'}`).join('\n') :
-  'No environment configurations identified'
+${
+  (codebase as any).deployment?.environments?.length > 0
+    ? (codebase as any).deployment.environments
+        .map((env: any) => `- **${env.name}**: ${env.description || 'No description'}`)
+        .join('\n')
+    : 'No environment configurations identified'
 }
 
 ## Security Analysis
@@ -787,9 +856,10 @@ ${(codebase as any).deployment?.environments?.length > 0 ?
 - **Input Validation:** ${(codebase as any).security?.inputValidation || 'Not analyzed'}
 
 ### Security Configuration Files
-${(codebase as any).security?.configFiles?.length > 0 ? 
-  (codebase as any).security.configFiles.map((file: any) => `- \`${file}\``).join('\n') :
-  'No security configuration files identified'
+${
+  (codebase as any).security?.configFiles?.length > 0
+    ? (codebase as any).security.configFiles.map((file: any) => `- \`${file}\``).join('\n')
+    : 'No security configuration files identified'
 }
 
 ## Performance Considerations
@@ -800,21 +870,32 @@ ${(codebase as any).security?.configFiles?.length > 0 ?
 - **Memory Usage:** ${(codebase as any).performance?.memoryUsage || 'Not profiled'}
 
 ### Performance Optimization
-${(codebase as any).performance?.optimizations?.length > 0 ? 
-  (codebase as any).performance.optimizations.map((opt: any) => `- ${opt}`).join('\n') :
-  'No performance optimizations identified'
+${
+  (codebase as any).performance?.optimizations?.length > 0
+    ? (codebase as any).performance.optimizations.map((opt: any) => `- ${opt}`).join('\n')
+    : 'No performance optimizations identified'
 }
 
 ## Documentation Analysis
 
 ### Available Documentation
-${(codebase as any).documentation?.files?.length > 0 ? 
-  (codebase as any).documentation.files.map((file: any) => `- [\`${file.name}\`](${file.path}) - ${file.description || 'No description'}`).join('\n') :
-  'No documentation files found'
+${
+  (codebase as any).documentation?.files?.length > 0
+    ? (codebase as any).documentation.files
+        .map(
+          (file: any) =>
+            `- [\`${file.name}\`](${file.path}) - ${file.description || 'No description'}`
+        )
+        .join('\n')
+    : 'No documentation files found'
 }
 
 ### API Documentation
-${(codebase as any).documentation?.apiDocs ? `Available at: ${(codebase as any).documentation.apiDocs}` : 'No API documentation identified'}
+${
+  (codebase as any).documentation?.apiDocs
+    ? `Available at: ${(codebase as any).documentation.apiDocs}`
+    : 'No API documentation identified'
+}
 
 ## MCP Tool Integration Guidelines
 
@@ -838,13 +919,27 @@ ${(codebase as any).documentation?.apiDocs ? `Available at: ${(codebase as any).
 ### Key Files to Examine
 
 #### Configuration Files
-${codebase.techStack.flatMap(tech => (tech as any).configFiles || []).map(file => `- \`${file}\``).join('\n') || 'No configuration files identified'}
+${
+  codebase.techStack
+    .flatMap(tech => (tech as any).configFiles || [])
+    .map(file => `- \`${file}\``)
+    .join('\n') || 'No configuration files identified'
+}
 
 #### Entry Points
-${(codebase as any).entryPoints?.map((entry: any) => `- \`${entry.file}\` (${entry.type})`).join('\n') || 'No entry points identified'}
+${
+  (codebase as any).entryPoints
+    ?.map((entry: any) => `- \`${entry.file}\` (${entry.type})`)
+    .join('\n') || 'No entry points identified'
+}
 
 #### Critical Implementation Files
-${codebase.patterns.flatMap(pattern => pattern.files.slice(0, 3)).map(file => `- \`${file}\``).join('\n') || 'No critical files identified'}
+${
+  codebase.patterns
+    .flatMap(pattern => pattern.files.slice(0, 3))
+    .map(file => `- \`${file}\``)
+    .join('\n') || 'No critical files identified'
+}
 
 ## Analysis Guidelines for AI
 
@@ -870,11 +965,17 @@ ${codebase.patterns.flatMap(pattern => pattern.files.slice(0, 3)).map(file => `-
 
 ### Technical Constraints
 - **Legacy Code:** ${(codebase as any).constraints?.legacy || 'No legacy constraints identified'}
-- **Performance Requirements:** ${(codebase as any).constraints?.performance || 'No performance constraints identified'}
-- **Security Requirements:** ${(codebase as any).constraints?.security || 'No security constraints identified'}
+- **Performance Requirements:** ${
+      (codebase as any).constraints?.performance || 'No performance constraints identified'
+    }
+- **Security Requirements:** ${
+      (codebase as any).constraints?.security || 'No security constraints identified'
+    }
 
 ### Resource Constraints
-- **Team Skills:** ${(codebase as any).constraints?.teamSkills || 'Team skill constraints not identified'}
+- **Team Skills:** ${
+      (codebase as any).constraints?.teamSkills || 'Team skill constraints not identified'
+    }
 - **Timeline:** ${(codebase as any).constraints?.timeline || 'Timeline constraints not identified'}
 - **Budget:** ${(codebase as any).constraints?.budget || 'Budget constraints not identified'}
 
@@ -913,8 +1014,11 @@ ${codebase.patterns.flatMap(pattern => pattern.files.slice(0, 3)).map(file => `-
     const timestamp = new Date().toISOString();
 
     // Generate detailed epic sections
-    const epicSections = jiraData.epics.map(epic => {
-      const storySections = epic.stories.map(story => `
+    const epicSections = jiraData.epics
+      .map(epic => {
+        const storySections = epic.stories
+          .map(
+            story => `
 ### Story: ${story.key} - ${story.summary}
 
 **Status:** ${story.status}
@@ -936,9 +1040,11 @@ ${(story as any).businessValue || 'Business value not specified'}
 ${(story as any).technicalNotes || 'No technical notes provided'}
 
 **Dependencies:**
-${(story as any).dependencies && (story as any).dependencies.length > 0 
-  ? (story as any).dependencies.map((dep: any) => `- ${dep.key}: ${dep.summary}`).join('\n')
-  : 'No dependencies identified'}
+${
+  (story as any).dependencies && (story as any).dependencies.length > 0
+    ? (story as any).dependencies.map((dep: any) => `- ${dep.key}: ${dep.summary}`).join('\n')
+    : 'No dependencies identified'
+}
 
 **Labels:** ${story.labels.length > 0 ? story.labels.join(', ') : 'None'}
 **Components:** ${story.components.length > 0 ? story.components.join(', ') : 'None'}
@@ -946,9 +1052,11 @@ ${(story as any).dependencies && (story as any).dependencies.length > 0
 **Definition of Done:**
 ${(story as any).definitionOfDone || 'Standard definition of done applies'}
 
----`).join('\n');
+---`
+          )
+          .join('\n');
 
-      return `
+        return `
 ## Epic: ${epic.key} - ${epic.summary}
 
 **Status:** ${epic.status}
@@ -971,37 +1079,84 @@ ${(epic as any).businessObjective || 'Business objective not specified'}
 ${(epic as any).successCriteria || 'Success criteria not defined'}
 
 **Stakeholders:**
-${(epic as any).stakeholders && (epic as any).stakeholders.length > 0 
-  ? (epic as any).stakeholders.map((stakeholder: any) => `- ${stakeholder.displayName} (${stakeholder.role || 'Role not specified'})`).join('\n')
-  : 'No stakeholders identified'}
+${
+  (epic as any).stakeholders && (epic as any).stakeholders.length > 0
+    ? (epic as any).stakeholders
+        .map(
+          (stakeholder: any) =>
+            `- ${stakeholder.displayName} (${stakeholder.role || 'Role not specified'})`
+        )
+        .join('\n')
+    : 'No stakeholders identified'
+}
 
 **Risk Assessment:**
-${(epic as any).risks && (epic as any).risks.length > 0
-  ? (epic as any).risks.map((risk: any) => `- **${risk.level}**: ${risk.description} (Mitigation: ${risk.mitigation || 'Not specified'})`).join('\n')
-  : 'No risks identified'}
+${
+  (epic as any).risks && (epic as any).risks.length > 0
+    ? (epic as any).risks
+        .map(
+          (risk: any) =>
+            `- **${risk.level}**: ${risk.description} (Mitigation: ${
+              risk.mitigation || 'Not specified'
+            })`
+        )
+        .join('\n')
+    : 'No risks identified'
+}
 
 ### Stories in this Epic (${epic.stories.length} stories)
 
 ${storySections}
 
 ---`;
-    }).join('\n');
+      })
+      .join('\n');
 
     // Calculate additional metrics
     const totalStories = jiraData.epics.reduce((sum, epic) => sum + epic.stories.length, 0);
-    const completedStories = jiraData.epics.reduce((sum, epic) => 
-      sum + epic.stories.filter(story => story.status === 'Done' || story.status === 'Closed').length, 0);
-    const inProgressStories = jiraData.epics.reduce((sum, epic) => 
-      sum + epic.stories.filter(story => story.status === 'In Progress' || story.status === 'In Development').length, 0);
-    const blockedStories = jiraData.epics.reduce((sum, epic) => 
-      sum + epic.stories.filter(story => story.status === 'Blocked' || story.status === 'Impediment').length, 0);
+    const completedStories = jiraData.epics.reduce(
+      (sum, epic) =>
+        sum +
+        epic.stories.filter(story => story.status === 'Done' || story.status === 'Closed').length,
+      0
+    );
+    const inProgressStories = jiraData.epics.reduce(
+      (sum, epic) =>
+        sum +
+        epic.stories.filter(
+          story => story.status === 'In Progress' || story.status === 'In Development'
+        ).length,
+      0
+    );
+    const blockedStories = jiraData.epics.reduce(
+      (sum, epic) =>
+        sum +
+        epic.stories.filter(story => story.status === 'Blocked' || story.status === 'Impediment')
+          .length,
+      0
+    );
 
     const storiesByPriority = {
-      highest: jiraData.epics.reduce((sum, epic) => sum + epic.stories.filter(story => story.priority === 'Highest').length, 0),
-      high: jiraData.epics.reduce((sum, epic) => sum + epic.stories.filter(story => story.priority === 'High').length, 0),
-      medium: jiraData.epics.reduce((sum, epic) => sum + epic.stories.filter(story => story.priority === 'Medium').length, 0),
-      low: jiraData.epics.reduce((sum, epic) => sum + epic.stories.filter(story => story.priority === 'Low').length, 0),
-      lowest: jiraData.epics.reduce((sum, epic) => sum + epic.stories.filter(story => story.priority === 'Lowest').length, 0)
+      highest: jiraData.epics.reduce(
+        (sum, epic) => sum + epic.stories.filter(story => story.priority === 'Highest').length,
+        0
+      ),
+      high: jiraData.epics.reduce(
+        (sum, epic) => sum + epic.stories.filter(story => story.priority === 'High').length,
+        0
+      ),
+      medium: jiraData.epics.reduce(
+        (sum, epic) => sum + epic.stories.filter(story => story.priority === 'Medium').length,
+        0
+      ),
+      low: jiraData.epics.reduce(
+        (sum, epic) => sum + epic.stories.filter(story => story.priority === 'Low').length,
+        0
+      ),
+      lowest: jiraData.epics.reduce(
+        (sum, epic) => sum + epic.stories.filter(story => story.priority === 'Lowest').length,
+        0
+      ),
     };
 
     return `---
@@ -1074,9 +1229,15 @@ When analyzing this Jira data, follow these detailed guidelines:
 ### Story Distribution
 - **Total Epics:** ${jiraData.epics.length}
 - **Total Stories:** ${totalStories}
-- **Completed Stories:** ${completedStories} (${totalStories > 0 ? Math.round((completedStories / totalStories) * 100) : 0}%)
-- **In Progress Stories:** ${inProgressStories} (${totalStories > 0 ? Math.round((inProgressStories / totalStories) * 100) : 0}%)
-- **Blocked Stories:** ${blockedStories} (${totalStories > 0 ? Math.round((blockedStories / totalStories) * 100) : 0}%)
+- **Completed Stories:** ${completedStories} (${
+      totalStories > 0 ? Math.round((completedStories / totalStories) * 100) : 0
+    }%)
+- **In Progress Stories:** ${inProgressStories} (${
+      totalStories > 0 ? Math.round((inProgressStories / totalStories) * 100) : 0
+    }%)
+- **Blocked Stories:** ${blockedStories} (${
+      totalStories > 0 ? Math.round((blockedStories / totalStories) * 100) : 0
+    }%)
 
 ### Priority Breakdown
 - **Highest Priority:** ${storiesByPriority.highest} stories
@@ -1086,14 +1247,30 @@ When analyzing this Jira data, follow these detailed guidelines:
 - **Lowest Priority:** ${storiesByPriority.lowest} stories
 
 ### Velocity Metrics
-- **Average Points per Epic:** ${jiraData.epics.length > 0 ? Math.round(jiraData.totalStoryPoints / jiraData.epics.length) : 0}
-- **Average Points per Story:** ${totalStories > 0 ? Math.round(jiraData.totalStoryPoints / totalStories) : 0}
-- **Completion Rate:** ${jiraData.epics.length > 0 ? Math.round((jiraData.epics.filter(epic => epic.status === 'Done').length / jiraData.epics.length) * 100) : 0}%
+- **Average Points per Epic:** ${
+      jiraData.epics.length > 0 ? Math.round(jiraData.totalStoryPoints / jiraData.epics.length) : 0
+    }
+- **Average Points per Story:** ${
+      totalStories > 0 ? Math.round(jiraData.totalStoryPoints / totalStories) : 0
+    }
+- **Completion Rate:** ${
+      jiraData.epics.length > 0
+        ? Math.round(
+            (jiraData.epics.filter(epic => epic.status === 'Done').length / jiraData.epics.length) *
+              100
+          )
+        : 0
+    }%
 
 ### Key Stakeholders
-${jiraData.epics.map(epic => 
-  `**${epic.key}:** ${epic.assignee?.displayName || 'Unassigned'} (Assignee), ${epic.reporter?.displayName || 'Unknown'} (Reporter)`
-).join('\n')}
+${jiraData.epics
+  .map(
+    epic =>
+      `**${epic.key}:** ${epic.assignee?.displayName || 'Unassigned'} (Assignee), ${
+        epic.reporter?.displayName || 'Unknown'
+      } (Reporter)`
+  )
+  .join('\n')}
 
 ## Analysis Instructions for AI
 

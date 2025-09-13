@@ -5,10 +5,7 @@
 
 import * as vscode from 'vscode';
 import { JiraPortfolio, CodebaseAnalysis } from '../types';
-import {
-  StageTemplate,
-  MULTI_STAGE_TEMPLATES,
-} from './PromptTemplates';
+import { StageTemplate, MULTI_STAGE_TEMPLATES } from './PromptTemplates';
 import { buildContextFrame } from './ContextEngineering';
 
 export interface GeneratedPrompt {
@@ -73,7 +70,6 @@ export class PromptGenerator {
       timestamp: new Date().toISOString(),
     };
   }
-
 
   /**
    * Get available stage templates

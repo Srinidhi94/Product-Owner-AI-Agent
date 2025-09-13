@@ -583,4 +583,3 @@ export function validateStageIntegrity(): { isValid: boolean; issues: string[] }
 export function getSequentialStageTemplates(): StageTemplate[] {
   return MULTI_STAGE_TEMPLATES.filter(template => template.buildsOnPreviousStage);
 }
-
