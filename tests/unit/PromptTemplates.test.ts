@@ -164,7 +164,74 @@ describe('PromptTemplates', () => {
       MULTI_STAGE_TEMPLATES.forEach(template => {
         // Templates should focus on instructions and reference context files
         expect(template.template).toContain('🎯 YOUR TASK:');
-        expect(template.template).toContain('OUTPUT FORMAT');
+        expect(template.template).toContain('CONTEXT.md');
+        expect(template.template).toContain('JIRA.md');
+        expect(template.template).toContain('CODEBASE.md');
+        expect(template.template).toContain('ANALYSIS.md');
+      });
+    });
+  });
+
+  describe('Prompt Template Optimization', () => {
+    test('should not contain MCP Tools Used sections', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).not.toContain('MCP Tools Used');
+        expect(template.template).not.toContain('## MCP Tools Used');
+        expect(template.template).not.toContain('[Document tools used');
+      });
+    });
+
+    test('should not contain Context File References sections', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).not.toContain('Context File References');
+        expect(template.template).not.toContain('## Context File References');
+        expect(template.template).not.toContain('[Specific sections referenced');
+      });
+    });
+
+    test('should contain explicit file update instructions', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).toContain('CRITICAL: UPDATE ANALYSIS.md FILE');
+        expect(template.template).toContain('MUST update the ANALYSIS.md file');
+      });
+    });
+
+    test('should have action-oriented output format', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).toContain('ACTION-ORIENTED OUTPUT');
+        expect(template.template).toContain('STEP 1: UPDATE ANALYSIS.md');
+      });
+    });
+
+    test('should specify correct stage sections for ANALYSIS.md updates', () => {
+      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).toContain('## Stage 1: Product Requirements Analysis');
+      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('## Stage 2: System Architecture');
+      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('## Stage 3: Technical Design');
+      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain('## Stage 4: Implementation Strategy');
+      expect(STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN).toContain('## Stage 5: Sprint Planning');
+    });
+
+    test('should emphasize sequential building on previous stages', () => {
+      // Stage 2-5 should build on previous stages
+      expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('building on the Stage 1 analysis');
+      expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('building on Stages 1-2 analysis');
+      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain('Build upon the previous stages');
+      expect(STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN).toContain('builds upon and synthesizes all previous stages');
+    });
+
+    test('should contain MCP tools guidance without hardcoded references', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        expect(template.template).toContain('MCP TOOLS & ANALYSIS');
+        expect(template.template).toContain('Available tools may include');
+        expect(template.template).not.toContain('mcp4_read_text_file');
+        expect(template.template).not.toContain('mcp6_create_entities');
+      });
+    });
+
+    test('should have reduced visualization requirements', () => {
+      MULTI_STAGE_TEMPLATES.forEach(template => {
+        const mermaidMatches = (template.template.match(/mermaid diagrams for:/g) || []).length;
+        expect(mermaidMatches).toBeLessThanOrEqual(1); // Max 1 visualization section per template
       });
     });
   });

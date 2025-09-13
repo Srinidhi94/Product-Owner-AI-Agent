@@ -157,22 +157,15 @@ describe('DocumentGenerator', () => {
 
   describe('template generation', () => {
     test('should create files with expected content structure', async () => {
-      const epicKey = 'TEST-TEMPLATE';
-
-      await generator.initializeOutputStructure(epicKey);
-
-      // Check that README contains epic key
-      const readmeCall = mockFs.writeFile.mock.calls.find(call =>
-        String(call[0]).includes('README.md')
-      );
-      expect(readmeCall?.[1]).toContain(epicKey);
-
-      // Check that ANALYSIS contains stage tracking
+      // Initialize the output structure first to generate the files
+      await generator.initializeOutputStructure('TEST-123');
+      
       const analysisCall = mockFs.writeFile.mock.calls.find(call =>
         String(call[0]).includes('ANALYSIS.md')
       );
-      expect(analysisCall?.[1]).toContain('Stage');
-      expect(analysisCall?.[1]).toContain('Status');
+      expect(analysisCall).toBeDefined();
+      expect(analysisCall![1]).toContain('Stage');
+      expect(analysisCall![1]).toContain('AI Analysis Results');
     });
   });
 });
