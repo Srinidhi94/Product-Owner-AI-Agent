@@ -24,7 +24,6 @@ import { ErrorHandler, ErrorContext } from './utils/ErrorHandler';
 import { WelcomeManager } from './utils/WelcomeManager';
 import { ExtensionState } from './types';
 import { QuickActionsProvider } from './utils/QuickActionsProvider';
-import { AnalysisDocumentUpdater } from './output/AnalysisDocumentUpdater';
 
 /**
  * Extension state management for VS Code context and UI updates
@@ -301,32 +300,6 @@ function registerCommands(
     }
   );
 
-  // Register paste Copilot response command
-  const pasteCopilotResponseCommand = vscode.commands.registerCommand(
-    'aiProductOwner.pasteCopilotResponse',
-    async () => {
-      const state = stateManager.getState();
-      if (!state.currentEpic) {
-        vscode.window.showWarningMessage('No active analysis. Start an epic analysis first.');
-        return;
-      }
-
-      if (!state.analyzing) {
-        vscode.window.showWarningMessage(
-          'No active analysis workflow. The analysis must be in progress to paste responses.'
-        );
-        return;
-      }
-
-      try {
-        const updater = new AnalysisDocumentUpdater();
-        await updater.pasteCopilotResponse(state.currentEpic);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        vscode.window.showErrorMessage(`Failed to paste Copilot response: ${errorMessage}`);
-      }
-    }
-  );
 
   // Register cancel analysis command
   const cancelAnalysisCommand = vscode.commands.registerCommand(
@@ -361,8 +334,7 @@ function registerCommands(
     testConnectionCommand,
     cancelAnalysisCommand,
     completeStageCommand,
-    openOutputFolderCommand,
-    pasteCopilotResponseCommand
+    openOutputFolderCommand
   );
 }
 
