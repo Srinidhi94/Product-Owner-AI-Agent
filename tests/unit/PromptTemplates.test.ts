@@ -193,8 +193,9 @@ describe('PromptTemplates', () => {
       MULTI_STAGE_TEMPLATES.forEach(template => {
         expect(template.template).toContain('UPDATE ANALYSIS.md');
         // Check for either uppercase or lowercase version
-        const hasUpdateInstruction = template.template.includes('UPDATE the ANALYSIS.md file') || 
-                                    template.template.includes('update the ANALYSIS.md file');
+        const hasUpdateInstruction =
+          template.template.includes('UPDATE the ANALYSIS.md file') ||
+          template.template.includes('update the ANALYSIS.md file');
         expect(hasUpdateInstruction).toBe(true);
       });
     });
@@ -207,10 +208,14 @@ describe('PromptTemplates', () => {
     });
 
     test('should specify correct stage sections for ANALYSIS.md updates', () => {
-      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).toContain('## Stage 1: Product Requirements Analysis');
+      expect(STAGE_1_PRODUCT_REQUIREMENTS_ANALYSIS).toContain(
+        '## Stage 1: Product Requirements Analysis'
+      );
       expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('## Stage 2: System Architecture');
       expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('## Stage 3: Technical Design');
-      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain('## Stage 4: Implementation Strategy');
+      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain(
+        '## Stage 4: Implementation Strategy'
+      );
       expect(STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN).toContain('## Stage 5: Sprint Planning');
     });
 
@@ -218,8 +223,12 @@ describe('PromptTemplates', () => {
       // Stage 2-5 should build on previous stages
       expect(STAGE_2_SYSTEM_ARCHITECTURE_DESIGN).toContain('building on the Stage 1 analysis');
       expect(STAGE_3_TECHNICAL_DESIGN_SPECIFICATION).toContain('building on Stages 1-2 analysis');
-      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain('Build upon the previous stages');
-      expect(STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN).toContain('builds upon and synthesizes all previous stages');
+      expect(STAGE_4_IMPLEMENTATION_DEPLOYMENT_STRATEGY).toContain(
+        'Build upon the previous stages'
+      );
+      expect(STAGE_5_SPRINT_PLANNING_JIRA_BREAKDOWN).toContain(
+        'builds upon and synthesizes all previous stages'
+      );
     });
 
     test('should contain MCP tools guidance without hardcoded references', () => {

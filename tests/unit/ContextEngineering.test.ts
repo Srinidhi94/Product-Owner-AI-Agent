@@ -196,7 +196,9 @@ describe('ContextEngineering', () => {
       const contextFrame = buildContextFrame(mockJiraPortfolio, mockCodebaseAnalysis);
 
       expect(contextFrame).toContain('Key Directories: AuthService, UserController');
-      expect(contextFrame).toContain('Representative Functions/Classes: authenticate, login, createUser');
+      expect(contextFrame).toContain(
+        'Representative Functions/Classes: authenticate, login, createUser'
+      );
     });
 
     test('should include constraints and guidelines', () => {

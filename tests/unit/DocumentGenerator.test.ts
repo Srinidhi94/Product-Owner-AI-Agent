@@ -159,7 +159,7 @@ describe('DocumentGenerator', () => {
     test('should create files with expected content structure', async () => {
       // Initialize the output structure first to generate the files
       await generator.initializeOutputStructure('TEST-123');
-      
+
       const analysisCall = mockFs.writeFile.mock.calls.find(call =>
         String(call[0]).includes('ANALYSIS.md')
       );

@@ -267,7 +267,11 @@ describe('PromptGenerator', () => {
       ];
 
       for (const stage of stages) {
-        const result = await generator.generateStagePrompt(stage, mockJiraPortfolio, mockCodebaseAnalysis);
+        const result = await generator.generateStagePrompt(
+          stage,
+          mockJiraPortfolio,
+          mockCodebaseAnalysis
+        );
         expect(result.content).toContain('🎯 YOUR TASK:');
         expect(result.content).toContain('📊 ANALYSIS FRAMEWORK:');
         expect(result.content).toContain('🔧 MCP TOOLS & ANALYSIS:');
@@ -276,17 +280,29 @@ describe('PromptGenerator', () => {
     });
 
     test('should build on previous stages sequentially', async () => {
-      const result1 = await generator.generateStagePrompt('product-requirements-analysis', mockJiraPortfolio, mockCodebaseAnalysis);
+      const result1 = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
       expect(result1.content).toContain('Stage 1: Product Requirements Analysis');
 
-      const result2 = await generator.generateStagePrompt('system-architecture-design', mockJiraPortfolio, mockCodebaseAnalysis);
+      const result2 = await generator.generateStagePrompt(
+        'system-architecture-design',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
       expect(result2.content).toContain('Stage 2: System Architecture');
 
       // Stage 2 should reference building on Stage 1
       expect(result2.content).toContain('Stage 1');
 
       // Stage 5 should reference previous stages
-      const result5 = await generator.generateStagePrompt('sprint-planning-jira-breakdown', mockJiraPortfolio, mockCodebaseAnalysis);
+      const result5 = await generator.generateStagePrompt(
+        'sprint-planning-jira-breakdown',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
       expect(result5.content).toContain('previous stages');
     });
   });
