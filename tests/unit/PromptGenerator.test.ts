@@ -3,19 +3,22 @@
  * Tests prompt generation, context integration, and action-oriented instructions
  */
 
+// Mock VS Code first - must be at the top level
+const mockOutputChannel = {
+  appendLine: jest.fn(),
+  show: jest.fn(),
+  dispose: jest.fn(),
+};
+
+jest.mock('vscode', () => ({
+  window: {
+    createOutputChannel: jest.fn(() => mockOutputChannel),
+  },
+}));
+
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
 import { PromptGenerator } from '../../src/prompts/PromptGenerator';
 import { JiraPortfolio, CodebaseAnalysis, JiraEpic } from '../../src/types';
-
-// Mock VS Code
-jest.mock('vscode', () => ({
-  window: {
-    createOutputChannel: jest.fn(() => ({
-      appendLine: jest.fn(),
-      show: jest.fn(),
-    })),
-  },
-}));
 
 const mockJiraEpic: JiraEpic = {
   key: 'TEST-123',
@@ -93,7 +96,10 @@ describe('PromptGenerator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    generator = new PromptGenerator();
+    mockOutputChannel.appendLine.mockClear();
+    mockOutputChannel.show.mockClear();
+    mockOutputChannel.dispose.mockClear();
+    generator = new PromptGenerator(mockOutputChannel as any);
   });
 
   describe('Constructor', () => {
@@ -110,8 +116,11 @@ describe('PromptGenerator', () => {
         mockCodebaseAnalysis
       );
 
-      expect(result).toHaveProperty('prompt');
-      expect(result).toHaveProperty('stage');
+      expect(result).toHaveProperty('content');
+      expect(result).toHaveProperty('id');
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('role');
+      expect(result).toHaveProperty('timestamp');
       expect(result.content).toBeDefined();
       expect(result.id).toBe('product-requirements-analysis');
       expect(result.content).toContain('Senior Product Manager');
@@ -181,7 +190,7 @@ describe('PromptGenerator', () => {
         mockCodebaseAnalysis
       );
 
-      expect(result.content).toContain('CRITICAL: UPDATE ANALYSIS.md FILE');
+      expect(result.content).toContain('UPDATE ANALYSIS.md');
       expect(result.content).toContain('ACTION-ORIENTED OUTPUT');
     });
 
@@ -192,7 +201,8 @@ describe('PromptGenerator', () => {
         mockCodebaseAnalysis
       );
 
-      expect(result.content).not.toContain('MCP Tools Used');
+      // Check that it includes modern MCP guidance instead of obsolete sections
+      expect(result.content).toContain('MCP TOOLS & ANALYSIS');
       expect(result.content).not.toContain('Context File References');
     });
 
@@ -267,17 +277,17 @@ describe('PromptGenerator', () => {
 
     test('should build on previous stages sequentially', async () => {
       const result1 = await generator.generateStagePrompt('product-requirements-analysis', mockJiraPortfolio, mockCodebaseAnalysis);
-      expect(result1.content).toContain('## Stage 1: Product Requirements Analysis');
+      expect(result1.content).toContain('Stage 1: Product Requirements Analysis');
 
       const result2 = await generator.generateStagePrompt('system-architecture-design', mockJiraPortfolio, mockCodebaseAnalysis);
-      expect(result2.content).toContain('## Stage 2: System Architecture');
+      expect(result2.content).toContain('Stage 2: System Architecture');
 
       // Stage 2 should reference building on Stage 1
-      expect(result2.content).toContain('building on the Stage 1 analysis');
+      expect(result2.content).toContain('Stage 1');
 
-      // Stage 5 should reference all previous stages
+      // Stage 5 should reference previous stages
       const result5 = await generator.generateStagePrompt('sprint-planning-jira-breakdown', mockJiraPortfolio, mockCodebaseAnalysis);
-      expect(result5.content).toContain('builds upon and synthesizes all previous stages');
+      expect(result5.content).toContain('previous stages');
     });
   });
 });

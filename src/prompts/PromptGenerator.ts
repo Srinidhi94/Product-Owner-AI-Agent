@@ -23,8 +23,8 @@ export interface PromptGenerationOptions {
 export class PromptGenerator {
   private outputChannel: vscode.OutputChannel;
 
-  constructor() {
-    this.outputChannel = vscode.window.createOutputChannel('AI Product Owner - Prompt Generator');
+  constructor(outputChannel?: vscode.OutputChannel) {
+    this.outputChannel = outputChannel || vscode.window.createOutputChannel('AI Product Owner - Prompt Generator');
   }
 
   /**

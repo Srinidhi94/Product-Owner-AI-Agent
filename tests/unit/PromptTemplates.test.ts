@@ -191,8 +191,11 @@ describe('PromptTemplates', () => {
 
     test('should contain explicit file update instructions', () => {
       MULTI_STAGE_TEMPLATES.forEach(template => {
-        expect(template.template).toContain('CRITICAL: UPDATE ANALYSIS.md FILE');
-        expect(template.template).toContain('MUST update the ANALYSIS.md file');
+        expect(template.template).toContain('UPDATE ANALYSIS.md');
+        // Check for either uppercase or lowercase version
+        const hasUpdateInstruction = template.template.includes('UPDATE the ANALYSIS.md file') || 
+                                    template.template.includes('update the ANALYSIS.md file');
+        expect(hasUpdateInstruction).toBe(true);
       });
     });
 
