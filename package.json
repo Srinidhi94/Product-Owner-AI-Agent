@@ -2,7 +2,7 @@
   "name": "ai-product-owner-agent",
   "displayName": "AI Product Owner Agent",
   "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
-  "version": "1.0.5",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -250,37 +250,49 @@
     "release:quick": "npm run test && npm run build:prod && npm run vsce-package",
     "dev": "npm run watch",
     "start": "npm run compile && code --extensionDevelopmentPath=.",
-    "debug": "npm run compile && code --extensionDevelopmentPath=. --verbose"
+    "debug": "npm run compile && code --extensionDevelopmentPath=. --verbose",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.8",
     "@types/mocha": "^10.0.10",
     "@types/node": "^16.18.126",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "@vscode/test-electron": "^2.2.0",
     "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.2.0",
     "@vscode/vsce": "^3.0.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "glob": "^8.0.3",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
+    "lint-staged": "^16.1.6",
     "mocha": "^10.8.2",
     "prettier": "^2.8.0",
+    "ts-jest": "^29.1.1",
     "ts-loader": "^9.4.1",
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.0",
-    "jest": "^29.7.0",
-    "@types/jest": "^29.5.8",
-    "ts-jest": "^29.1.1",
-    "@jest/globals": "^29.7.0",
-    "jest-environment-node": "^29.7.0"
+    "webpack-cli": "^5.0.0"
   },
   "dependencies": {
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "mermaid": "^10.6.0",
     "yaml": "^2.3.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{js,json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

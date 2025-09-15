@@ -97,8 +97,10 @@ export class MultiStageAnalysisEngine {
       const outputDir = await this.documentGenerator.initializeOutputStructure(epicKey);
       vscode.window.showInformationMessage(`📁 Analysis files created in: ${outputDir}`);
 
-      // Write context grounding
+      // Write context grounding and create JIRA.md and CODEBASE.md
       await this.documentGenerator.updateContextDocument(epicKey, jiraData, codebaseData);
+      await this.documentGenerator.createJiraDocument(epicKey, jiraData);
+      await this.documentGenerator.createCodebaseDocument(epicKey, codebaseData);
 
       const stages = this.getDynamicStages();
 

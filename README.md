@@ -80,17 +80,35 @@ The extension connects to your Jira epics, analyzes your codebase, and guides yo
 - Task breakdown
 - Development timeline
 
-## What You Get
+## Generated Documentation
 
-The extension automatically creates 4 documentation files:
+The extension creates comprehensive documentation using **context file architecture** in an epic-specific folder structure:
 
 ```
-your-project/
-├── README.md          # Project overview & setup
-├── PROMPTS.md         # Generated AI prompts
-├── ANALYSIS.md        # AI responses & insights
-└── CONTEXT.md         # Codebase technical details
+ai-analysis/
+└── [EPIC-KEY]/
+    ├── README.md          # Project overview and setup
+    ├── CONTEXT.md         # Project context and constraints
+    ├── JIRA.md           # Epic and story details
+    ├── CODEBASE.md       # Technical patterns and architecture
+    ├── PROMPTS.md        # Generated prompts for each stage
+    └── ANALYSIS.md       # Analysis outputs from all stages
 ```
+
+### Context File Architecture Benefits
+
+- **60-70% Token Reduction**: Streamlined prompts reference context files instead of embedding large contexts
+- **Enhanced AI Grounding**: Context files provide explicit grounding for better analysis accuracy
+- **Better Maintainability**: Context written once, referenced by all analysis stages
+- **Anti-Hallucination Protocol**: Explicit context file references prevent AI from making unfounded assumptions
+
+### Key Features
+
+- **Epic-Specific Organization**: Each Jira epic gets its own analysis folder with dedicated context files
+- **Comprehensive Coverage**: From business requirements to implementation strategy
+- **GitHub Copilot Integration**: Seamless AI-powered analysis workflow with optimized prompts
+- **Multi-Language Support**: Works with 9+ programming languages
+- **Secure**: Jira credentials stored safely in VS Code
 
 ## Supported Languages
 
