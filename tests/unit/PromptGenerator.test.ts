@@ -305,5 +305,221 @@ describe('PromptGenerator', () => {
       );
       expect(result5.content).toContain('previous stages');
     });
+
+    test('should include context engineering frame in all prompts', async () => {
+      const result = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(result.content).toContain(
+        'You must strictly ground all analysis in the Context Engineering Frame below.'
+      );
+      expect(result.content).toContain(
+        'If evidence is missing, ask for clarification instead of guessing'
+      );
+      expect(result.content).toContain('Cite actual file paths you used');
+    });
+
+    test('should include previous context when provided', async () => {
+      const previousContext = 'Previous analysis results from stage 1';
+
+      const result = await generator.generateStagePrompt(
+        'system-architecture-design',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis,
+        previousContext
+      );
+
+      expect(result.content).toBeDefined();
+      expect(result.id).toBe('system-architecture-design');
+    });
+
+    test('should handle options parameter', async () => {
+      const options = { outputDirectory: './custom/output' };
+
+      const result = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis,
+        undefined,
+        options
+      );
+
+      expect(result.content).toBeDefined();
+      expect(result.id).toBe('product-requirements-analysis');
+    });
+  });
+
+  describe('Error Handling', () => {
+    test('should throw error for unknown stage template', async () => {
+      await expect(
+        generator.generateStagePrompt('unknown-stage-id', mockJiraPortfolio, mockCodebaseAnalysis)
+      ).rejects.toThrow('Stage template not found: unknown-stage-id');
+    });
+
+    test('should handle null/undefined inputs gracefully', async () => {
+      // Test with minimal valid inputs
+      const minimalPortfolio: JiraPortfolio = {
+        type: 'epic',
+        key: 'MIN-123',
+        name: 'Minimal',
+        description: '',
+        epics: [],
+        totalStoryPoints: 0,
+      };
+
+      const minimalCodebase: CodebaseAnalysis = {
+        projectPath: '',
+        totalFiles: 0,
+        packages: [],
+        structs: [],
+        functions: [],
+        imports: [],
+        patterns: [],
+        techStack: [],
+        metrics: {
+          linesOfCode: 0,
+          complexity: 'low',
+          maintainability: 0,
+          testCoverage: 0,
+          technicalDebt: 'low',
+        },
+      };
+
+      const result = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        minimalPortfolio,
+        minimalCodebase
+      );
+
+      expect(result).toBeDefined();
+      expect(result.content).toBeDefined();
+    });
+  });
+
+  describe('Template Management', () => {
+    test('should return available stage templates', () => {
+      const templates = generator.getAvailableStageTemplates();
+
+      expect(templates).toBeInstanceOf(Array);
+      expect(templates.length).toBeGreaterThan(0);
+
+      // Verify template structure
+      templates.forEach(template => {
+        expect(template).toHaveProperty('id');
+        expect(template).toHaveProperty('name');
+        expect(template).toHaveProperty('role');
+        expect(template).toHaveProperty('template');
+        expect(typeof template.id).toBe('string');
+        expect(typeof template.name).toBe('string');
+        expect(typeof template.role).toBe('string');
+        expect(typeof template.template).toBe('string');
+      });
+    });
+
+    test('should return copy of templates (not reference)', () => {
+      const templates1 = generator.getAvailableStageTemplates();
+      const templates2 = generator.getAvailableStageTemplates();
+
+      expect(templates1).not.toBe(templates2); // Different array instances
+      expect(templates1).toEqual(templates2); // Same content
+    });
+
+    test('should include all expected stage templates', () => {
+      const templates = generator.getAvailableStageTemplates();
+      const templateIds = templates.map(t => t.id);
+
+      const expectedStages = [
+        'product-requirements-analysis',
+        'system-architecture-design',
+        'technical-design-specification',
+        'implementation-deployment-strategy',
+        'sprint-planning-jira-breakdown',
+      ];
+
+      expectedStages.forEach(stageId => {
+        expect(templateIds).toContain(stageId);
+      });
+    });
+  });
+
+  describe('VS Code Integration', () => {
+    test('should log messages to output channel', async () => {
+      await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(mockOutputChannel.appendLine).toHaveBeenCalledWith(
+        expect.stringContaining('🧠 Generating prompt for stage: product-requirements-analysis')
+      );
+    });
+
+    test('should show output channel when requested', () => {
+      generator.showOutput();
+      expect(mockOutputChannel.show).toHaveBeenCalled();
+    });
+
+    test('should dispose output channel on cleanup', () => {
+      generator.dispose();
+      expect(mockOutputChannel.dispose).toHaveBeenCalled();
+    });
+
+    test('should create default output channel when none provided', () => {
+      const generatorWithoutChannel = new PromptGenerator();
+      expect(generatorWithoutChannel).toBeInstanceOf(PromptGenerator);
+    });
+  });
+
+  describe('Prompt Content Validation', () => {
+    test('should generate valid timestamps', async () => {
+      const result = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(result.timestamp).toBeDefined();
+      expect(new Date(result.timestamp)).toBeInstanceOf(Date);
+      expect(new Date(result.timestamp).getTime()).not.toBeNaN();
+    });
+
+    test('should include codebase metrics in context', async () => {
+      const result = await generator.generateStagePrompt(
+        'system-architecture-design',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(result.content).toContain('25'); // total files
+      expect(result.content).toContain('medium'); // complexity
+      expect(result.content).toContain('75'); // maintainability score
+    });
+
+    test('should include Jira data in context', async () => {
+      const result = await generator.generateStagePrompt(
+        'product-requirements-analysis',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(result.content).toContain('TEST-123');
+      expect(result.content).toContain('13'); // total story points
+    });
+
+    test('should include tech stack information', async () => {
+      const result = await generator.generateStagePrompt(
+        'technical-design-specification',
+        mockJiraPortfolio,
+        mockCodebaseAnalysis
+      );
+
+      expect(result.content).toContain('TypeScript');
+      expect(result.content).toContain('Express');
+      expect(result.content).toContain('4.9.0'); // TypeScript version
+    });
   });
 });
