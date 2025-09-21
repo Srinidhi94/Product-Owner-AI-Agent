@@ -41,7 +41,7 @@ export interface JiraUser {
 }
 
 export interface JiraPortfolio {
-  type: 'epic' | 'project';
+  type: 'epic' | 'project' | 'portfolio';
   key: string;
   name: string;
   description?: string;
