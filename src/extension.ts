@@ -68,17 +68,9 @@ class ExtensionStateManager {
   }
 
   private updateContextKeys(): void {
-    vscode.commands.executeCommand(
-      'setContext',
-      'epicBridge.configured',
-      this.state.configured
-    );
+    vscode.commands.executeCommand('setContext', 'epicBridge.configured', this.state.configured);
     vscode.commands.executeCommand('setContext', 'epicBridge.analyzing', this.state.analyzing);
-    vscode.commands.executeCommand(
-      'setContext',
-      'epicBridge.hasResults',
-      this.state.hasResults
-    );
+    vscode.commands.executeCommand('setContext', 'epicBridge.hasResults', this.state.hasResults);
   }
 }
 
@@ -142,41 +134,38 @@ function registerCommands(
   configManager: ConfigurationManager
 ) {
   // Main analysis command with comprehensive error handling
-  const analyzeEpicCommand = vscode.commands.registerCommand(
-    'epicBridge.analyzeEpic',
-    async () => {
-      const context: ErrorContext = {
-        operation: 'Epic Analysis',
-        timestamp: new Date(),
-      };
+  const analyzeEpicCommand = vscode.commands.registerCommand('epicBridge.analyzeEpic', async () => {
+    const context: ErrorContext = {
+      operation: 'Epic Analysis',
+      timestamp: new Date(),
+    };
 
-      try {
-        await runEpicAnalysisWorkflow(stateManager, configManager, context);
-      } catch (error) {
-        console.error('Epic analysis error:', error);
+    try {
+      await runEpicAnalysisWorkflow(stateManager, configManager, context);
+    } catch (error) {
+      console.error('Epic analysis error:', error);
 
-        // Use comprehensive error handling
-        if (error && typeof error === 'object') {
-          if ('status' in error || 'code' in error) {
-            await ErrorHandler.handleJiraError(error, context);
-          } else if ('message' in error && typeof error.message === 'string') {
-            if (error.message.includes('source files') || error.message.includes('codebase')) {
-              await ErrorHandler.handleCodebaseError(error, context);
-            } else if (error.message.includes('Copilot')) {
-              await ErrorHandler.handleCopilotError(error, context);
-            } else {
-              const shouldRetry = await ErrorHandler.handleJiraError(error, context);
-              if (shouldRetry) {
-                vscode.commands.executeCommand('epicBridge.analyzeEpic');
-              }
+      // Use comprehensive error handling
+      if (error && typeof error === 'object') {
+        if ('status' in error || 'code' in error) {
+          await ErrorHandler.handleJiraError(error, context);
+        } else if ('message' in error && typeof error.message === 'string') {
+          if (error.message.includes('source files') || error.message.includes('codebase')) {
+            await ErrorHandler.handleCodebaseError(error, context);
+          } else if (error.message.includes('Copilot')) {
+            await ErrorHandler.handleCopilotError(error, context);
+          } else {
+            const shouldRetry = await ErrorHandler.handleJiraError(error, context);
+            if (shouldRetry) {
+              vscode.commands.executeCommand('epicBridge.analyzeEpic');
             }
           }
-        } else {
-          vscode.window.showErrorMessage(`❌ Epic Analysis Failed: ${String(error)}`);
         }
+      } else {
+        vscode.window.showErrorMessage(`❌ Epic Analysis Failed: ${String(error)}`);
       }
     }
-  );
+  });
 
   // Configuration command
   const configureSettingsCommand = vscode.commands.registerCommand(

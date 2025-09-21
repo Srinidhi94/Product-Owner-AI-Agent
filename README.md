@@ -163,14 +163,14 @@ npm run compile
 
 ## Available Commands
 
-| Command                                    | Description                 |
-| ------------------------------------------ | --------------------------- |
-| `Epic Bridge: Analyze Epic`           | Start the analysis workflow |
-| `Epic Bridge: Configure Settings`     | Setup Jira connection       |
-| `Epic Bridge: Test Connection`        | Verify Jira access          |
-| `Epic Bridge: Complete Stage`         | Mark current stage done     |
-| `Epic Bridge: Cancel Analysis`        | Stop current analysis       |
-| `Epic Bridge: Open Output Folder`     | View generated docs         |
+| Command                           | Description                 |
+| --------------------------------- | --------------------------- |
+| `Epic Bridge: Analyze Epic`       | Start the analysis workflow |
+| `Epic Bridge: Configure Settings` | Setup Jira connection       |
+| `Epic Bridge: Test Connection`    | Verify Jira access          |
+| `Epic Bridge: Complete Stage`     | Mark current stage done     |
+| `Epic Bridge: Cancel Analysis`    | Stop current analysis       |
+| `Epic Bridge: Open Output Folder` | View generated docs         |
 
 ## Troubleshooting
 
