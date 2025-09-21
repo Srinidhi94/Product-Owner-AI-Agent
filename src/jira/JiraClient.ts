@@ -161,12 +161,21 @@ export class JiraClient {
    */
   async fetchPortfolioOrEpic(key: string): Promise<JiraPortfolio | null> {
     try {
-      this.log(`🔍 Attempting to fetch: ${key}`);
+      this.log(`🔍 Searching for: ${key} (trying Epic, Portfolio Feature, or Project...)`);
 
-      // Try as Epic first
+      // Try as Portfolio Feature first (based on Jira instance analysis)
+      const portfolioData = await this.fetchPortfolioFeature(key);
+      if (portfolioData) {
+        this.log(
+          `✅ Found Portfolio Feature: ${key} with ${portfolioData.epics[0].stories.length} child issues`
+        );
+        return portfolioData;
+      }
+
+      // Try as Epic
       const epicData = await this.fetchEpicWithStories(key);
       if (epicData) {
-        this.log(`✅ Successfully fetched as Epic with ${epicData.stories.length} stories`);
+        this.log(`✅ Found Epic: ${key} with ${epicData.stories.length} stories`);
         return {
           type: 'epic',
           key: key,
@@ -177,19 +186,18 @@ export class JiraClient {
       }
 
       // Try as Project (Portfolio-like)
-      this.log('📂 Trying as Project...');
       const projectData = await this.fetchProjectEpics(key);
       if (projectData) {
-        this.log(`✅ Successfully fetched as Project with ${projectData.epics.length} epics`);
+        this.log(`✅ Found Project: ${key} with ${projectData.epics.length} epics`);
         return projectData;
       }
 
-      this.log(`❌ Could not find portfolio/epic: ${key}`);
+      // Only show error if nothing was found
+      this.log(`❌ Could not find any match for: ${key}`);
       this.log('💡 Make sure the key exists and you have permission to access it');
       return null;
     } catch (error: any) {
-      this.log(`❌ Error fetching Jira data: ${error.message}`);
-      this.log('🔍 Check your Jira URL and token');
+      this.log(`❌ Error searching for ${key}: ${error.message}`);
       return null;
     }
   }
@@ -214,7 +222,6 @@ export class JiraClient {
       });
 
       if (response.status !== 200) {
-        this.log(`⚠️ Epic not found or no access: ${epicKey}`);
         return null;
       }
 
@@ -240,15 +247,13 @@ export class JiraClient {
 
       for (const jql of epicLinkQueries) {
         try {
-          this.log(`🔍 Trying optimized query: ${jql}`);
           stories = await this.searchIssues(jql);
           if (stories.length > 0) {
-            this.log(`✅ Found ${stories.length} stories using query: ${jql}`);
+            this.log(`✅ Found ${stories.length} child issues for ${epicKey}`);
             break;
           }
         } catch (error: any) {
-          this.log(`⚠️ Query failed (${error.response?.status || 'unknown'}): ${jql}`);
-          // Continue to next query instead of failing completely
+          // Silently continue to next query - only log if all queries fail
           continue;
         }
       }
@@ -285,7 +290,7 @@ export class JiraClient {
           : undefined,
       };
     } catch (error: any) {
-      this.log(`❌ Error fetching epic ${epicKey}: ${error.message}`);
+      // Silently return null - error will be handled at higher level
       return null;
     }
   }
@@ -576,14 +581,12 @@ export class JiraClient {
       let childIssues: JiraStory[] = [];
       for (const jql of childQueries) {
         try {
-          this.log(`🔍 Trying Portfolio Feature child query: ${jql}`);
           childIssues = await this.searchIssues(jql);
           if (childIssues.length > 0) {
-            this.log(`✅ Found ${childIssues.length} child issues using query: ${jql}`);
             break;
           }
         } catch (error: any) {
-          this.log(`⚠️ Portfolio query failed (${error.response?.status || 'unknown'}): ${jql}`);
+          // Silently continue to next query
           continue;
         }
       }
@@ -622,7 +625,7 @@ export class JiraClient {
         epics: [epic],
       };
     } catch (error: any) {
-      this.log(`⚠️ Failed to fetch Portfolio Feature ${key}: ${error.message}`);
+      // Silently return null - error will be handled at higher level
       return null;
     }
   }
