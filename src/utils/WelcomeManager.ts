@@ -1,5 +1,5 @@
 /**
- * Welcome Manager for AI Product Owner Agent
+ * Welcome Manager for Epic Bridge
  * Handles first-time user experience and onboarding walkthrough
  */
 
@@ -19,7 +19,7 @@ export class WelcomeManager {
   private context: vscode.ExtensionContext;
   private logger = createLogger('WelcomeManager');
   private readonly CURRENT_VERSION = '1.0.0';
-  private readonly STATE_KEY = 'aiProductOwner.welcomeState';
+  private readonly STATE_KEY = 'epicBridge.welcomeState';
 
   private constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -69,7 +69,7 @@ export class WelcomeManager {
     this.logger.info('Showing first-time welcome');
 
     const action = await vscode.window.showInformationMessage(
-      '🎉 Welcome to AI Product Owner Agent!\n\nThis extension helps you analyze Jira epics and universal codebases across 9 programming languages to generate comprehensive technical documentation.',
+      '🎉 Welcome to Epic Bridge!\n\nThis extension helps you analyze Jira epics and universal codebases across 9 programming languages to generate comprehensive technical documentation.',
       { modal: false },
       'Get Started',
       'Show Walkthrough',
@@ -85,7 +85,7 @@ export class WelcomeManager {
         await this.showWalkthrough();
         break;
       case 'Configure Now':
-        await vscode.commands.executeCommand('aiProductOwner.configureSettings');
+        await vscode.commands.executeCommand('epicBridge.configureSettings');
         break;
       case 'Later':
       default:
@@ -110,7 +110,7 @@ export class WelcomeManager {
     this.logger.info('Showing version update welcome');
 
     const action = await vscode.window.showInformationMessage(
-      `🆕 AI Product Owner Agent updated to v${this.CURRENT_VERSION}!\n\nCheck out the latest improvements and features.`,
+      `🆕 Epic Bridge updated to v${this.CURRENT_VERSION}!\n\nCheck out the latest improvements and features.`,
       "What's New",
       'Documentation',
       'Dismiss'
@@ -158,19 +158,19 @@ export class WelcomeManager {
         title: 'Step 1: Configure Jira Settings',
         description: 'Set up your Jira URL, email, and API token',
         action: 'Configure',
-        command: 'aiProductOwner.configureSettings',
+        command: 'epicBridge.configureSettings',
       },
       {
         title: 'Step 2: Test Connection',
         description: 'Verify your Jira connection is working',
         action: 'Test',
-        command: 'aiProductOwner.testConnection',
+        command: 'epicBridge.testConnection',
       },
       {
         title: 'Step 3: Analyze an Epic',
         description: 'Run your first analysis on a Jira epic',
         action: 'Analyze',
-        command: 'aiProductOwner.analyzeEpic',
+        command: 'epicBridge.analyzeEpic',
       },
     ];
 
@@ -195,7 +195,7 @@ export class WelcomeManager {
     }
 
     vscode.window.showInformationMessage(
-      "✅ Quick start completed! You're ready to use AI Product Owner Agent.",
+      "✅ Quick start completed! You're ready to use Epic Bridge.",
       'Great!'
     );
   }
@@ -231,7 +231,7 @@ export class WelcomeManager {
    * Check if user needs configuration
    */
   needsConfiguration(): boolean {
-    const config = vscode.workspace.getConfiguration('aiProductOwner.jira');
+    const config = vscode.workspace.getConfiguration('epicBridge.jira');
     return !config.get('baseUrl') || !config.get('email') || !config.get('token');
   }
 
@@ -261,13 +261,13 @@ export class WelcomeManager {
    * Create walkthrough content
    */
   private createWalkthroughContent(): string {
-    return `# 🎯 AI Product Owner Agent - Interactive Walkthrough
+    return `# 🎯 Epic Bridge - Interactive Walkthrough
 
-Welcome to AI Product Owner Agent! This walkthrough will help you get started with analyzing Jira epics and generating technical documentation.
+Welcome to Epic Bridge! This walkthrough will help you get started with analyzing Jira epics and generating technical documentation.
 
 ## 🚀 What This Extension Does
 
-The AI Product Owner Agent is a powerful VS Code extension that:
+The Epic Bridge is a powerful VS Code extension that:
 
 - **Analyzes Jira Epics**: Fetches comprehensive data from your Jira epics and stories
 - **Scans Universal Codebases**: Identifies architectural patterns, tech stack, and code structure across 9 programming languages
@@ -435,7 +435,7 @@ Click the buttons below to start using the extension:
       }
     } else {
       vscode.window.showInformationMessage(
-        'No workspace open. Please open the AI Product Owner Agent workspace to view documentation.',
+        'No workspace open. Please open the Epic Bridge workspace to view documentation.',
         'Got it'
       );
     }

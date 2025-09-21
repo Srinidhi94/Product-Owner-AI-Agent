@@ -80,7 +80,7 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
         'Analyze Epic',
         'Analyze Jira epic and codebase',
         {
-          command: 'aiProductOwner.analyzeEpic',
+          command: 'epicBridge.analyzeEpic',
           title: 'Analyze Epic',
         },
         new vscode.ThemeIcon('graph'),
@@ -91,7 +91,7 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
         'Configure Settings',
         'Setup Jira and extension settings',
         {
-          command: 'aiProductOwner.configureSettings',
+          command: 'epicBridge.configureSettings',
           title: 'Configure Settings',
         },
         new vscode.ThemeIcon('settings-gear'),
@@ -102,7 +102,7 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
         'Test Connection',
         'Verify Jira connectivity',
         {
-          command: 'aiProductOwner.testConnection',
+          command: 'epicBridge.testConnection',
           title: 'Test Jira Connection',
         },
         new vscode.ThemeIcon('plug'),
@@ -113,7 +113,7 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
         'Complete Stage',
         'Manually complete current analysis stage',
         {
-          command: 'aiProductOwner.completeStage',
+          command: 'epicBridge.completeStage',
           title: 'Complete Current Stage',
         },
         new vscode.ThemeIcon('check'),
@@ -124,7 +124,7 @@ export class QuickActionsProvider implements vscode.TreeDataProvider<QuickAction
         'Show Welcome',
         'Display getting started guide',
         {
-          command: 'aiProductOwner.openWalkthrough',
+          command: 'epicBridge.openWalkthrough',
           title: 'Show Welcome Walkthrough',
         },
         new vscode.ThemeIcon('lightbulb'),

@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { ExtensionConfiguration, JiraConfiguration, OutputConfiguration } from '../types';
 
 export class ConfigurationManager {
-  private static readonly JIRA_TOKEN_KEY = 'aiProductOwner.jira.token';
+  private static readonly JIRA_TOKEN_KEY = 'epicBridge.jira.token';
 
   /**
    * Get complete extension configuration
@@ -23,7 +23,7 @@ export class ConfigurationManager {
    * Get Jira configuration with secure token handling
    */
   getJiraConfiguration(): JiraConfiguration {
-    const config = vscode.workspace.getConfiguration('aiProductOwner.jira');
+    const config = vscode.workspace.getConfiguration('epicBridge.jira');
 
     return {
       baseUrl: config.get('baseUrl', ''),
@@ -37,7 +37,7 @@ export class ConfigurationManager {
    * Get output configuration
    */
   getOutputConfiguration(): OutputConfiguration {
-    const config = vscode.workspace.getConfiguration('aiProductOwner.output');
+    const config = vscode.workspace.getConfiguration('epicBridge.output');
 
     return {
       directory: config.get('directory', './docs/analysis'),
@@ -48,7 +48,7 @@ export class ConfigurationManager {
    * Update Jira configuration
    */
   async updateJiraConfiguration(updates: Partial<JiraConfiguration>): Promise<void> {
-    const config = vscode.workspace.getConfiguration('aiProductOwner.jira');
+    const config = vscode.workspace.getConfiguration('epicBridge.jira');
 
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
@@ -61,7 +61,7 @@ export class ConfigurationManager {
    * Update output configuration
    */
   async updateOutputConfiguration(updates: Partial<OutputConfiguration>): Promise<void> {
-    const config = vscode.workspace.getConfiguration('aiProductOwner.output');
+    const config = vscode.workspace.getConfiguration('epicBridge.output');
 
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) {
@@ -140,8 +140,8 @@ AI Product Owner Configuration:
    * Reset all configuration to defaults
    */
   async resetConfiguration(): Promise<void> {
-    const jiraConfig = vscode.workspace.getConfiguration('aiProductOwner.jira');
-    const outputConfig = vscode.workspace.getConfiguration('aiProductOwner.output');
+    const jiraConfig = vscode.workspace.getConfiguration('epicBridge.jira');
+    const outputConfig = vscode.workspace.getConfiguration('epicBridge.output');
 
     // Reset Jira configuration
     await jiraConfig.update('baseUrl', undefined, vscode.ConfigurationTarget.Global);

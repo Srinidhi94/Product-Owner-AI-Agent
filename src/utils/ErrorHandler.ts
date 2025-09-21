@@ -73,7 +73,7 @@ export class ErrorHandler {
     );
 
     if (action === 'Open Settings') {
-      await vscode.commands.executeCommand('aiProductOwner.configureSettings');
+      await vscode.commands.executeCommand('epicBridge.configureSettings');
     }
 
     return false;
@@ -127,7 +127,7 @@ export class ErrorHandler {
         return false;
 
       case 'Try Another Epic':
-        await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+        await vscode.commands.executeCommand('epicBridge.analyzeEpic');
         return true;
 
       default:
@@ -578,7 +578,7 @@ Troubleshooting:
 
     if (!hasShownWelcome) {
       const action = await vscode.window.showInformationMessage(
-        '🚀 Welcome to AI Product Owner Agent!\n\nWould you like a quick walkthrough to get started?',
+        '🚀 Welcome to Epic Bridge!\n\nWould you like a quick walkthrough to get started?',
         'Start Walkthrough',
         'Configure Now',
         'Skip'
@@ -587,7 +587,7 @@ Troubleshooting:
       if (action === 'Start Walkthrough') {
         await this.runWalkthrough();
       } else if (action === 'Configure Now') {
-        await vscode.commands.executeCommand('aiProductOwner.configureSettings');
+        await vscode.commands.executeCommand('epicBridge.configureSettings');
       }
 
       await context.globalState.update('hasShownWelcome', true);
@@ -605,14 +605,14 @@ Troubleshooting:
 
     vscode.window
       .showInformationMessage(
-        `📋 AI Product Owner Walkthrough:\n\n${steps
+        `📋 Epic Bridge Walkthrough:\n\n${steps
           .map((step, i) => `${i + 1}. ${step}`)
           .join('\n')}\n\nReady to start?`,
         'Configure Jira'
       )
       .then(action => {
         if (action === 'Configure Jira') {
-          vscode.commands.executeCommand('aiProductOwner.configureSettings');
+          vscode.commands.executeCommand('epicBridge.configureSettings');
         }
       });
   }

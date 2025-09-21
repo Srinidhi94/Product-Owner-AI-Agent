@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the AI Product Owner Agent extension are documented in this file.
+All notable changes to the Epic Bridge extension are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -140,7 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 📦 Packaging
 
-- Updated extension package (ai-product-owner-agent-1.0.1.vsix) with all fixes
+- Updated extension package (epic-bridge-1.0.1.vsix) with all fixes
 - Verified compilation and build process works correctly
 - Extension size: 5.48MB with all improvements
 
@@ -148,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 Initial Release
 
-The first stable release of the AI Product Owner Agent VS Code extension with comprehensive technical analysis automation.
+The first stable release of the Epic Bridge VS Code extension with comprehensive technical analysis automation.
 
 ### ✨ Added
 
@@ -283,15 +283,15 @@ The first stable release of the AI Product Owner Agent VS Code extension with co
 
 ### Feedback Welcome
 
-We're constantly improving the AI Product Owner Agent. Please share your feedback:
+We're constantly improving the Epic Bridge. Please share your feedback:
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/your-company/ai-product-owner-agent/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/your-company/ai-product-owner-agent/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/your-company/epic-bridge/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/your-company/epic-bridge/discussions)
 - 📧 **Direct Feedback**: extension-feedback@your-company.com
 
 ---
 
-**Thank you for using AI Product Owner Agent! 🚀**
+**Thank you for using Epic Bridge! 🚀**
 
 ## [Unreleased]
 
@@ -471,8 +471,8 @@ When contributing to this project:
 
 ```
 ### Added
-- **New Feature**: Description of user-facing change ([#123](link-to-issue))
-- **Integration**: New platform support with configuration options
+- **Enhanced Workflow**: Automated LLM-driven document updates eliminate manual copy-paste
+- **Improved Prompts**: Structured XML instructions for reliable AI file editing
 
 ### Fixed
 - **Bug Fix**: Description of resolved issue affecting users ([#456](link-to-issue))
@@ -481,4 +481,4 @@ When contributing to this project:
 
 ---
 
-_This changelog is maintained by the AI Product Owner Agent development team. For questions or suggestions about release notes, please open an issue on GitHub._
+_This changelog is maintained by the Epic Bridge development team. For questions or suggestions about release notes, please open an issue on GitHub._

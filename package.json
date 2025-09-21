@@ -1,7 +1,7 @@
 {
-  "name": "ai-product-owner-agent",
-  "displayName": "AI Product Owner Agent",
-  "description": "Professional VS Code extension for automated technical analysis of Jira epics and universal codebase analysis across 9 programming languages with GitHub Copilot integration",
+  "name": "epic-bridge",
+  "displayName": "Epic Bridge",
+  "description": "Professional VS Code extension that bridges Jira epics to comprehensive technical documentation through AI-powered codebase analysis across 9+ programming languages",
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
@@ -20,7 +20,7 @@
     "automation",
     "codebase-analysis"
   ],
-  "publisher": "ai-product-owner-team",
+  "publisher": "epic-bridge-team",
   "private": true,
   "license": "MIT",
   "repository": {
@@ -37,88 +37,81 @@
   "contributes": {
     "commands": [
       {
-        "command": "aiProductOwner.analyzeEpic",
+        "command": "epicBridge.analyzeEpic",
         "title": "Analyze Epic",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(graph)",
-        "enablement": "aiProductOwner.configured",
+        "enablement": "epicBridge.configured",
         "description": "Analyze a Jira epic and universal codebase across 9 programming languages to generate technical documentation."
       },
       {
-        "command": "aiProductOwner.configureSettings",
+        "command": "epicBridge.configureSettings",
         "title": "Configure Settings",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(settings-gear)",
         "description": "Configure Jira and extension settings."
       },
       {
-        "command": "aiProductOwner.openWalkthrough",
+        "command": "epicBridge.openWalkthrough",
         "title": "Show Welcome Walkthrough",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(lightbulb)",
         "description": "Show the welcome walkthrough for new users."
       },
       {
-        "command": "aiProductOwner.testConnection",
+        "command": "epicBridge.testConnection",
         "title": "Test Jira Connection",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(plug)",
         "description": "Test the connection to your Jira instance."
       },
       {
-        "command": "aiProductOwner.completeStage",
+        "command": "epicBridge.completeStage",
         "title": "Complete Current Stage & Continue",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(arrow-right)",
         "description": "Mark current analysis stage as complete and proceed to next stage."
       },
       {
-        "command": "aiProductOwner.cancelAnalysis",
+        "command": "epicBridge.cancelAnalysis",
         "title": "Cancel Analysis",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(stop)",
         "description": "Cancel the current analysis workflow."
       },
       {
-        "command": "aiProductOwner.openOutputFolder",
+        "command": "epicBridge.openOutputFolder",
         "title": "Open Output Folder",
-        "category": "AI Product Owner",
+        "category": "Epic Bridge",
         "icon": "$(folder-opened)",
         "description": "Open the output folder for the current epic analysis."
-      },
-      {
-        "command": "aiProductOwner.pasteCopilotResponse",
-        "title": "Paste Copilot Response",
-        "category": "AI Product Owner",
-        "icon": "$(clippy)",
-        "description": "Automatically integrate AI response from clipboard into the analysis document."
       }
     ],
     "configuration": {
-      "title": "AI Product Owner Agent",
+      "title": "Epic Bridge",
       "properties": {
-        "aiProductOwner.jira.baseUrl": {
+        "epicBridge.jira.baseUrl": {
           "type": "string",
           "description": "Jira base URL (e.g., company.atlassian.net)",
           "scope": "application",
           "order": 1,
           "category": "JIRA Integration"
         },
-        "aiProductOwner.jira.email": {
+        "epicBridge.jira.email": {
           "type": "string",
           "description": "Your Jira email address",
           "scope": "application",
           "order": 2,
           "category": "JIRA Integration"
         },
-        "aiProductOwner.jira.token": {
+        "epicBridge.jira.token": {
           "type": "string",
           "description": "Jira API token (stored securely in VS Code secrets)",
           "scope": "application",
           "order": 3,
           "category": "JIRA Integration"
         },
-        "aiProductOwner.jira.timeout": {
+        "epicBridge.jira.timeout": {
           "type": "number",
           "default": 10000,
           "minimum": 5000,
@@ -128,7 +121,7 @@
           "order": 4,
           "category": "JIRA Integration"
         },
-        "aiProductOwner.output.directory": {
+        "epicBridge.output.directory": {
           "type": "string",
           "default": "./ai-analysis",
           "description": "Base output directory for generated documentation. Each Jira epic will create a subfolder here (e.g., ./ai-analysis/PROJ-123/)",
@@ -141,30 +134,30 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "aiProductOwner",
-          "title": "AI Product Owner",
+          "id": "epicBridge",
+          "title": "Epic Bridge",
           "icon": "$(robot)"
         }
       ]
     },
     "views": {
-      "aiProductOwner": [
+      "epicBridge": [
         {
           "id": "analysisResults",
           "name": "Analysis Results",
-          "when": "aiProductOwner.hasResults",
+          "when": "epicBridge.hasResults",
           "icon": "$(graph)"
         },
         {
           "id": "currentAnalysis",
           "name": "Current Analysis",
-          "when": "aiProductOwner.analyzing",
+          "when": "epicBridge.analyzing",
           "icon": "$(loading~spin)"
         },
         {
           "id": "quickActions",
           "name": "Quick Actions",
-          "when": "aiProductOwner.configured",
+          "when": "epicBridge.configured",
           "icon": "$(zap)"
         }
       ]
@@ -172,39 +165,35 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "aiProductOwner.analyzeEpic",
-          "when": "aiProductOwner.configured"
+          "command": "epicBridge.analyzeEpic",
+          "when": "epicBridge.configured"
         },
         {
-          "command": "aiProductOwner.configureSettings"
+          "command": "epicBridge.configureSettings"
         },
         {
-          "command": "aiProductOwner.testConnection",
-          "when": "aiProductOwner.configured"
+          "command": "epicBridge.testConnection",
+          "when": "epicBridge.configured"
         },
         {
-          "command": "aiProductOwner.completeStage",
-          "when": "aiProductOwner.analyzing"
+          "command": "epicBridge.completeStage",
+          "when": "epicBridge.analyzing"
         },
         {
-          "command": "aiProductOwner.cancelAnalysis",
-          "when": "aiProductOwner.analyzing"
+          "command": "epicBridge.cancelAnalysis",
+          "when": "epicBridge.analyzing"
         },
         {
-          "command": "aiProductOwner.openOutputFolder",
-          "when": "aiProductOwner.hasResults"
+          "command": "epicBridge.openOutputFolder",
+          "when": "epicBridge.hasResults"
         },
         {
-          "command": "aiProductOwner.openWalkthrough"
-        },
-        {
-          "command": "aiProductOwner.pasteCopilotResponse",
-          "when": "aiProductOwner.analyzing"
+          "command": "epicBridge.openWalkthrough"
         }
       ],
       "view/title": [
         {
-          "command": "aiProductOwner.analyzeEpic",
+          "command": "epicBridge.analyzeEpic",
           "when": "view == analysisResults",
           "group": "navigation"
         }
@@ -212,10 +201,10 @@
     },
     "keybindings": [
       {
-        "command": "aiProductOwner.analyzeEpic",
+        "command": "epicBridge.analyzeEpic",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a",
-        "when": "aiProductOwner.configured"
+        "when": "epicBridge.configured"
       }
     ]
   },

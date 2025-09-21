@@ -1,5 +1,5 @@
 /**
- * AI Product Owner Agent - VS Code Extension Entry Point
+ * Epic Bridge Agent - VS Code Extension Entry Point
  *
  * Professional VS Code extension providing automated technical analysis for Jira epics
  * and universal codebase analysis across multiple programming languages with GitHub Copilot integration.
@@ -7,7 +7,7 @@
  * Supported Languages: JavaScript, TypeScript, Python, Java, Go, C#, PHP, Ruby, Rust
  *
  * @version 1.0.3
- * @author AI Product Owner Team
+ * @author Epic Bridge Team
  */
 
 import * as vscode from 'vscode';
@@ -70,13 +70,13 @@ class ExtensionStateManager {
   private updateContextKeys(): void {
     vscode.commands.executeCommand(
       'setContext',
-      'aiProductOwner.configured',
+      'epicBridge.configured',
       this.state.configured
     );
-    vscode.commands.executeCommand('setContext', 'aiProductOwner.analyzing', this.state.analyzing);
+    vscode.commands.executeCommand('setContext', 'epicBridge.analyzing', this.state.analyzing);
     vscode.commands.executeCommand(
       'setContext',
-      'aiProductOwner.hasResults',
+      'epicBridge.hasResults',
       this.state.hasResults
     );
   }
@@ -86,7 +86,7 @@ class ExtensionStateManager {
  * Main extension activation function
  */
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('🚀 AI Product Owner Agent extension is now active!');
+  console.log('🚀 Epic Bridge Agent extension is now active!');
 
   // Initialize error handler and status management
   ErrorHandler.initialize(context);
@@ -110,7 +110,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register configuration change listener
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(e => {
-      if (e.affectsConfiguration('aiProductOwner')) {
+      if (e.affectsConfiguration('epicBridge')) {
         checkInitialConfiguration(stateManager, configManager);
       }
     })
@@ -120,14 +120,14 @@ export async function activate(context: vscode.ExtensionContext) {
   const welcomeManager = WelcomeManager.getInstance(context);
   await welcomeManager.handleActivation();
 
-  console.log('✅ AI Product Owner Agent extension activated successfully');
+  console.log('✅ Epic Bridge Agent extension activated successfully');
 }
 
 /**
  * Extension deactivation function
  */
 export function deactivate() {
-  console.log('👋 AI Product Owner Agent extension deactivated');
+  console.log('👋 Epic Bridge Agent extension deactivated');
 
   // Cleanup resources
   ErrorHandler.dispose();
@@ -143,7 +143,7 @@ function registerCommands(
 ) {
   // Main analysis command with comprehensive error handling
   const analyzeEpicCommand = vscode.commands.registerCommand(
-    'aiProductOwner.analyzeEpic',
+    'epicBridge.analyzeEpic',
     async () => {
       const context: ErrorContext = {
         operation: 'Epic Analysis',
@@ -167,7 +167,7 @@ function registerCommands(
             } else {
               const shouldRetry = await ErrorHandler.handleJiraError(error, context);
               if (shouldRetry) {
-                vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+                vscode.commands.executeCommand('epicBridge.analyzeEpic');
               }
             }
           }
@@ -180,7 +180,7 @@ function registerCommands(
 
   // Configuration command
   const configureSettingsCommand = vscode.commands.registerCommand(
-    'aiProductOwner.configureSettings',
+    'epicBridge.configureSettings',
     async () => {
       try {
         await openConfigurationSettings(configManager);
@@ -193,7 +193,7 @@ function registerCommands(
 
   // Complete current stage and continue command
   const completeStageCommand = vscode.commands.registerCommand(
-    'aiProductOwner.completeStage',
+    'epicBridge.completeStage',
     async () => {
       try {
         if (
@@ -209,7 +209,7 @@ function registerCommands(
             )
             .then(action => {
               if (action === 'Start Analysis') {
-                vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+                vscode.commands.executeCommand('epicBridge.analyzeEpic');
               }
             });
         }
@@ -222,13 +222,13 @@ function registerCommands(
 
   // Open result command - now works without parameters
   // Remove the openResultCommand registration and handler
-  // Remove any references to 'aiProductOwner.openResult' in the manual stage progression and elsewhere
+  // Remove any references to 'epicBridge.openResult' in the manual stage progression and elsewhere
   // In the manual stage progression, remove the 'View Current Results' option and its case
   // In the context.subscriptions, remove openResultCommand
 
   // Additional UX commands
   const openWalkthroughCommand = vscode.commands.registerCommand(
-    'aiProductOwner.openWalkthrough',
+    'epicBridge.openWalkthrough',
     async () => {
       const welcomeManager = WelcomeManager.getInstance(context);
       await welcomeManager.forceShowWalkthrough();
@@ -236,7 +236,7 @@ function registerCommands(
   );
 
   const testConnectionCommand = vscode.commands.registerCommand(
-    'aiProductOwner.testConnection',
+    'epicBridge.testConnection',
     async () => {
       const errorContext: ErrorContext = {
         operation: 'Test Connection',
@@ -279,7 +279,7 @@ function registerCommands(
 
   // Open output folder for current epic using configured directory
   const openOutputFolderCommand = vscode.commands.registerCommand(
-    'aiProductOwner.openOutputFolder',
+    'epicBridge.openOutputFolder',
     async () => {
       const state = stateManager.getState();
       if (!state.currentEpic) {
@@ -302,7 +302,7 @@ function registerCommands(
 
   // Register cancel analysis command
   const cancelAnalysisCommand = vscode.commands.registerCommand(
-    'aiProductOwner.cancelAnalysis',
+    'epicBridge.cancelAnalysis',
     async () => {
       // Route to the active analysis engine instance
       if (
@@ -352,12 +352,12 @@ function checkInitialConfiguration(
   if (!isConfigured) {
     vscode.window
       .showWarningMessage(
-        'AI Product Owner Agent needs configuration. Click to set up Jira credentials.',
+        'Epic Bridge Agent needs configuration. Click to set up Jira credentials.',
         'Configure Now'
       )
       .then(selection => {
         if (selection === 'Configure Now') {
-          vscode.commands.executeCommand('aiProductOwner.configureSettings');
+          vscode.commands.executeCommand('epicBridge.configureSettings');
         }
       });
   }
@@ -375,7 +375,7 @@ async function runEpicAnalysisWorkflow(
   const config = configManager.getJiraConfiguration();
   if (!config.baseUrl || !config.email || !config.token) {
     vscode.window.showErrorMessage('Please configure Jira settings first');
-    await vscode.commands.executeCommand('aiProductOwner.configureSettings');
+    await vscode.commands.executeCommand('epicBridge.configureSettings');
     return;
   }
 
@@ -421,13 +421,13 @@ async function runEpicAnalysisWorkflow(
     );
 
     if (action === 'View Results') {
-      await vscode.commands.executeCommand('aiProductOwner.refreshDocumentation');
+      await vscode.commands.executeCommand('epicBridge.refreshDocumentation');
     } else if (action === 'Open Output Folder') {
       const outputDir = configManager.getOutputConfiguration().directory;
       const uri = vscode.Uri.file(outputDir);
       await vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: false });
     } else if (action === 'Analyze Another Epic') {
-      await vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+      await vscode.commands.executeCommand('epicBridge.analyzeEpic');
     }
   } catch (error) {
     // Handle cancellation gracefully
@@ -642,7 +642,7 @@ async function openConfigurationSettings(configManager: ConfigurationManager): P
  * Configure Jira settings with guided setup
  */
 async function configureJiraSettings(configManager: ConfigurationManager): Promise<void> {
-  const config = vscode.workspace.getConfiguration('aiProductOwner.jira');
+  const config = vscode.workspace.getConfiguration('epicBridge.jira');
 
   // Get Jira URL
   const baseUrl = await vscode.window.showInputBox({
@@ -758,14 +758,14 @@ async function configureJiraSettings(configManager: ConfigurationManager): Promi
  * Configure output settings
  */
 async function configureOutputSettings(): Promise<void> {
-  await vscode.commands.executeCommand('workbench.action.openSettings', 'aiProductOwner.output');
+  await vscode.commands.executeCommand('workbench.action.openSettings', 'epicBridge.output');
 }
 
 /**
  * Configure analysis settings
  */
 async function configureAnalysisSettings(): Promise<void> {
-  await vscode.commands.executeCommand('workbench.action.openSettings', 'aiProductOwner.analysis');
+  await vscode.commands.executeCommand('workbench.action.openSettings', 'epicBridge.analysis');
 }
 
 /**
@@ -782,7 +782,7 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
       )
       .then(action => {
         if (action === 'Run Analysis') {
-          vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+          vscode.commands.executeCommand('epicBridge.analyzeEpic');
         }
       });
     return;
@@ -820,7 +820,7 @@ async function refreshAnalysisDocumentation(stateManager: ExtensionStateManager)
           const uri = vscode.Uri.file(outputDir);
           vscode.commands.executeCommand('vscode.openFolder', uri, { forceNewWindow: true });
         } else if (action === 'Restart Analysis') {
-          vscode.commands.executeCommand('aiProductOwner.analyzeEpic');
+          vscode.commands.executeCommand('epicBridge.analyzeEpic');
         }
       });
     return;
