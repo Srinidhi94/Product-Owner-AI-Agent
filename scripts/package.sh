@@ -66,8 +66,8 @@ check_prerequisites() {
     
     # Check if extension name matches
     EXTENSION_NAME=$(grep '"name"' package.json | head -1 | cut -d'"' -f4)
-    if [ "$EXTENSION_NAME" != "ai-product-owner-agent" ]; then
-        log_error "This script is for the AI Product Owner Agent extension. Current package: $EXTENSION_NAME"
+    if [ "$EXTENSION_NAME" != "epic-bridge" ]; then
+        log_error "This script is for the Epic Bridge extension. Current package: $EXTENSION_NAME"
         exit 1
     fi
     
@@ -203,7 +203,7 @@ This extension is for **authorized team members only**. Do not distribute outsid
 
 ## Prerequisites
 
-Before installing the AI Product Owner Agent extension, ensure you have:
+Before installing the Epic Bridge extension, ensure you have:
 
 - ✅ **VS Code 1.74.0 or higher**
 - ✅ **GitHub Copilot extension** installed and activated
@@ -272,18 +272,15 @@ code --install-extension $EXTENSION_FILE
    - API token will be stored securely in VS Code
 
 3. **Test Connection:**
-   - Command Palette → "AI Product Owner: Test Jira Connection"
+   - Command Palette → "Epic Bridge: Test Jira Connection"
    - Wait for confirmation: ✅ "Jira connection successful!"
 
-### Configure Analysis Settings (Optional)
-Customize the extension behavior:
+### Configure Output Settings (Optional)
+Customize the output directory:
 
 \`\`\`json
 {
-  "aiProductOwner.output.directory": "./docs/analysis",
-  "aiProductOwner.analysis.maxSolutions": 2,
-  "aiProductOwner.output.generateDiagrams": true,
-  "aiProductOwner.codebase.includeTests": false
+  "epicBridge.output.directory": "./docs/analysis"
 }
 \`\`\`
 
@@ -381,12 +378,12 @@ When a new version is released:
 
 1. **Uninstall Current Version:**
    \`\`\`bash
-   code --uninstall-extension your-company-internal.ai-product-owner-agent
+   code --uninstall-extension your-company-internal.epic-bridge
    \`\`\`
 
 2. **Install New Version:**
    \`\`\`bash
-   code --install-extension ai-product-owner-agent-NEW-VERSION.vsix
+   code --install-extension epic-bridge-NEW-VERSION.vsix
    \`\`\`
 
 3. **Restart VS Code**
@@ -424,7 +421,7 @@ create_distribution_package() {
     
     EXTENSION_FILE=$(cat .last-package-name)
     EXTENSION_VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
-    DIST_DIR="ai-product-owner-agent-v$EXTENSION_VERSION"
+    DIST_DIR="epic-bridge-v$EXTENSION_VERSION"
     
     # Create distribution directory
     mkdir -p "$DIST_DIR"
@@ -442,7 +439,7 @@ create_distribution_package() {
     
     # Create quick reference
     cat > "$DIST_DIR/QUICK_START.md" << EOF
-# Quick Start - AI Product Owner Agent v$EXTENSION_VERSION
+# Quick Start - Epic Bridge v$EXTENSION_VERSION
 
 ## Install
 \`\`\`bash
@@ -451,8 +448,8 @@ code --install-extension $EXTENSION_FILE
 
 ## Configure
 1. Get Jira API token: https://id.atlassian.com/manage-profile/security/api-tokens
-2. Run: "AI Product Owner: Configure Settings"
-3. Test: "AI Product Owner: Test Jira Connection"
+2. Run: "Epic Bridge: Configure Settings"
+3. Test: "Epic Bridge: Test Jira Connection"
 
 ## Use
 1. Press Ctrl+Shift+A
@@ -511,7 +508,7 @@ main() {
     echo -e "${GREEN}✅ Extension Package:${NC} $EXTENSION_FILE"
     echo -e "${GREEN}✅ Version:${NC} $EXTENSION_VERSION"
     echo -e "${GREEN}✅ Installation Guide:${NC} INSTALLATION.md"
-    echo -e "${GREEN}✅ Distribution Package:${NC} ai-product-owner-agent-v$EXTENSION_VERSION/"
+    echo -e "${GREEN}✅ Distribution Package:${NC} epic-bridge-v$EXTENSION_VERSION/"
     
     echo -e "\n${BLUE}Next Steps:${NC}"
     echo "1. Test the extension: code --install-extension $EXTENSION_FILE"

@@ -44,7 +44,17 @@ Add your findings under "## Stage 1: Product Requirements Analysis" section, inc
 Ensure to use your MCP servers and tools to think through this in detail, plan comprehensively while keeping it focused on the requirements and guidelines and do the necessary analysis accurately without any hallucinations. Available tools may include filesystem, sequential-thinking, memory, and others depending on your setup.
 
 **🎯 YOUR ACTION:**
-UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 1: Product Requirements Analysis" section. Build your analysis using the following structure:
+You must DIRECTLY EDIT the ANALYSIS.md file using your file editing capabilities. Follow these precise instructions:
+
+<file_editing_instructions>
+1. **LOCATE** the "## Stage 1: Product Requirements Analysis" section in ANALYSIS.md
+2. **REPLACE** the placeholder text with your complete analysis
+3. **UPDATE** the progress table to mark Stage 1 as "✅ Complete" and "✅"
+4. **PRESERVE** all other sections and formatting exactly as they are
+</file_editing_instructions>
+
+<analysis_structure>
+Replace the Stage 1 section content with:
 
 ## Executive Summary
 [Business overview with confidence scores and Jira key references]
@@ -65,6 +75,7 @@ UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage
 [Measurable outcomes linked to Jira acceptance criteria]
 
 [Include required mermaid diagrams]
+</analysis_structure>
 
 **Next Stage Context:**
 Your analysis will provide validated requirements and technical constraints for the Principal Engineer architecture design stage.
@@ -108,7 +119,17 @@ Add your findings under "## Stage 2: System Architecture Analysis" section, incl
 - **Technical Debt Assessment:** Identify and plan resolution strategies
 
 **🎯 YOUR ACTION:**
-UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 2: System Architecture Design" section, building on the Stage 1 analysis. Use the following structure:
+You must DIRECTLY EDIT the ANALYSIS.md file using your file editing capabilities. Follow these precise instructions:
+
+<file_editing_instructions>
+1. **LOCATE** the "## Stage 2: System Architecture Analysis" section in ANALYSIS.md
+2. **REPLACE** the placeholder text with your complete analysis
+3. **UPDATE** the progress table to mark Stage 2 as "✅ Complete" and "✅"
+4. **PRESERVE** all other sections and formatting exactly as they are
+</file_editing_instructions>
+
+<analysis_structure>
+Replace the Stage 1 section content with:
 
 ## Architecture Overview
 [System design with confidence scores and file references]
@@ -129,6 +150,7 @@ UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage
 [Security design aligned with existing practices]
 
 [Include required mermaid diagrams]
+</analysis_structure>
 
 **Next Stage Context:**
 Your architectural analysis will provide the foundation for the technical design specification stage.
@@ -199,7 +221,17 @@ Add your findings under "## Stage 3: Technical Design & Implementation" section,
 - Refactoring recommendations for existing code that needs improvement to support new features
 
 **🎯 YOUR ACTION:**
-UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 3: Technical Design Specification" section, building on Stages 1-2 analysis. Use the following structure:
+You must DIRECTLY EDIT the ANALYSIS.md file using your file editing capabilities. Follow these precise instructions:
+
+<file_editing_instructions>
+1. **LOCATE** the "## Stage 3: Technical Design & Implementation" section in ANALYSIS.md
+2. **REPLACE** the placeholder text with your complete analysis
+3. **UPDATE** the progress table to mark Stage 3 as "✅ Complete" and "✅"
+4. **PRESERVE** all other sections and formatting exactly as they are
+</file_editing_instructions>
+
+<analysis_structure>
+Replace the Stage 1 section content with:
 
 ## Technical Overview
 [Design approach with confidence scores and pattern references]
@@ -220,6 +252,7 @@ UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage
 [Coding standards based on existing project conventions]
 
 [Include required mermaid diagrams]
+</analysis_structure>
 
 **Next Stage Context:**
 Your technical specifications will guide the implementation and deployment strategy stage.
@@ -307,7 +340,17 @@ Add your findings under "## Stage 4: Implementation Strategy & Technical Design"
 - Network security and access controls analysis and improvements
 
 **🎯 YOUR ACTION:**
-UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage 4: Implementation & Deployment Strategy" section, building on Stages 1-3 analysis. Use the following structure:
+You must DIRECTLY EDIT the ANALYSIS.md file using your file editing capabilities. Follow these precise instructions:
+
+<file_editing_instructions>
+1. **LOCATE** the "## Stage 4: Implementation Strategy & Technical Design" section in ANALYSIS.md
+2. **REPLACE** the placeholder text with your complete analysis
+3. **UPDATE** the progress table to mark Stage 4 as "✅ Complete" and "✅"
+4. **PRESERVE** all other sections and formatting exactly as they are
+</file_editing_instructions>
+
+<analysis_structure>
+Replace the Stage 1 section content with:
 
 ## Implementation Strategy
 [Development workflow with confidence scores and infrastructure references]
@@ -331,6 +374,7 @@ UPDATE the ANALYSIS.md file by adding your complete analysis under the "## Stage
 After completing your analysis, you MUST update the ANALYSIS.md file by adding your findings under the "## Stage 4: Implementation Strategy & Technical Design" section. Build upon the previous stages' content sequentially.
 
 [Include required mermaid diagrams]
+</analysis_structure>
 
 **Next Stage Context:**
 Your implementation strategy will inform the final sprint planning and Jira breakdown stage.
@@ -361,8 +405,7 @@ Ensure to use your MCP servers and tools to think through this in detail, plan c
 
 **📊 REQUIRED VISUALIZATIONS:**
 Create mermaid diagrams for:
-1. **Sprint Timeline & Roadmap** - Multi-sprint plan with dependencies and milestones
-2. **Feature Priority Matrix** - Business value vs. technical complexity analysis
+1. **Gantt Chart** - Implementation timeline with dependencies and milestones
 
 **✅ ACTION-ORIENTED OUTPUT:**
 
@@ -427,9 +470,59 @@ Add the following sections under "## Stage 5: Sprint Planning & Jira Breakdown":
 Generate actionable deliverables that can be immediately used by development teams
 
 **CRITICAL: UPDATE ANALYSIS.md FILE**
-After completing your analysis, you MUST update the ANALYSIS.md file by adding your findings under the "## Stage 5: Sprint Planning & Jira Breakdown" section. This is the final stage - ensure your content builds upon and synthesizes all previous stages' analysis.
+You must DIRECTLY EDIT the ANALYSIS.md file using your file editing capabilities. Follow these precise instructions:
+
+<file_editing_instructions>
+1. **LOCATE** the "## Stage 5: Sprint Planning & Jira Breakdown" section in ANALYSIS.md
+2. **REPLACE** the placeholder text with your complete analysis
+3. **UPDATE** the progress table to mark Stage 5 as "✅ Complete" and "✅"
+4. **PRESERVE** all other sections and formatting exactly as they are
+</file_editing_instructions>
+
+<analysis_structure>
+Replace the Stage 5 section content with:
+
+## Sprint Planning Overview
+[Executive summary of sprint structure with confidence scores and timeline references]
+
+## Epic Breakdown & User Stories
+[Detailed user stories with descriptions, acceptance criteria, and code references from CODEBASE.md]
+
+### User Story Template:
+**Story ID:** [JIRA-XXX]
+**Title:** [Story title]
+**Description:** [Detailed description with business context]
+**Acceptance Criteria:** 
+- [Specific, testable criteria]
+**Code References:** [Specific files/components from CODEBASE.md]
+**Dependencies:** [Other stories this depends on]
+**Effort Estimate:** [Story points with confidence level]
+
+## Sprint Structure & Timeline
+[Sprint-by-sprint breakdown with capacity planning]
+
+### Sprint [N] - [Sprint Goal]
+**Duration:** [Start Date] - [End Date]
+**Capacity:** [Team capacity in story points]
+**Stories:**
+- [List of stories with estimates]
+**Dependencies:** [Cross-sprint dependencies]
+**Risks:** [Identified risks and mitigation]
+
+## Task Dependencies & Critical Path
+[Dependency analysis with critical path identification]
+
+## Resource Allocation & Team Planning
+[Team member assignments with skill matching from technical analysis]
+
+## Risk Management & Mitigation
+[Risk assessment with specific mitigation strategies]
+
+## Definition of Done & Quality Gates
+[Quality criteria and acceptance gates for each sprint]
 
 [Include required mermaid diagrams]
+</analysis_structure>
 
 **Final Deliverables:**
 Complete implementation roadmap with actionable sprint plans, detailed Jira tickets, resource allocation, and risk management framework.

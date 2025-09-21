@@ -1,5 +1,5 @@
 # Architecture Documentation
-## AI Product Owner Agent
+## Epic Bridge
 
 **Version**: 1.0 | **Status**: Active
 
@@ -7,7 +7,7 @@
 
 ## Overview
 
-The AI Product Owner Agent is a VS Code extension built with a modular architecture. It connects different components to analyze Jira epics and codebases, then generates technical documentation using AI.
+The Epic Bridge is a VS Code extension built with a modular architecture. It connects different components to analyze Jira epics and codebases, then generates technical documentation using AI.
 
 ## Key Design Principles
 
@@ -172,8 +172,8 @@ The extension creates structured documentation in an **epic-specific folder stru
 ```
 ai-analysis/
 └── [EPIC-KEY]/
-    ├── README.md          # Project overview and setup
-    ├── CONTEXT.md         # Project context and constraints  
+    ├── README.md         # Project overview and setup
+    ├── CONTEXT.md        # Project context and constraints  
     ├── JIRA.md           # Epic and story details
     ├── CODEBASE.md       # Technical patterns and architecture
     ├── PROMPTS.md        # Generated prompts for each stage

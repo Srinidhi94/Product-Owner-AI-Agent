@@ -1,8 +1,8 @@
-# AI Product Owner Agent - User Guide
+# Epic Bridge - User Guide
 
 ## Overview
 
-The AI Product Owner Agent is a VS Code extension that analyzes Jira epics and generates comprehensive technical documentation. It supports multiple programming languages and integrates with GitHub Copilot for enhanced analysis.
+The Epic Bridge is a VS Code extension that analyzes Jira epics and generates comprehensive technical documentation. It supports multiple programming languages and integrates with GitHub Copilot for enhanced analysis.
 
 ## Supported Languages
 - **JavaScript/TypeScript** - Frontend and backend applications
@@ -33,28 +33,28 @@ The AI Product Owner Agent is a VS Code extension that analyzes Jira epics and g
 ### 1. Install Extension
 1. Open VS Code
 2. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-3. Search for "AI Product Owner Agent"
+3. Search for "Epic Bridge"
 4. Click "Install"
 
 ### 2. Get Jira API Token
 1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Click "Create API token"
-3. Name it "AI Product Owner Agent"
+3. Name it "Epic Bridge"
 4. Copy and save the token
 
 ### 3. Configure Settings
 Access configuration via:
-- Command Palette: `Ctrl+Shift+P` → "AI Product Owner: Configure Settings"
-- VS Code Settings: Search "AI Product Owner"
+- Command Palette: `Ctrl+Shift+P` → "Epic Bridge: Configure Settings"
+- VS Code Settings: Search "Epic Bridge"
 
 ## Configuration
 
 ### Jira Settings
 ```json
 {
-  "aiProductOwner.jira.baseUrl": "your-organization.atlassian.net",
-  "aiProductOwner.jira.email": "your-email@organization.com",
-  "aiProductOwner.jira.token": "your-api-token"
+  "epicBridge.jira.baseUrl": "your-organization.atlassian.net",
+  "epicBridge.jira.email": "your-email@organization.com",
+  "epicBridge.jira.token": "your-api-token"
 }
 ```
 
@@ -63,24 +63,13 @@ Access configuration via:
 ### Output Settings
 ```json
 {
-  "aiProductOwner.output.directory": "./docs/analysis",
-  "aiProductOwner.output.generateDiagrams": true,
-  "aiProductOwner.output.includeMetadata": true
-}
-```
-
-### Analysis Settings
-```json
-{
-  "aiProductOwner.analysis.maxSolutions": 2,
-  "aiProductOwner.codebase.includeTests": false,
-  "aiProductOwner.analysis.depthLevel": "comprehensive"
+  "epicBridge.output.directory": "./docs/analysis"
 }
 ```
 
 ### Test Connection
 1. Open Command Palette (`Ctrl+Shift+P`)
-2. Run "AI Product Owner: Test Jira Connection"
+2. Run "Epic Bridge: Test Jira Connection"
 3. Look for: ✅ "Jira connection established successfully!"
 
 ## Using the Extension
@@ -125,11 +114,10 @@ Documentation Output
 ### Stage Workflow
 
 For each of the 5 stages:
-1. Extension generates AI-optimized prompt
+1. Extension generates AI-optimized prompt with file editing instructions
 2. Copy prompt to GitHub Copilot or your preferred LLM
-3. Get AI response
-4. Copy response back to extension
-5. Move to next stage
+3. AI automatically edits ANALYSIS.md with response and updates progress indicators
+4. Move to next stage
 
 ### Output Files
 
@@ -164,17 +152,11 @@ your-project/
 - **Extension not responding**: Restart VS Code and try again
 
 ### Debug Mode
-Enable detailed logging:
-```json
-{
-  "aiProductOwner.debug.enableVerboseLogging": true
-}
-```
-Check: View → Output → "AI Product Owner"
+Check logs in: View → Output → "Epic Bridge"
 
 ### Getting Help
-- Test connection: "AI Product Owner: Test Jira Connection"
-- Reset settings: "AI Product Owner: Configure Settings"
+- Test connection: "Epic Bridge: Test Jira Connection"
+- Reset settings: "Epic Bridge: Configure Settings"
 - Check output panel for error details
 
 ## Best Practices

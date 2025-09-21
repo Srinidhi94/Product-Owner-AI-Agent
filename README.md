@@ -1,10 +1,16 @@
-# AI Product Owner Agent
+# Epic Bridge 🌉
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Srinidhi94/Product-Owner-AI-Agent/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-1.74%2B-blue)](https://code.visualstudio.com/)
+[![Languages](https://img.shields.io/badge/languages-9%2B-orange)]()
+[![AI Powered](https://img.shields.io/badge/AI-Powered-purple)]()
 
-Turn Jira epics into detailed technical documentation in under an hour. This VS Code extension analyzes your codebase and creates comprehensive project documentation using AI.
+**Transform Jira epics into comprehensive technical documentation in under an hour.**
+
+Epic Bridge is a professional VS Code extension that bridges the gap between business requirements and technical implementation. It analyzes your codebase across 9+ programming languages and creates principal engineer-level documentation using AI-driven analysis.
+
+> **🎯 Perfect for:** Senior Engineers, Technical Leads, Product Owners, and Engineering Managers who need to quickly understand and document complex technical requirements.
 
 ## What It Does
 
@@ -128,14 +134,14 @@ ai-analysis/
 ### From VS Code Marketplace
 
 1. Open VS Code Extensions (`Ctrl/Cmd + Shift + X`)
-2. Search "AI Product Owner Agent"
+2. Search "Epic Bridge"
 3. Click Install
 
 ### For Developers
 
 ```bash
 git clone <repository-url>
-cd ai-product-owner-agent
+cd epic-bridge
 npm install
 npm run compile
 # Press F5 to launch Extension Development Host
@@ -157,15 +163,14 @@ npm run compile
 
 ## Available Commands
 
-| Command                                    | Description                 |
-| ------------------------------------------ | --------------------------- |
-| `AI Product Owner: Analyze Epic`           | Start the analysis workflow |
-| `AI Product Owner: Configure Settings`     | Setup Jira connection       |
-| `AI Product Owner: Test Connection`        | Verify Jira access          |
-| `AI Product Owner: Complete Stage`         | Mark current stage done     |
-| `AI Product Owner: Cancel Analysis`        | Stop current analysis       |
-| `AI Product Owner: Open Output Folder`     | View generated docs         |
-| `AI Product Owner: Paste Copilot Response` | Add AI response             |
+| Command                           | Description                 |
+| --------------------------------- | --------------------------- |
+| `Epic Bridge: Analyze Epic`       | Start the analysis workflow |
+| `Epic Bridge: Configure Settings` | Setup Jira connection       |
+| `Epic Bridge: Test Connection`    | Verify Jira access          |
+| `Epic Bridge: Complete Stage`     | Mark current stage done     |
+| `Epic Bridge: Cancel Analysis`    | Stop current analysis       |
+| `Epic Bridge: Open Output Folder` | View generated docs         |
 
 ## Troubleshooting
 

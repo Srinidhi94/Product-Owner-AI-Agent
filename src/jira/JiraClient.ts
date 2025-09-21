@@ -161,37 +161,43 @@ export class JiraClient {
    */
   async fetchPortfolioOrEpic(key: string): Promise<JiraPortfolio | null> {
     try {
-      this.log(`🔍 Attempting to fetch: ${key}`);
+      this.log(`🔍 Searching for: ${key} (trying Epic, Portfolio Feature, or Project...)`);
 
-      // Try as Epic first
-      this.log('📋 Trying as Epic...');
+      // Try as Portfolio Feature first (based on Jira instance analysis)
+      const portfolioData = await this.fetchPortfolioFeature(key);
+      if (portfolioData) {
+        this.log(
+          `✅ Found Portfolio Feature: ${key} with ${portfolioData.epics[0].stories.length} child issues`
+        );
+        return portfolioData;
+      }
+
+      // Try as Epic
       const epicData = await this.fetchEpicWithStories(key);
       if (epicData) {
-        this.log(`✅ Successfully fetched as Epic: ${epicData.summary}`);
+        this.log(`✅ Found Epic: ${key} with ${epicData.stories.length} stories`);
         return {
           type: 'epic',
           key: key,
           name: epicData.summary,
-          description: epicData.description,
-          epics: [epicData],
           totalStoryPoints: epicData.totalPoints,
+          epics: [epicData],
         };
       }
 
       // Try as Project (Portfolio-like)
-      this.log('📂 Trying as Project...');
       const projectData = await this.fetchProjectEpics(key);
       if (projectData) {
-        this.log(`✅ Successfully fetched as Project with ${projectData.epics.length} epics`);
+        this.log(`✅ Found Project: ${key} with ${projectData.epics.length} epics`);
         return projectData;
       }
 
-      this.log(`❌ Could not find portfolio/epic: ${key}`);
+      // Only show error if nothing was found
+      this.log(`❌ Could not find any match for: ${key}`);
       this.log('💡 Make sure the key exists and you have permission to access it');
       return null;
     } catch (error: any) {
-      this.log(`❌ Error fetching Jira data: ${error.message}`);
-      this.log('🔍 Check your Jira URL and token');
+      this.log(`❌ Error searching for ${key}: ${error.message}`);
       return null;
     }
   }
@@ -216,28 +222,39 @@ export class JiraClient {
       });
 
       if (response.status !== 200) {
-        this.log(`⚠️ Epic not found or no access: ${epicKey}`);
         return null;
       }
 
       const epicData = response.data;
 
-      // Get stories in this epic - try multiple Epic Link field variations
+      // Get stories in this epic - use optimized queries based on Jira instance analysis
       let stories: JiraStory[] = [];
 
+      // Optimized queries based on actual Jira field structure
       const epicLinkQueries = [
-        `"Epic Link" = ${epicKey}`,
-        `parent = ${epicKey}`,
-        `"Parent Link" = ${epicKey}`,
-        `"Epic Name" = "${epicKey}"`,
+        // Direct parent relationship (most common in modern Jira)
+        `parent = "${epicKey}"`,
+        // Key-based search for child issues
+        `key in childIssuesOf("${epicKey}")`,
+        // Project-specific search with issue type filtering
+        `project = "${
+          epicKey.split('-')[0]
+        }" AND issueType in (Story, Task, Bug) AND parent = "${epicKey}"`,
+        // Fallback: search by epic key in various fields
+        `"Epic Link" = "${epicKey}"`,
+        `cf[10014] = "${epicKey}"`, // Common Epic Link custom field ID
       ];
 
       for (const jql of epicLinkQueries) {
-        this.log(`🔍 Trying Epic Link query: ${jql}`);
-        stories = await this.searchIssues(jql);
-        if (stories.length > 0) {
-          this.log(`✅ Found ${stories.length} stories using query: ${jql}`);
-          break;
+        try {
+          stories = await this.searchIssues(jql);
+          if (stories.length > 0) {
+            this.log(`✅ Found ${stories.length} child issues for ${epicKey}`);
+            break;
+          }
+        } catch (error: any) {
+          // Silently continue to next query - only log if all queries fail
+          continue;
         }
       }
 
@@ -273,7 +290,7 @@ export class JiraClient {
           : undefined,
       };
     } catch (error: any) {
-      this.log(`❌ Error fetching epic ${epicKey}: ${error.message}`);
+      // Silently return null - error will be handled at higher level
       return null;
     }
   }
@@ -526,6 +543,91 @@ export class JiraClient {
     }
 
     return text.trim();
+  }
+
+  /**
+   * Fetch Portfolio Feature and its child issues (based on Jira instance analysis)
+   */
+  private async fetchPortfolioFeature(key: string): Promise<JiraPortfolio | null> {
+    try {
+      // First, try to fetch the Portfolio Feature itself
+      const issueUrl = `${this.baseUrl}/rest/api/3/issue/${key}`;
+      const response = await axios.get(issueUrl, {
+        headers: {
+          Authorization: this.authHeader,
+          Accept: 'application/json',
+        },
+        timeout: 10000,
+      });
+
+      if (response.status !== 200) {
+        return null;
+      }
+
+      const issueData = response.data;
+
+      // Check if it's a Portfolio Feature
+      if (issueData.fields.issuetype.name !== 'Portfolio Feature') {
+        return null;
+      }
+
+      // Get child issues (Epics, Stories, etc.)
+      const childQueries = [
+        `parent = "${key}"`,
+        `"Portfolio Feature" = "${key}"`,
+        `project = "${key.split('-')[0]}" AND "Portfolio Feature" = "${key}"`,
+      ];
+
+      let childIssues: JiraStory[] = [];
+      for (const jql of childQueries) {
+        try {
+          childIssues = await this.searchIssues(jql);
+          if (childIssues.length > 0) {
+            break;
+          }
+        } catch (error: any) {
+          // Silently continue to next query
+          continue;
+        }
+      }
+
+      // Convert to Epic format for compatibility
+      const epic: JiraEpic = {
+        key: issueData.key,
+        summary: issueData.fields.summary,
+        description: this.extractDescription(issueData.fields.description),
+        status: issueData.fields.status.name,
+        assignee: issueData.fields.assignee
+          ? {
+              accountId: issueData.fields.assignee.accountId,
+              displayName: issueData.fields.assignee.displayName,
+              emailAddress: issueData.fields.assignee.emailAddress,
+            }
+          : undefined,
+        reporter: issueData.fields.reporter
+          ? {
+              accountId: issueData.fields.reporter.accountId,
+              displayName: issueData.fields.reporter.displayName,
+              emailAddress: issueData.fields.reporter.emailAddress,
+            }
+          : undefined,
+        created: issueData.fields.created,
+        updated: issueData.fields.updated,
+        stories: childIssues,
+        totalPoints: childIssues.reduce((sum, story) => sum + (story.storyPoints || 0), 0),
+      };
+
+      return {
+        type: 'portfolio',
+        key: key,
+        name: issueData.fields.summary,
+        totalStoryPoints: epic.totalPoints,
+        epics: [epic],
+      };
+    } catch (error: any) {
+      // Silently return null - error will be handled at higher level
+      return null;
+    }
   }
 
   /**

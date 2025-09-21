@@ -49,7 +49,6 @@ When generating code for this project:
 interface AnalysisConfig {
   readonly epicKey: string;
   readonly outputPath: string;
-  readonly includeTests: boolean;
 }
 
 // ✅ Proper error handling
